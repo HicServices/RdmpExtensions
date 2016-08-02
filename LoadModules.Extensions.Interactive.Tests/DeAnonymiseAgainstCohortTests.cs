@@ -1,20 +1,14 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CatalogueLibrary.Data.DataLoad;
 using CatalogueLibrary.DataFlowPipeline;
 using DataExportManager2.Interfaces.Data.DataTables;
-using DataExportManager2Library.Data.DataTables;
-using LoadModules.Extensions.Interactive;
+using DataExportManager2.Tests;
 using LoadModules.Extensions.Interactive.DeAnonymise;
 using NUnit.Framework;
 using ReusableLibraryCode.Progress;
 
-namespace DataExportManager2.Tests.PluginTests
+namespace LoadModules.Extensions.Interactive.Tests
 {
     public class DeAnonymiseAgainstCohortTests:TestsRequiringACohort,IDeAnonymiseAgainstCohortConfigurationFulfiller
     {

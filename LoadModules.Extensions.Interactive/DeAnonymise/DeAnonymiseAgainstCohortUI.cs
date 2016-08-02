@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using DataExportManager2.Interfaces.Data.DataTables;
 using DataExportManager2Library.Data.DataTables;
 using DataExportManager2Library.Repositories;
+using MapsDirectlyToDatabaseTableUI;
 using RDMPStartup;
 using ReusableLibraryCode;
 using ReusableLibraryCode.Checks;
