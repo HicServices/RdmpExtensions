@@ -256,7 +256,7 @@ namespace LoadModules.Extensions.Python.DataProvider
                 case PythonVersion.Version2:
                     return "python27";
                 case PythonVersion.Version3:
-                    return "python34";
+                    return "python35";
                 default:
                     throw new ArgumentOutOfRangeException();
             }

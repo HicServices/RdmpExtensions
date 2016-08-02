@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CatalogueLibrary.DataFlowPipeline;
 using DataLoadEngine.Job;
+using DataLoadEngineTests.Integration;
 using LoadModules.Extensions.Python.DataProvider;
 using NUnit.Framework;
 using Rhino.Mocks;
@@ -52,7 +53,7 @@ namespace LoadModules.Extensions.Python.Tests.Unit
             //call with accept all
             provider.Check(new AcceptAllCheckNotifier());
 
-            provider.Fetch(MockRepository.GenerateStub<IDataLoadJob>(), new GracefulCancellationToken());
+            provider.Fetch(new ThrowImmediatelyDataLoadJob(), new GracefulCancellationToken());
         }
 
         [Test]
@@ -72,7 +73,7 @@ namespace LoadModules.Extensions.Python.Tests.Unit
             provider.Check(new AcceptAllCheckNotifier());
 
             //new MockRepository().DynamicMock<IDataLoadJob>()
-            provider.Fetch(MockRepository.GenerateStub<IDataLoadJob>(), new GracefulCancellationToken());
+            provider.Fetch(new ThrowImmediatelyDataLoadJob(), new GracefulCancellationToken());
         }
 
     }
