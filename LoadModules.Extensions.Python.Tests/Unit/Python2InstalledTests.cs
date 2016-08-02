@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using CatalogueLibrary.Data.DataLoad;
 using CatalogueLibrary.DataFlowPipeline;
 using DataLoadEngine.Job;
+using DataLoadEngineTests.Integration;
+using JetBrains.Annotations;
 using LoadModules.Extensions.Python.DataProvider;
 using NUnit.Framework;
 using ReusableLibraryCode.Checks;
@@ -56,8 +58,7 @@ namespace LoadModules.Extensions.Python.Tests.Unit
             provider.Check(new AcceptAllCheckNotifier());
             provider.Check(new ThrowImmediatelyCheckNotifier() { ThrowOnWarning = true });
 
-            //new MockRepository().DynamicMock<IDataLoadJob>()
-            provider.Fetch(MockRepository.GenerateStub<IDataLoadJob>(), new GracefulCancellationToken());
+            provider.Fetch(new ThrowImmediatelyDataLoadJob(), new GracefulCancellationToken());
         }
 
         [Test]
@@ -77,8 +78,10 @@ namespace LoadModules.Extensions.Python.Tests.Unit
             provider.Check(new AcceptAllCheckNotifier());
 
             //new MockRepository().DynamicMock<IDataLoadJob>()
-            ProcessExitCode result = provider.Fetch(MockRepository.GenerateStub<IDataLoadJob>(), new GracefulCancellationToken());
-            Assert.AreEqual(ProcessExitCode.Failure, result);
+            var ex = Assert.Throws<Exception>(()=>provider.Fetch(new ThrowImmediatelyDataLoadJob(), new GracefulCancellationToken()));
+
+            Assert.IsTrue(ex.Message.Contains("Python command timed out"));
+
         }
 
         [Test]
@@ -98,7 +101,7 @@ namespace LoadModules.Extensions.Python.Tests.Unit
             //call with accept all
             provider.Check(new AcceptAllCheckNotifier());
 
-            provider.Fetch(MockRepository.GenerateStub<IDataLoadJob>(), new GracefulCancellationToken());
+            provider.Fetch(new ThrowImmediatelyDataLoadJob(), new GracefulCancellationToken());
         }
 
         [Test]
@@ -112,9 +115,8 @@ namespace LoadModules.Extensions.Python.Tests.Unit
             //call with accept all
             provider.Check(new AcceptAllCheckNotifier());
 
-            var result = provider.Fetch(MockRepository.GenerateStub<IDataLoadJob>(), new GracefulCancellationToken());
+            var result = provider.Fetch(new ThrowImmediatelyDataLoadJob(), new GracefulCancellationToken());
 
-            Assert.AreEqual(ProcessExitCode.Failure,result);
         }
     }
 }
