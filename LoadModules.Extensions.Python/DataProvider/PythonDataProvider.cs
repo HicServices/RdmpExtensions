@@ -194,9 +194,18 @@ namespace LoadModules.Extensions.Python.DataProvider
             processStartInfo.RedirectStandardError = true;
 
             processStartInfo.UseShellExecute = false;
-
-            Process p = Process.Start(processStartInfo);
-         
+            
+            Process p = null;
+            
+            try
+            {
+                
+                p = Process.Start(processStartInfo);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Failed to launch:" + Environment.NewLine + processStartInfo.FileName +Environment.NewLine +  " with Arguments:" + processStartInfo.Arguments,e);
+            }
             
             // To avoid deadlocks, always read the output stream first and then wait.
             var outputAwait = p.StandardOutput.ReadToEndAsync();
