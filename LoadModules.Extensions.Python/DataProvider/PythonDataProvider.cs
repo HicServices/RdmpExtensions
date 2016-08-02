@@ -83,15 +83,9 @@ namespace LoadModules.Extensions.Python.DataProvider
             {
                 //python is not installed
                 if (e.Message.Equals("The system cannot find the file specified"))
-                {
-                    //install it?
-                    bool attemptToInstallIt = notifier.OnCheckPerformed(new CheckEventArgs("Python is not installed on the host",CheckResult.Fail,e,"Attempt to install Python?"));
-
-                    if (attemptToInstallIt)
-                        InstallPython(notifier);//yes please install it for me
-                }
+                    notifier.OnCheckPerformed(new CheckEventArgs("Python is not installed on the host", CheckResult.Fail,e));
                 else
-                    notifier.OnCheckPerformed(new CheckEventArgs(e.Message,CheckResult.Fail, e));
+                    notifier.OnCheckPerformed(new CheckEventArgs(e.Message, CheckResult.Fail, e));
             }
 
             if (FullPathToPythonScriptToRun.Contains(" ") && !FullPathToPythonScriptToRun.Contains("\""))
@@ -156,94 +150,6 @@ namespace LoadModules.Extensions.Python.DataProvider
             info.Arguments = command;
 
             return info;
-        }
-
-
-        private void InstallPython(ICheckNotifier notifier)
-        {
-            //Create the MSI file in the same directory as the dll
-            string pythonExecutableName = GetPythonMSIFileName();
-            Assembly assembly = typeof (PythonDataProvider).Assembly;
-            string currentDllDirectory;
-            try
-            {
-                currentDllDirectory = Path.GetDirectoryName(assembly.Location);    
-            }
-            catch (Exception e)
-            {
-                notifier.OnCheckPerformed(
-                    new CheckEventArgs(
-                        "Could not figure out where the currently executing assembly " + assembly +
-                        " is stored on the hard disk", CheckResult.Fail, e));
-                return;
-            }
-
-            string pythonInstallerLocation = Path.Combine(currentDllDirectory, pythonExecutableName);
-
-            notifier.OnCheckPerformed(new CheckEventArgs("About to create Python MSI file in " + currentDllDirectory,CheckResult.Success));
-            try
-            {
-
-                //e.g. LoadModules.Generic.python-3.4.3.msi
-                string manifestName = typeof (PythonDataProvider).Namespace + "." + pythonExecutableName;
-
-                Stream MSIFile = assembly.GetManifestResourceStream(manifestName);
-
-                if(MSIFile == null)
-                    notifier.OnCheckPerformed(new CheckEventArgs("Assembly " + assembly + " did not contain a manifest resource called '" + manifestName + "', the only mainfest resources found in the dll were:" + Environment.NewLine + string.Join(Environment.NewLine, assembly.GetManifestResourceNames()), CheckResult.Fail));
-            
-                //get the bytes
-                byte[] buffer = new byte[MSIFile.Length];
-                MSIFile.Read(buffer, 0, buffer.Length);
-
-                File.WriteAllBytes(pythonInstallerLocation,buffer);
-                
-                notifier.OnCheckPerformed(
-                    new CheckEventArgs(
-                        "Succesfully created Python MSI in " + currentDllDirectory + " (it was " + buffer.Length +
-                        " bytes)", CheckResult.Success));
-
-                MSIFile.Close();
-                MSIFile.Dispose();
-            }
-            catch (Exception e)
-            {
-                notifier.OnCheckPerformed(
-                    new CheckEventArgs("Failed to create Python MSI executable in " + currentDllDirectory,
-                        CheckResult.Fail, e));
-                return;
-            }
-
-
-            string driveToInstallTo = GetFullPythonInstallDirectory();
-
-            notifier.OnCheckPerformed(
-                new CheckEventArgs(
-                    "About to attempt to install Python to  " + driveToInstallTo,
-                    CheckResult.Success));
-
-            try
-            {
-                
-                
-                Process p = new Process();
-                p.StartInfo.FileName = "msiexec";
-                p.StartInfo.Arguments = "/i " + pythonInstallerLocation + " TARGETDIR=" + driveToInstallTo + " /qn";
-
-                notifier.OnCheckPerformed(new CheckEventArgs("About to run msiexec with arguments " + p.StartInfo.Arguments, CheckResult.Success));
-                p.Start();
-
-                bool waitForExit = p.WaitForExit(600000);
-
-                if (!waitForExit)
-                    notifier.OnCheckPerformed(new CheckEventArgs("Python installer failed to complete after 600 seconds",
-                        CheckResult.Fail));
-            }
-            catch (Exception e)
-            {
-                notifier.OnCheckPerformed(new CheckEventArgs("Python install MSI failed to install correctly",
-                    CheckResult.Fail, e));
-            }
         }
 
         public ProcessExitCode Fetch(IDataLoadJob job, GracefulCancellationToken cancellationToken)
