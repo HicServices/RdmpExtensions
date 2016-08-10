@@ -2,6 +2,7 @@
 using System.Data;
 using System.Windows.Forms;
 using DataExportManager2.Interfaces.Data.DataTables;
+using DataExportManager2.Interfaces.Repositories;
 using DataExportManager2Library.Data.DataTables;
 using DataExportManager2Library.Repositories;
 using MapsDirectlyToDatabaseTableUI;
@@ -15,9 +16,7 @@ namespace LoadModules.Extensions.Interactive.DeAnonymise
     public partial class DeAnonymiseAgainstCohortUI : BetterToolTipForm, IDeAnonymiseAgainstCohortConfigurationFulfiller
     {
         private readonly DataTable _toProcess;
-        private DataExportRepository _dataExportRepository;
-
-        public DataExportRepository DataExportRepository { get; private set;}
+        private IDataExportRepository _dataExportRepository;
         public IExtractableCohort ChosenCohort { get; set; }
         public string OverrideReleaseIdentifier { get; set; }
         
