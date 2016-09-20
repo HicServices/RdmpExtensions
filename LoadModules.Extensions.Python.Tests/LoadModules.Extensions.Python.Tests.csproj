@@ -235,6 +235,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScriptExecutionTests.cs" />
+    <Compile Include="ThrowImmediatelyDataLoadJob.cs" />
     <Compile Include="Unit\Python2And3InstalledTests.cs" />
     <Compile Include="Unit\Python2InstalledTests.cs" />
     <Compile Include="Unit\Python3InstalledTests.cs" />

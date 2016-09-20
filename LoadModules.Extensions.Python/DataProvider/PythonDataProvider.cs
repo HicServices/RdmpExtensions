@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 using CatalogueLibrary;
 using CatalogueLibrary.Data;
 using CatalogueLibrary.Data.DataLoad;
@@ -23,6 +25,8 @@ namespace LoadModules.Extensions.Python.DataProvider
 
     public class PythonDataProvider:IPluginDataProvider
     {
+        private IDataLoadEventListener _listener;
+
         [DemandsInitialization("The Python script to run")]
         public string FullPathToPythonScriptToRun { get; set; }
 
@@ -104,20 +108,18 @@ namespace LoadModules.Extensions.Python.DataProvider
         {
             var info = GetPythonCommand(@"-c ""import sys; print(sys.version)""");
             
-            string output;
-            string error;
+            var toMemory = new ToMemoryDataLoadEventReceiver(true);
 
-            int result = ExecuteProcess(info, out output, out error, 600);
+            int result = ExecuteProcess(toMemory, info, 600);
             
             if (result != 0)
                 return null;
-
-            if (!string.IsNullOrWhiteSpace(output))
-                return output;
-
-            if (!string.IsNullOrWhiteSpace(error))
-                return error;
             
+            var msg = toMemory.EventsReceivedBySender[this].SingleOrDefault();
+
+            if (msg != null)
+                return msg.Message;
+
             throw new Exception("Call to " + info.Arguments + " did not return any value but exited with code " + result);
         }
 
@@ -155,41 +157,26 @@ namespace LoadModules.Extensions.Python.DataProvider
         public ProcessExitCode Fetch(IDataLoadJob job, GracefulCancellationToken cancellationToken)
         {
             ProcessStartInfo processStartInfo = GetPythonCommand(FullPathToPythonScriptToRun);
-
-            string output;
-            string error;
-
+            
             int exitCode;
             try
             {
-                exitCode = ExecuteProcess(processStartInfo, out output, out error,
-                    MaximumNumberOfSecondsToLetScriptRunFor);
+                exitCode = ExecuteProcess(job, processStartInfo,MaximumNumberOfSecondsToLetScriptRunFor);
             }
             catch (TimeoutException e)
             {
-                
                 job.OnNotify(this,new NotifyEventArgs(ProgressEventType.Error, "Python command timed out (See inner exception for details)",e));
                 return ProcessExitCode.Failure;
             }
 
-            if (!string.IsNullOrWhiteSpace(output))
-                job.OnNotify(this, new NotifyEventArgs(exitCode == 0 ? ProgressEventType.Information : ProgressEventType.Error, output));
+            job.OnNotify(this, new NotifyEventArgs(exitCode == 0 ? ProgressEventType.Information : ProgressEventType.Error, "Python script terminated with exit code " + exitCode));
 
-            if (!string.IsNullOrWhiteSpace(error))
-                job.OnNotify(this, new NotifyEventArgs(exitCode == 0 ? ProgressEventType.Information : ProgressEventType.Error, error));
-
-            //did it succeed?
-            if (exitCode != 0)
-            {
-                job.OnNotify(this,new NotifyEventArgs(ProgressEventType.Error, "Python command " + FullPathToPythonScriptToRun + " returned exit code " + exitCode +" (expected exit code 0)"));
-                return ProcessExitCode.Failure;
-            }
             return exitCode == 0 ? ProcessExitCode.Success : ProcessExitCode.Failure;
         }
 
-        private static int ExecuteProcess(ProcessStartInfo processStartInfo,out string output, out string error, int maximumNumberOfSecondsToLetScriptRunFor)
+        private int ExecuteProcess(IDataLoadEventListener listener, ProcessStartInfo processStartInfo, int maximumNumberOfSecondsToLetScriptRunFor)
         {
-
+            _listener = listener;
             processStartInfo.RedirectStandardOutput = true;
             processStartInfo.RedirectStandardError = true;
 
@@ -199,8 +186,13 @@ namespace LoadModules.Extensions.Python.DataProvider
             
             try
             {
-                
                 p = Process.Start(processStartInfo);
+                p.OutputDataReceived += OutputDataReceived;
+                p.ErrorDataReceived += OutputDataReceived;
+                
+                p.BeginErrorReadLine();
+                p.BeginOutputReadLine();
+
             }
             catch (Exception e)
             {
@@ -208,16 +200,12 @@ namespace LoadModules.Extensions.Python.DataProvider
             }
             
             // To avoid deadlocks, always read the output stream first and then wait.
-            var outputAwait = p.StandardOutput.ReadToEndAsync();
-            var errorAwait = p.StandardError.ReadToEndAsync();
+            DateTime startTime = DateTime.Now;
 
-            if (maximumNumberOfSecondsToLetScriptRunFor == 0)
-                p.WaitForExit();
-            else
+            
+            while (!p.WaitForExit(100))//while process has not exited
             {
-
-                bool ended = p.WaitForExit(maximumNumberOfSecondsToLetScriptRunFor*1000);
-                if (!ended)
+                if (TimeoutExpired(startTime))//if timeout expired
                 {
                     bool killed = false;
                     try
@@ -230,15 +218,30 @@ namespace LoadModules.Extensions.Python.DataProvider
                         killed = false;
                     }
 
-                    throw new TimeoutException("Process command " + processStartInfo.FileName + " with arguments " + processStartInfo.Arguments + " did not complete after  " +
-                                               maximumNumberOfSecondsToLetScriptRunFor + " seconds " +(killed ? "(After timeout we killed the process succesfully)":"(We also failed to kill the process after the timeout expired)"));
+                    throw new TimeoutException("Process command " + processStartInfo.FileName + " with arguments " + processStartInfo.Arguments + " did not complete after  " + maximumNumberOfSecondsToLetScriptRunFor + " seconds " + (killed ? "(After timeout we killed the process succesfully)" : "(We also failed to kill the process after the timeout expired)"));
                 }
             }
-
-            output = outputAwait.Result;
-            error = errorAwait.Result;
-
+            
             return p.ExitCode;
+        }
+
+        private void OutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            if(e.Data == null)
+                return;
+            
+            lock (this)
+            {
+                //it has expired the standard out
+                _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, e.Data));
+            }
+        }
+        private bool TimeoutExpired(DateTime startTime)
+        {
+            if (MaximumNumberOfSecondsToLetScriptRunFor == 0)
+                return false;
+
+            return DateTime.Now - startTime > new TimeSpan(0, 0, 0, MaximumNumberOfSecondsToLetScriptRunFor);
         }
 
 
@@ -261,22 +264,7 @@ namespace LoadModules.Extensions.Python.DataProvider
                     throw new ArgumentOutOfRangeException();
             }
         }
-
-        private string GetPythonMSIFileName()
-        {
-            switch (Version)
-            {
-                case PythonVersion.NotSet:
-                    throw new Exception("Python version not set yet");
-                case PythonVersion.Version2:
-                    return "python-2.7.10.msi";
-                case PythonVersion.Version3:
-                    return "python-3.4.3.msi";
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
+        
         private string GetExpectedPythonVersion()
         {
             switch (Version)
