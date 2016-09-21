@@ -38,7 +38,6 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         }
 
         [Test]
-        [ExpectedException(ExpectedMessage = "SyntaxError: Missing parentheses in call to 'print'", MatchType = MessageMatch.Contains)]
         public void PythonScript_Version3_DodgySyntax()
         {
             string MyPythonScript = @"print 'Hello World'";
@@ -54,7 +53,10 @@ namespace LoadModules.Extensions.Python.Tests.Unit
             //call with accept all
             provider.Check(new AcceptAllCheckNotifier());
 
-            provider.Fetch(new ThrowImmediatelyDataLoadJob(), new GracefulCancellationToken());
+            var toMemory = new ToMemoryDataLoadJob(false);
+            provider.Fetch(toMemory, new GracefulCancellationToken());
+
+            Assert.AreEqual(1,toMemory.EventsReceivedBySender[provider].Count(m => m.Message.Equals("SyntaxError: Missing parentheses in call to 'print'")));
         }
 
         [Test]

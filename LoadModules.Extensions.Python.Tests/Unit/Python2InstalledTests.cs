@@ -105,7 +105,6 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         }
 
         [Test]
-        [ExpectedException(ExpectedMessage = "can't open file 'ImANonExistentFile.py': [Errno 2] No such file or directory", MatchType = MessageMatch.Contains)]
         public void PythonScript_NonExistentFile()
         {
             PythonDataProvider provider = new PythonDataProvider();
@@ -115,7 +114,11 @@ namespace LoadModules.Extensions.Python.Tests.Unit
             //call with accept all
             provider.Check(new AcceptAllCheckNotifier());
 
-            var result = provider.Fetch(new ThrowImmediatelyDataLoadJob(), new GracefulCancellationToken());
+            var toMemory = new ToMemoryDataLoadJob(false);
+
+            var result = provider.Fetch(toMemory, new GracefulCancellationToken());
+
+            Assert.IsTrue(toMemory.EventsReceivedBySender[provider].Any(m => m.Message.Contains("can't open file 'ImANonExistentFile.py'")));
 
         }
     }

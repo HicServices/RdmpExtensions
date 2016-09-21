@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using CatalogueLibrary;
 using CatalogueLibrary.Data;
 using CatalogueLibrary.Data.DataLoad;
@@ -25,8 +26,6 @@ namespace LoadModules.Extensions.Python.DataProvider
 
     public class PythonDataProvider:IPluginDataProvider
     {
-        private IDataLoadEventListener _listener;
-
         [DemandsInitialization("The Python script to run")]
         public string FullPathToPythonScriptToRun { get; set; }
 
@@ -176,20 +175,24 @@ namespace LoadModules.Extensions.Python.DataProvider
 
         private int ExecuteProcess(IDataLoadEventListener listener, ProcessStartInfo processStartInfo, int maximumNumberOfSecondsToLetScriptRunFor)
         {
-            _listener = listener;
             processStartInfo.RedirectStandardOutput = true;
             processStartInfo.RedirectStandardError = true;
 
             processStartInfo.UseShellExecute = false;
             
             Process p = null;
-            
+
+            bool allErrorDataConsumed = false;
+            bool allOutputDataConsumed = false;
+
             try
             {
-                p = Process.Start(processStartInfo);
-                p.OutputDataReceived += OutputDataReceived;
-                p.ErrorDataReceived += OutputDataReceived;
+                p =  new Process();
+                p.StartInfo = processStartInfo;
+                p.OutputDataReceived += (s, e) => allOutputDataConsumed = OutputDataReceived(s, e, listener,false);
+                p.ErrorDataReceived += (s, e) => allErrorDataConsumed = OutputDataReceived(s, e, listener,true);
                 
+                p.Start();
                 p.BeginErrorReadLine();
                 p.BeginOutputReadLine();
 
@@ -221,20 +224,30 @@ namespace LoadModules.Extensions.Python.DataProvider
                     throw new TimeoutException("Process command " + processStartInfo.FileName + " with arguments " + processStartInfo.Arguments + " did not complete after  " + maximumNumberOfSecondsToLetScriptRunFor + " seconds " + (killed ? "(After timeout we killed the process succesfully)" : "(We also failed to kill the process after the timeout expired)"));
                 }
             }
-            
+
+            while (!allErrorDataConsumed || !allOutputDataConsumed)
+            {
+                Task.Delay(100);
+
+                if(TimeoutExpired(startTime))
+                    throw new TimeoutException("Timeout expired while waiting for all output streams from the Python process to finish being read");
+            }
+
             return p.ExitCode;
         }
 
-        private void OutputDataReceived(object sender, DataReceivedEventArgs e)
+        private bool OutputDataReceived(object sender, DataReceivedEventArgs e, IDataLoadEventListener listener,bool isErrorStream)
         {
             if(e.Data == null)
-                return;
+                return true;
             
             lock (this)
             {
                 //it has expired the standard out
-                _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, e.Data));
+                listener.OnNotify(this, new NotifyEventArgs(isErrorStream?ProgressEventType.Warning : ProgressEventType.Information, e.Data));
             }
+             
+            return false;
         }
         private bool TimeoutExpired(DateTime startTime)
         {

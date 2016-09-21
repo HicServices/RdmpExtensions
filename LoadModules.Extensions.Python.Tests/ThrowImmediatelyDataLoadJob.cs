@@ -11,7 +11,7 @@ using ReusableLibraryCode.Progress;
 
 namespace LoadModules.Extensions.Python.Tests
 {
-    public class ToMemoryDataLoadJob : ToMemoryDataLoadEventReciever, IDataLoadJob
+    public class ToMemoryDataLoadJob : ToMemoryDataLoadEventReceiver, IDataLoadJob
     {
         public ToMemoryDataLoadJob(bool throwOnErrorEvents = true): base(throwOnErrorEvents)
         {
