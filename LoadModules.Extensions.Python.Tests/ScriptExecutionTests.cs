@@ -110,5 +110,41 @@ sys.stdout.flush()
                 file.Delete();
             }
         }
+
+
+        [Test]
+        public void ThrowDeadlock()
+        {
+            var script =
+@"from __future__ import print_function
+import sys
+
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+print(""Test Normal Msg"")
+
+eprint(""Test Error"")
+";
+
+            var file = new FileInfo("threadscript.py");
+
+            File.WriteAllText(file.FullName, script);
+            try
+            {
+                var py = new PythonDataProvider();
+                py.FullPathToPythonScriptToRun = file.FullName;
+                py.Version = PythonVersion.Version3;
+
+                var tomem = new ToMemoryDataLoadJob(true);
+                var ex = Assert.Throws<Exception>(()=>py.Fetch(tomem, new GracefulCancellationToken()));
+                Assert.AreEqual("Test Error",ex.Message);
+
+            }
+            finally
+            {
+                file.Delete();
+            }
+        }
     }
 }

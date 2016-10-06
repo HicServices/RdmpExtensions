@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -12,6 +13,7 @@ using CatalogueLibrary.DataFlowPipeline;
 using DataLoadEngine;
 using DataLoadEngine.DataProvider;
 using DataLoadEngine.Job;
+using NHibernate.Mapping;
 using ReusableLibraryCode.Checks;
 using ReusableLibraryCode.Progress;
 
@@ -26,6 +28,8 @@ namespace LoadModules.Extensions.Python.DataProvider
 
     public class PythonDataProvider:IPluginDataProvider
     {
+        
+
         [DemandsInitialization("The Python script to run")]
         public string FullPathToPythonScriptToRun { get; set; }
 
@@ -233,8 +237,16 @@ namespace LoadModules.Extensions.Python.DataProvider
                     throw new TimeoutException("Timeout expired while waiting for all output streams from the Python process to finish being read");
             }
 
+            if (outputDataReceivedExceptions.Any())
+                if (outputDataReceivedExceptions.Count == 1)
+                    throw outputDataReceivedExceptions[0];
+                else
+                    throw new AggregateException(outputDataReceivedExceptions);
+
             return p.ExitCode;
         }
+
+        List<Exception> outputDataReceivedExceptions = new List<Exception>();
 
         private bool OutputDataReceived(object sender, DataReceivedEventArgs e, IDataLoadEventListener listener,bool isErrorStream)
         {
@@ -243,8 +255,17 @@ namespace LoadModules.Extensions.Python.DataProvider
             
             lock (this)
             {
-                //it has expired the standard out
-                listener.OnNotify(this, new NotifyEventArgs(isErrorStream?ProgressEventType.Warning : ProgressEventType.Information, e.Data));
+                try
+                {
+                    //it has expired the standard out
+                    listener.OnNotify(this, new NotifyEventArgs(isErrorStream?ProgressEventType.Warning : ProgressEventType.Information, e.Data));
+                }
+                catch (Exception ex)
+                {
+                    //the notify handler is crashing... lets stop tyring to read data from this async handler.  Also add the exception to the list because we don't want it throwing out of this lamda
+                    outputDataReceivedExceptions.Add(ex);
+                    return true;
+                }
             }
              
             return false;

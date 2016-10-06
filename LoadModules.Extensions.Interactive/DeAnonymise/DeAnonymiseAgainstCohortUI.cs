@@ -10,6 +10,7 @@ using RDMPStartup;
 using ReusableLibraryCode;
 using ReusableLibraryCode.Checks;
 using ReusableUIComponents;
+using ReusableUIComponents.BetterToolTips;
 
 namespace LoadModules.Extensions.Interactive.DeAnonymise
 {
