@@ -17,6 +17,11 @@ namespace LoadModules.Extensions.Python.Tests
         {
         }
 
+        public void CreateTablesInStage(DatabaseCloner cloner, LoadBubble stage)
+        {
+            
+        }
+
         public string Description { get; private set; }
         public IDataLoadInfo DataLoadInfo { get; private set; }
         public IHICProjectDirectory HICProjectDirectory { get; set; }
