@@ -42,7 +42,7 @@ namespace LoadModules.Extensions.Python.DataProvider
         [DemandsInitialization("Override Python Executable Path")]
         public FileInfo OverridePythonExecutablePath { get; set; }
 
-        public bool DisposeImmediately { get; set; }
+        
         public void LoadCompletedSoDispose(ExitCodeType exitCode, IDataLoadEventListener postLoadEventsListener)
         {
             
@@ -157,7 +157,7 @@ namespace LoadModules.Extensions.Python.DataProvider
             return info;
         }
 
-        public ProcessExitCode Fetch(IDataLoadJob job, GracefulCancellationToken cancellationToken)
+        public ExitCodeType Fetch(IDataLoadJob job, GracefulCancellationToken cancellationToken)
         {
             ProcessStartInfo processStartInfo = GetPythonCommand(FullPathToPythonScriptToRun);
             
@@ -169,12 +169,12 @@ namespace LoadModules.Extensions.Python.DataProvider
             catch (TimeoutException e)
             {
                 job.OnNotify(this,new NotifyEventArgs(ProgressEventType.Error, "Python command timed out (See inner exception for details)",e));
-                return ProcessExitCode.Failure;
+                return ExitCodeType.Error;
             }
 
             job.OnNotify(this, new NotifyEventArgs(exitCode == 0 ? ProgressEventType.Information : ProgressEventType.Error, "Python script terminated with exit code " + exitCode));
 
-            return exitCode == 0 ? ProcessExitCode.Success : ProcessExitCode.Failure;
+            return exitCode == 0 ? ExitCodeType.Success : ExitCodeType.Error;
         }
 
         private int ExecuteProcess(IDataLoadEventListener listener, ProcessStartInfo processStartInfo, int maximumNumberOfSecondsToLetScriptRunFor)
@@ -225,7 +225,7 @@ namespace LoadModules.Extensions.Python.DataProvider
                         killed = false;
                     }
 
-                    throw new TimeoutException("Process command " + processStartInfo.FileName + " with arguments " + processStartInfo.Arguments + " did not complete after  " + maximumNumberOfSecondsToLetScriptRunFor + " seconds " + (killed ? "(After timeout we killed the process succesfully)" : "(We also failed to kill the process after the timeout expired)"));
+                    throw new TimeoutException("Process command " + processStartInfo.FileName + " with arguments " + processStartInfo.Arguments + " did not complete after  " + maximumNumberOfSecondsToLetScriptRunFor + " seconds " + (killed ? "(After timeout we killed the process successfully)" : "(We also failed to kill the process after the timeout expired)"));
                 }
             }
 

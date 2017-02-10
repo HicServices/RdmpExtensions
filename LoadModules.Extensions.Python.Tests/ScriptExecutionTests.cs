@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using CatalogueLibrary;
 using CatalogueLibrary.Data.DataLoad;
 using CatalogueLibrary.DataFlowPipeline;
 using DataLoadEngineTests.Integration;
@@ -45,7 +46,7 @@ time.sleep(1)
 
                 var exitCode = py.Fetch(tomemory, new GracefulCancellationToken());
 
-                Assert.AreEqual(ProcessExitCode.Success, exitCode);
+                Assert.AreEqual(ExitCodeType.Success, exitCode);
 
                 Assert.AreEqual(5, tomemory.EventsReceivedBySender[py].Count(m=>m.Message.Equals("1")));
 

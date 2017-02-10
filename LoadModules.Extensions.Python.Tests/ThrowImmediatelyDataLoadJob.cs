@@ -22,6 +22,11 @@ namespace LoadModules.Extensions.Python.Tests
             
         }
 
+        public void PushForDisposal(IDisposeAfterDataLoad disposeable)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public string Description { get; private set; }
         public IDataLoadInfo DataLoadInfo { get; private set; }
         public IHICProjectDirectory HICProjectDirectory { get; set; }
@@ -53,6 +58,11 @@ namespace LoadModules.Extensions.Python.Tests
 
         public void CreateTablesInStage(DatabaseCloner cloner, INameDatabasesAndTablesDuringLoads namer, LoadBubble stage)
         {
+        }
+
+        public void LoadCompletedSoDispose(ExitCodeType exitCode, IDataLoadEventListener postLoadEventsListener)
+        {
+            
         }
     }
 }
