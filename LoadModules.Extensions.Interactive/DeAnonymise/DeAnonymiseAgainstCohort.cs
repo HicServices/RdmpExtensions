@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows.Forms;
 using CatalogueLibrary.DataFlowPipeline;
-using DataExportManager2Library.Repositories;
+using DataExportLibrary.Repositories;
 using RDMPStartup;
 using ReusableLibraryCode;
 using ReusableLibraryCode.Checks;

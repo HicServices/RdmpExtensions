@@ -183,7 +183,8 @@ namespace LoadModules.Extensions.Python.DataProvider
             processStartInfo.RedirectStandardError = true;
 
             processStartInfo.UseShellExecute = false;
-            
+            processStartInfo.CreateNoWindow = true;
+
             Process p = null;
 
             bool allErrorDataConsumed = false;

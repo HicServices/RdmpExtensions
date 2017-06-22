@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using CatalogueLibrary.DataFlowPipeline;
-using DataExportManager2.Interfaces.Data.DataTables;
-using DataExportManager2.Tests;
+using DataExportLibrary.Interfaces.Data.DataTables;
+using DataExportLibrary.Tests;
 using LoadModules.Extensions.Interactive.DeAnonymise;
 using NUnit.Framework;
 using ReusableLibraryCode.Progress;

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Data;
 using System.Windows.Forms;
-using DataExportManager2.Interfaces.Data.DataTables;
-using DataExportManager2.Interfaces.Repositories;
-using DataExportManager2Library.Data.DataTables;
-using DataExportManager2Library.Repositories;
+using DataExportLibrary.Interfaces.Data.DataTables;
+using DataExportLibrary.Interfaces.Repositories;
+using DataExportLibrary.Data.DataTables;
+using DataExportLibrary.Repositories;
 using MapsDirectlyToDatabaseTableUI;
 using RDMPStartup;
 using ReusableLibraryCode;

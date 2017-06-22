@@ -10,6 +10,7 @@ using CatalogueLibrary.DataFlowPipeline;
 using DataLoadEngineTests.Integration;
 using LoadModules.Extensions.Python.DataProvider;
 using NUnit.Framework;
+using ReusableLibraryCode.Progress;
 
 namespace LoadModules.Extensions.Python.Tests
 {
@@ -114,7 +115,7 @@ sys.stdout.flush()
 
 
         [Test]
-        public void ThrowDeadlock()
+        public void WriteToErrorAndStandardOut()
         {
             var script =
 @"from __future__ import print_function
@@ -138,8 +139,16 @@ eprint(""Test Error"")
                 py.Version = PythonVersion.Version3;
 
                 var tomem = new ToMemoryDataLoadJob(true);
-                var ex = Assert.Throws<Exception>(()=>py.Fetch(tomem, new GracefulCancellationToken()));
-                Assert.AreEqual("Test Error",ex.Message);
+                py.Fetch(tomem, new GracefulCancellationToken());
+
+                Assert.AreEqual(
+                    tomem.EventsReceivedBySender[py].First(n => n.ProgressEventType == ProgressEventType.Information)
+                        .Message, "Test Normal Msg");
+
+                
+                Assert.AreEqual(
+                    tomem.EventsReceivedBySender[py].Single(n => n.ProgressEventType == ProgressEventType.Warning)
+                        .Message, "Test Error");
 
             }
             finally
