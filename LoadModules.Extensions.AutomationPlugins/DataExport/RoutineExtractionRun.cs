@@ -35,7 +35,12 @@ namespace LoadModules.Extensions.AutomationPlugins.DataExport
             {
                 task.Job.SetLastKnownStatus(AutomationJobStatus.Running);
 
-                File.WriteAllText(@"C:\temp\" + DateTime.Now + ".txt", "great scottt it works");
+                string path = @"C:\temp\" + DateTime.Now.ToString().Replace(":", "_").Replace("/","_") + ".txt";
+                File.WriteAllText(path, "great scottt it works");
+                
+                //it worked!
+                task.Job.SetLastKnownStatus(AutomationJobStatus.Finished);
+                task.Job.DeleteInDatabase();
             }
             catch (Exception)
             {

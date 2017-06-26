@@ -25,5 +25,18 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
             Assert.NotNull(source.GetChunk(new ThrowImmediatelyDataLoadJob(), new GracefulCancellationToken()));
             Assert.IsNull(source.GetChunk(new ThrowImmediatelyDataLoadJob(), new GracefulCancellationToken()));
         }
+
+        [Test]
+        public void CheckRunTask()
+        {
+            var slot = new AutomationServiceSlot(CatalogueRepository);
+            var source = new AutomatedExtractionSource();
+            source.PreInitialize(slot, new ThrowImmediatelyDataLoadJob());
+
+            var chunk = source.GetChunk(new ThrowImmediatelyDataLoadJob(), new GracefulCancellationToken());
+            var job = chunk.Job;
+            chunk.Task.RunSynchronously();
+            Assert.AreEqual(AutomationJobStatus.Finished,job.LastKnownStatus);
+        }
     }
 }
