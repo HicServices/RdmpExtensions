@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Windows.Forms;
+using CatalogueManager.TestsAndSetup.ServicePropogation;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using DataExportLibrary.Interfaces.Repositories;
 using DataExportLibrary.Data.DataTables;
@@ -10,11 +11,10 @@ using RDMPStartup;
 using ReusableLibraryCode;
 using ReusableLibraryCode.Checks;
 using ReusableUIComponents;
-using ReusableUIComponents.BetterToolTips;
 
 namespace LoadModules.Extensions.Interactive.DeAnonymise
 {
-    public partial class DeAnonymiseAgainstCohortUI : BetterToolTipForm, IDeAnonymiseAgainstCohortConfigurationFulfiller
+    public partial class DeAnonymiseAgainstCohortUI : RDMPForm, IDeAnonymiseAgainstCohortConfigurationFulfiller
     {
         private readonly DataTable _toProcess;
         private IDataExportRepository _dataExportRepository;
