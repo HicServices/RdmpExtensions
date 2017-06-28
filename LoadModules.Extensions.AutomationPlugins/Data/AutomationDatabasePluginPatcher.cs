@@ -18,7 +18,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
         public IExternalDatabaseServer[] FindDatabases(out Assembly hostAssembly, out Assembly dbAssembly)
         {
             hostAssembly = GetType().Assembly;
-            dbAssembly = typeof (LoadModules.Extensions.AutomationPlugins.Database.Class1).Assembly;
+            dbAssembly = typeof (Database.Class1).Assembly;
 
             var dbAssemblyName = dbAssembly.GetName().Name;
 

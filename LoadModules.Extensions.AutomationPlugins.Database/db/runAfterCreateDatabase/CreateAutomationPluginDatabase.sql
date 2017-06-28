@@ -1,4 +1,4 @@
-﻿/****** Object:  Table [dbo].[AutomateExtraction]    Script Date: 27/06/2017 10:02:03 ******/
+﻿/****** Object:  Table [dbo].[AutomateExtraction]    Script Date: 28/06/2017 14:44:49 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -18,27 +18,29 @@ CREATE TABLE [dbo].[AutomateExtraction](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[ExecutionSchedule]    Script Date: 27/06/2017 10:02:03 ******/
+/****** Object:  Table [dbo].[ExecutionSchedule]    Script Date: 28/06/2017 14:44:49 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[ExecutionSchedule](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
-	[EveryXDays] [int] NULL,
+	[ExecutionTimescale] [varchar](50) NOT NULL,
 	[UserRequestingRefresh] [varchar](500) NULL,
 	[UserRequestingRefreshDate] [datetime] NULL,
 	[Ticket] [varchar](500) NULL,
-	[PermissionWindow_ID] [int] NOT NULL,
 	[Name] [varchar](500) NOT NULL,
+	[Comment] [varchar](max) NULL,
+	[Disabled] [bit] NOT NULL,
+	[Project_ID] [int] NOT NULL,
  CONSTRAINT [PK_ExecutionSchedule] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[ReleaseIdentifierExtracted]    Script Date: 27/06/2017 10:02:03 ******/
+/****** Object:  Table [dbo].[ReleaseIdentifierExtracted]    Script Date: 28/06/2017 14:44:49 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -54,7 +56,7 @@ CREATE TABLE [dbo].[ReleaseIdentifierExtracted](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[SuccessfullyExtractedResults]    Script Date: 27/06/2017 10:02:03 ******/
+/****** Object:  Table [dbo].[SuccessfullyExtractedResults]    Script Date: 28/06/2017 14:44:49 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -69,6 +71,8 @@ CREATE TABLE [dbo].[SuccessfullyExtractedResults](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
+GO
+ALTER TABLE [dbo].[ExecutionSchedule] ADD  CONSTRAINT [DF_ExecutionSchedule_Disabled]  DEFAULT ((0)) FOR [Disabled]
 GO
 ALTER TABLE [dbo].[SuccessfullyExtractedResults] ADD  CONSTRAINT [DF_SuccessfullyExtractedResults_ExtractDate]  DEFAULT (getdate()) FOR [ExtractDate]
 GO
