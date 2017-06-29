@@ -25,7 +25,6 @@ namespace LoadModules.Extensions.AutomationPlugins.DashboardComponents
     public partial class AutomateExtractionDashboard : UserControl, IDashboardableControl
     {
         private IActivateItems _activator;
-        private Assembly _databaseAssembly;
         private IPersistableObjectCollection _collection;
         private AutomateExtractionRepository _automationRepository;
         private AutomateExtractionRepositoryFinder _locator;
@@ -33,8 +32,6 @@ namespace LoadModules.Extensions.AutomationPlugins.DashboardComponents
         public AutomateExtractionDashboard()
         {
             InitializeComponent();
-
-            _databaseAssembly = typeof (Database.Class1).Assembly;
         }
 
         public void RefreshBus_RefreshObject(object sender, RefreshObjectEventArgs e)
@@ -75,7 +72,7 @@ namespace LoadModules.Extensions.AutomationPlugins.DashboardComponents
 
         private void btnCreateAutomationDatabase_Click(object sender, EventArgs e)
         {
-            var server = CreatePlatformDatabase.CreateNewExternalServer(_activator.RepositoryLocator.CatalogueRepository,ServerDefaults.PermissableDefaults.None,_databaseAssembly);
+            var server = CreatePlatformDatabase.CreateNewExternalServer(_activator.RepositoryLocator.CatalogueRepository, ServerDefaults.PermissableDefaults.None, typeof(Database.Class1).Assembly);
 
             if (server != null)
             {

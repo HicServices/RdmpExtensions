@@ -6,21 +6,23 @@ using CatalogueManager.Refreshing;
 using DataExportLibrary.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data;
 
-namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents
+namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.MenuItems
 {
     [System.ComponentModel.DesignerCategory("")]
     public class AddNewScheduleForProjectMenuItem : ToolStripMenuItem
     {
+        private readonly AutomationPluginInterface _plugin;
         private readonly AutomateExtractionRepository _automationRepository;
         private readonly IActivateItems _itemActivator;
         private readonly Project _project;
 
-        public AddNewScheduleForProjectMenuItem(AutomateExtractionRepository automationRepository, IActivateItems itemActivator, Project project)
+        public AddNewScheduleForProjectMenuItem(AutomationPluginInterface plugin, AutomateExtractionRepository automationRepository, IActivateItems itemActivator, Project project)
             : base(
-                "Add New Schedule For Project"
+                "Add New Schedule For Project",
+                new IconOverlayProvider().GetOverlayNoCache(AutomationIcons.ExecutionSchedule, OverlayKind.Add)
                 )
         {
-            Image = new IconOverlayProvider().GetOverlayNoCache(AutomationIcons.ExecutionSchedule, OverlayKind.Add);
+            _plugin = plugin;
             _automationRepository = automationRepository;
             _itemActivator = itemActivator;
             _project = project;
@@ -29,7 +31,8 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents
         protected override void OnClick(EventArgs e)
         {
             var schedule = new ExecutionSchedule(_automationRepository, _project);
-            _itemActivator.RefreshBus.Publish(this,new RefreshObjectEventArgs(schedule));
+            _plugin.RefreshPluginUserInterfaceRepoAndObjects();
+            _itemActivator.RefreshBus.Publish(this,new RefreshObjectEventArgs(_project));
         }
     }
 }

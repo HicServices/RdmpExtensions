@@ -88,6 +88,11 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             Disabled = Convert.ToBoolean(r["Disabled"]);
             Project_ID = Convert.ToInt32(r["Project_ID"]);
         }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 
     public enum TimeScale

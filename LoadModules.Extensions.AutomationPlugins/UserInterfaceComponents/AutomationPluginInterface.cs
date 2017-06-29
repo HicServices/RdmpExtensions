@@ -13,6 +13,7 @@ using CatalogueManager.PluginChildProvision;
 using CatalogueManager.Refreshing;
 using DataExportLibrary.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data;
+using LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.MenuItems;
 
 namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents
 {
@@ -25,22 +26,17 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents
 
         public AutomationPluginInterface(IActivateItems itemActivator) : base(itemActivator)
         {
-            var repoLocator = new AutomateExtractionRepositoryFinder(itemActivator.RepositoryLocator);
-            _automationRepository = repoLocator.GetRepositoryIfAny();
-
-            if(_automationRepository == null)
-            {
-                Exceptions.Add(new Exception("No AutomateExtractionRepository exists"));
-                return;
-            }
             _executionScheduleIcon = AutomationIcons.ExecutionSchedule;
             itemActivator.RefreshBus.Subscribe(this);
-            RefreshListOfSchedules();
+            RefreshPluginUserInterfaceRepoAndObjects();
         }
 
-        private void RefreshListOfSchedules()
+        public void RefreshPluginUserInterfaceRepoAndObjects()
         {
-            AllSchedules = _automationRepository.GetAllObjects<ExecutionSchedule>();
+            var repoLocator = new AutomateExtractionRepositoryFinder(ItemActivator.RepositoryLocator);
+            _automationRepository = repoLocator.GetRepositoryIfAny();
+
+            AllSchedules = _automationRepository != null ? _automationRepository.GetAllObjects<ExecutionSchedule>() : new ExecutionSchedule[0];
         }
 
         public override object[] GetChildren(object model)
@@ -60,11 +56,20 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents
             if (p == null)
                 return null;
 
-            return new[] {new AddNewScheduleForProjectMenuItem(_automationRepository,ItemActivator, p)};
+            RefreshPluginUserInterfaceRepoAndObjects();
+
+            if (_automationRepository == null)
+                return new[]{new CreateNewAutomationPluginsDatabase(this,ItemActivator)};
+            
+            return new[] {new AddNewScheduleForProjectMenuItem(this,_automationRepository,ItemActivator, p)};
         }
 
         public override Control Activate(object sender, object model)
         {
+            //no control because activation isn't for us (could be a Catalogue or anything)
+            if (!(model is ExecutionSchedule))
+                return null;
+
             var lbl = new Label();
             lbl.Text = "Placeholder";
             return lbl;
@@ -82,7 +87,10 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents
         {
             //if the published event relates to our repository
             if(e.Object.Repository is AutomateExtractionRepository)
-                RefreshListOfSchedules();//update our list of objects
+                RefreshPluginUserInterfaceRepoAndObjects();//update our list of objects
+
+            if(e.Object is ExternalDatabaseServer)
+                RefreshPluginUserInterfaceRepoAndObjects();//update our list of objects
         }
     }
 }
