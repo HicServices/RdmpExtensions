@@ -1,4 +1,4 @@
-﻿/****** Object:  Table [dbo].[AutomateExtraction]    Script Date: 28/06/2017 14:44:49 ******/
+﻿/****** Object:  Table [dbo].[AutomateExtraction]    Script Date: 29/06/2017 10:49:12 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -8,7 +8,6 @@ CREATE TABLE [dbo].[AutomateExtraction](
 	[ExtractionConfiguration_ID] [int] NOT NULL,
 	[LastAttempt] [datetime] NULL,
 	[LastAttemptDataLoadRunID] [int] NULL,
-	[Pipeline_ID] [int] NULL,
 	[ExecutionSchedule_ID] [int] NOT NULL,
 	[SuccessfullyExtractedResults_ID] [int] NULL,
  CONSTRAINT [PK_AutomateExtraction] PRIMARY KEY CLUSTERED 
@@ -18,12 +17,12 @@ CREATE TABLE [dbo].[AutomateExtraction](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[ExecutionSchedule]    Script Date: 28/06/2017 14:44:49 ******/
+/****** Object:  Table [dbo].[AutomateExtractionSchedule]    Script Date: 29/06/2017 10:49:13 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[ExecutionSchedule](
+CREATE TABLE [dbo].[AutomateExtractionSchedule](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
 	[ExecutionTimescale] [varchar](50) NOT NULL,
 	[UserRequestingRefresh] [varchar](500) NULL,
@@ -33,6 +32,7 @@ CREATE TABLE [dbo].[ExecutionSchedule](
 	[Comment] [varchar](max) NULL,
 	[Disabled] [bit] NOT NULL,
 	[Project_ID] [int] NOT NULL,
+	[Pipeline_ID] [int] NULL,
  CONSTRAINT [PK_ExecutionSchedule] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
@@ -40,7 +40,7 @@ CREATE TABLE [dbo].[ExecutionSchedule](
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[ReleaseIdentifierExtracted]    Script Date: 28/06/2017 14:44:49 ******/
+/****** Object:  Table [dbo].[ReleaseIdentifierExtracted]    Script Date: 29/06/2017 10:49:13 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -56,7 +56,7 @@ CREATE TABLE [dbo].[ReleaseIdentifierExtracted](
 ) ON [PRIMARY]
 
 GO
-/****** Object:  Table [dbo].[SuccessfullyExtractedResults]    Script Date: 28/06/2017 14:44:49 ******/
+/****** Object:  Table [dbo].[SuccessfullyExtractedResults]    Script Date: 29/06/2017 10:49:13 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -72,12 +72,12 @@ CREATE TABLE [dbo].[SuccessfullyExtractedResults](
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 
 GO
-ALTER TABLE [dbo].[ExecutionSchedule] ADD  CONSTRAINT [DF_ExecutionSchedule_Disabled]  DEFAULT ((0)) FOR [Disabled]
+ALTER TABLE [dbo].[AutomateExtractionSchedule] ADD  CONSTRAINT [DF_ExecutionSchedule_Disabled]  DEFAULT ((0)) FOR [Disabled]
 GO
 ALTER TABLE [dbo].[SuccessfullyExtractedResults] ADD  CONSTRAINT [DF_SuccessfullyExtractedResults_ExtractDate]  DEFAULT (getdate()) FOR [ExtractDate]
 GO
 ALTER TABLE [dbo].[AutomateExtraction]  WITH CHECK ADD  CONSTRAINT [FK_AutomateExtraction_ExecutionSchedule] FOREIGN KEY([ExecutionSchedule_ID])
-REFERENCES [dbo].[ExecutionSchedule] ([ID])
+REFERENCES [dbo].[AutomateExtractionSchedule] ([ID])
 GO
 ALTER TABLE [dbo].[AutomateExtraction] CHECK CONSTRAINT [FK_AutomateExtraction_ExecutionSchedule]
 GO

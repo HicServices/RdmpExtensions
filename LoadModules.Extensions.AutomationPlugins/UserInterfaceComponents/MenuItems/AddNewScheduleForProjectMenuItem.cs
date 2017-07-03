@@ -30,7 +30,7 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.MenuI
 
         protected override void OnClick(EventArgs e)
         {
-            var schedule = new ExecutionSchedule(_automationRepository, _project);
+            var schedule = new AutomateExtractionSchedule(_automationRepository, _project);
             _plugin.RefreshPluginUserInterfaceRepoAndObjects();
             _itemActivator.RefreshBus.Publish(this,new RefreshObjectEventArgs(_project));
         }

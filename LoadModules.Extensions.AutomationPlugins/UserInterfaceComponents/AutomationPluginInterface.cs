@@ -14,6 +14,7 @@ using CatalogueManager.Refreshing;
 using DataExportLibrary.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.MenuItems;
+using LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs;
 
 namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents
 {
@@ -22,7 +23,7 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents
         private AutomateExtractionRepository _automationRepository;
         private Bitmap _executionScheduleIcon;
 
-        public ExecutionSchedule[] AllSchedules { get; set; }
+        public AutomateExtractionSchedule[] AllSchedules { get; set; }
 
         public AutomationPluginInterface(IActivateItems itemActivator) : base(itemActivator)
         {
@@ -36,7 +37,7 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents
             var repoLocator = new AutomateExtractionRepositoryFinder(ItemActivator.RepositoryLocator);
             _automationRepository = repoLocator.GetRepositoryIfAny();
 
-            AllSchedules = _automationRepository != null ? _automationRepository.GetAllObjects<ExecutionSchedule>() : new ExecutionSchedule[0];
+            AllSchedules = _automationRepository != null ? _automationRepository.GetAllObjects<AutomateExtractionSchedule>() : new AutomateExtractionSchedule[0];
         }
 
         public override object[] GetChildren(object model)
@@ -64,20 +65,22 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents
             return new[] {new AddNewScheduleForProjectMenuItem(this,_automationRepository,ItemActivator, p)};
         }
 
-        public override Control Activate(object sender, object model)
+        public override void Activate(object sender, object model)
         {
-            //no control because activation isn't for us (could be a Catalogue or anything)
-            if (!(model is ExecutionSchedule))
-                return null;
 
-            var lbl = new Label();
-            lbl.Text = "Placeholder";
-            return lbl;
+            var schedule = model as AutomateExtractionSchedule;
+
+            //no control because activation isn't for us (could be a Catalogue or anything)
+            if (schedule != null)
+            {
+                var tab = new AutomateExtractionScheduleTab();
+                ItemActivator.ShowRDMPSingleDatabaseObjectControl(tab, schedule);
+            }
         }
 
         public override Bitmap GetImage(object concept, OverlayKind kind = OverlayKind.None)
         {
-            if (concept is ExecutionSchedule)
+            if (concept is AutomateExtractionSchedule)
                 return _executionScheduleIcon;
 
             return null;

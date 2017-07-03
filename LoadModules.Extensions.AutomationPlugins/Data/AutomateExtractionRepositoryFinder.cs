@@ -25,6 +25,9 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
 
         public AutomateExtractionRepository GetRepositoryIfAny()
         {
+            if (_repositoryLocator.CatalogueRepository == null || _repositoryLocator.DataExportRepository == null)
+                return null;
+
             var compatibleServers = _repositoryLocator.CatalogueRepository.GetAllObjects<ExternalDatabaseServer>()
                 .Where(e => e.CreatedByAssembly == _databaseAssembly.GetName().Name).ToArray();
 
@@ -40,7 +43,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             if (!server.RespondsWithinTime(5, out ex))
                 ExceptionViewer.Show(ex);
 
-            return new AutomateExtractionRepository(server.Builder);
+            return new AutomateExtractionRepository(_repositoryLocator,server.Builder);
         }
 
     }
