@@ -8,6 +8,7 @@ using CatalogueLibrary.Data.Dashboarding;
 using CatalogueLibrary.Data.DataLoad;
 using CatalogueLibrary.DataFlowPipeline;
 using CatalogueLibrary.DataFlowPipeline.Requirements;
+using CatalogueLibrary.Repositories;
 using DataExportLibrary.Data.DataTables;
 using RDMPAutomationService;
 using RDMPAutomationService.Interfaces;

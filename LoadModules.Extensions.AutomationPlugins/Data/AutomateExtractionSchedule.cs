@@ -87,7 +87,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
 
         #endregion
 
-        public AutomateExtractionSchedule(IRepository repository,Project project)
+        public AutomateExtractionSchedule(AutomateExtractionRepository repository, Project project)
         {
             repository.InsertAndHydrate(this, new Dictionary<string, object>()
             {
@@ -99,7 +99,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             if (ID == 0 || Repository != repository)
                 throw new ArgumentException("Repository failed to properly hydrate this class");
         }
-        public AutomateExtractionSchedule(IRepository repository, DbDataReader r)
+        public AutomateExtractionSchedule(AutomateExtractionRepository repository, DbDataReader r)
             : base(repository, r)
         {
             _repository = (AutomateExtractionRepository)repository;

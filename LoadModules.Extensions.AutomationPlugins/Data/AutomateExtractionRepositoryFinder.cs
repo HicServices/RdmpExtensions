@@ -5,25 +5,27 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using CatalogueLibrary.Data;
+using CatalogueLibrary.Repositories;
+using MapsDirectlyToDatabaseTable;
 using RDMPStartup;
 using ReusableLibraryCode.DataAccess;
 using ReusableUIComponents;
 
 namespace LoadModules.Extensions.AutomationPlugins.Data
 {
-    public class AutomateExtractionRepositoryFinder
+    public class AutomateExtractionRepositoryFinder : PluginRepositoryFinder
     {
         private readonly IRDMPPlatformRepositoryServiceLocator _repositoryLocator;
         private Assembly _databaseAssembly;
 
-        public AutomateExtractionRepositoryFinder(IRDMPPlatformRepositoryServiceLocator repositoryLocator)
+        public AutomateExtractionRepositoryFinder(IRDMPPlatformRepositoryServiceLocator repositoryLocator) : base(repositoryLocator)
         {
             _repositoryLocator = repositoryLocator;
 
             _databaseAssembly = typeof(Database.Class1).Assembly;
         }
 
-        public AutomateExtractionRepository GetRepositoryIfAny()
+        public override IRepository GetRepositoryIfAny()
         {
             if (_repositoryLocator.CatalogueRepository == null || _repositoryLocator.DataExportRepository == null)
                 return null;
@@ -46,5 +48,9 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             return new AutomateExtractionRepository(_repositoryLocator,server.Builder);
         }
 
+        public override Type GetRepositoryType()
+        {
+            return typeof (AutomateExtractionRepository);
+        }
     }
 }

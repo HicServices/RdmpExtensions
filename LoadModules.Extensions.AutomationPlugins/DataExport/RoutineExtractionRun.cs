@@ -21,7 +21,7 @@ namespace LoadModules.Extensions.AutomationPlugins.DataExport
         {
             _serviceSlot = serviceSlot;
             
-            AutomationJob = new AutomationJob(_serviceSlot.Repository, _serviceSlot, AutomationJobType.UserCustomPipeline, RoutineExtractionJobsPrefix + "placeholder");
+            AutomationJob = _serviceSlot.AddNewJob(AutomationJobType.UserCustomPipeline, RoutineExtractionJobsPrefix + "placeholder");
         }
 
         public OnGoingAutomationTask GetTask()

@@ -45,7 +45,7 @@ namespace LoadModules.Extensions.AutomationPlugins.DashboardComponents
             _collection = collection;
 
             _locator = new AutomateExtractionRepositoryFinder(_activator.RepositoryLocator);
-            _automationRepository = _locator.GetRepositoryIfAny();
+            _automationRepository = _locator.GetRepositoryIfAny() as AutomateExtractionRepository;
             btnCreateAutomationDatabase.Visible = _automationRepository == null;
         }
 
@@ -76,7 +76,7 @@ namespace LoadModules.Extensions.AutomationPlugins.DashboardComponents
 
             if (server != null)
             {
-                _automationRepository = _locator.GetRepositoryIfAny();
+                _automationRepository = _locator.GetRepositoryIfAny() as AutomateExtractionRepository;
                 btnCreateAutomationDatabase.Visible = _automationRepository == null;
             }
         }

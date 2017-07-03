@@ -35,7 +35,7 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents
         public void RefreshPluginUserInterfaceRepoAndObjects()
         {
             var repoLocator = new AutomateExtractionRepositoryFinder(ItemActivator.RepositoryLocator);
-            _automationRepository = repoLocator.GetRepositoryIfAny();
+            _automationRepository = repoLocator.GetRepositoryIfAny() as AutomateExtractionRepository;
 
             AllSchedules = _automationRepository != null ? _automationRepository.GetAllObjects<AutomateExtractionSchedule>() : new AutomateExtractionSchedule[0];
         }

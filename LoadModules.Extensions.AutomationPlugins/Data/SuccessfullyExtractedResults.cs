@@ -27,7 +27,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             get { return _extractDate; }
             set { SetField(ref _extractDate, value); }
         }
-        public SuccessfullyExtractedResults(IRepository repository,string sql)
+        public SuccessfullyExtractedResults(AutomateExtractionRepository repository,string sql)
         {
             repository.InsertAndHydrate(this, new Dictionary<string, object>()
             {
@@ -37,7 +37,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             if (ID == 0 || Repository != repository)
                 throw new ArgumentException("Repository failed to properly hydrate this class");
         }
-        public SuccessfullyExtractedResults(IRepository repository, DbDataReader r)
+        public SuccessfullyExtractedResults(AutomateExtractionRepository repository, DbDataReader r)
             : base(repository, r)
         {
             SQL = r["SQL"].ToString();

@@ -52,7 +52,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             get { return _successfullyExtractedResults_ID; }
             set { SetField(ref _successfullyExtractedResults_ID, value); }
         }
-        public AutomateExtraction(IRepository repository,ExtractionConfiguration config)
+        public AutomateExtraction(AutomateExtractionRepository repository,ExtractionConfiguration config)
         {
             repository.InsertAndHydrate(this, new Dictionary<string, object>()
             {
