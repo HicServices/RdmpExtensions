@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using CatalogueLibrary.Data.Automation;
 using RDMPAutomationService;
 using RDMPAutomationService.Interfaces;
 
-namespace LoadModules.Extensions.AutomationPlugins.DataExport
+namespace LoadModules.Extensions.AutomationPlugins.Execution
 {
     class RoutineExtractionRun : IAutomateable
     {

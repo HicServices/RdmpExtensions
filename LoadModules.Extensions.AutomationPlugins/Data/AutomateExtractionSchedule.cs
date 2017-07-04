@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CatalogueLibrary.Data;
 using CatalogueLibrary.Data.Pipelines;
 using DataExportLibrary.Data.DataTables;
+using DataExportLibrary.Interfaces.Data.DataTables;
 using MapsDirectlyToDatabaseTable;
 using ReusableLibraryCode.Checks;
 using ReusableUIComponents;
@@ -85,10 +86,25 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             return Pipeline_ID != null ? _repository.CatalogueRepository.GetObjectByID<Pipeline>(Pipeline_ID.Value) : null;
         } }
 
+        [NoMappingToDatabase]
+        public Project Project
+        {
+            get
+        {
+            return  _repository.DataExportRepository.GetObjectByID<Project>(Project_ID);
+        } }
+
+        [NoMappingToDatabase]
+        public AutomateExtraction[] AutomateExtractions { get
+        {
+            return _repository.GetAllObjectsWithParent<AutomateExtraction>(this);
+        } }
+        
         #endregion
 
         public AutomateExtractionSchedule(AutomateExtractionRepository repository, Project project)
         {
+            _repository = repository;
             repository.InsertAndHydrate(this, new Dictionary<string, object>()
             {
                 {"Project_ID",project.ID},
@@ -102,7 +118,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
         public AutomateExtractionSchedule(AutomateExtractionRepository repository, DbDataReader r)
             : base(repository, r)
         {
-            _repository = (AutomateExtractionRepository)repository;
+            _repository = repository;
 
             ExecutionTimescale = (AutomationTimeScale) Enum.Parse(typeof(AutomationTimeScale),r["ExecutionTimescale"].ToString());
             UserRequestingRefresh = r["UserRequestingRefresh"] as string;
@@ -152,6 +168,15 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
                 new CheckEventArgs(
                     "Ticket '" + Ticket + "' is " + evaluation + ".  Reason given was:" + Environment.NewLine + reason,
                     CheckResult.Fail, exc));
+        }
+
+        public IExtractionConfiguration[] GetImportableExtractionConfigurations()
+        {
+            var idsAlreadyPartOfSchedule = AutomateExtractions.Select(e => e.ExtractionConfiguration_ID);
+
+            var available = Project.ExtractionConfigurations;
+
+            return available.Where(e => !idsAlreadyPartOfSchedule.Contains(e.ID)).ToArray();
         }
     }
 

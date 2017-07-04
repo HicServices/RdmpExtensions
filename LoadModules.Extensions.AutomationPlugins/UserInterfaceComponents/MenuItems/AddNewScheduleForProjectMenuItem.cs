@@ -4,6 +4,7 @@ using CatalogueManager.Icons.IconOverlays;
 using CatalogueManager.ItemActivation;
 using CatalogueManager.Refreshing;
 using DataExportLibrary.Data.DataTables;
+using DataExportLibrary.Interfaces.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data;
 
 namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.MenuItems
@@ -33,6 +34,10 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.MenuI
             var schedule = new AutomateExtractionSchedule(_automationRepository, _project);
             _plugin.RefreshPluginUserInterfaceRepoAndObjects();
             _itemActivator.RefreshBus.Publish(this,new RefreshObjectEventArgs(_project));
+
+            //start out by making every AutomateExtraction part of the config
+            foreach (IExtractionConfiguration configuration in _project.ExtractionConfigurations)
+                new AutomateExtraction(_automationRepository,schedule, configuration);
         }
     }
 }

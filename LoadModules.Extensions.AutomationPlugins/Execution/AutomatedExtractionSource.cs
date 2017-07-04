@@ -1,22 +1,17 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using CatalogueLibrary.Data;
 using CatalogueLibrary.Data.Automation;
-using CatalogueLibrary.Data.Dashboarding;
-using CatalogueLibrary.Data.DataLoad;
 using CatalogueLibrary.DataFlowPipeline;
 using CatalogueLibrary.DataFlowPipeline.Requirements;
 using CatalogueLibrary.Repositories;
-using DataExportLibrary.Data.DataTables;
 using RDMPAutomationService;
 using RDMPAutomationService.Interfaces;
-using RDMPStartup;
 using ReusableLibraryCode.Checks;
 using ReusableLibraryCode.Progress;
 
-namespace LoadModules.Extensions.AutomationPlugins.DataExport
+namespace LoadModules.Extensions.AutomationPlugins.Execution
 {
     public class AutomatedExtractionSource : IPluginAutomationSource, IPipelineRequirement<IRDMPPlatformRepositoryServiceLocator>, ICheckable
     {

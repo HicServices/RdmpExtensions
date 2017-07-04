@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CatalogueLibrary.Data;
 using MapsDirectlyToDatabaseTable;
+using ReusableLibraryCode;
 
 namespace LoadModules.Extensions.AutomationPlugins.Data
 {
@@ -42,6 +45,27 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
         {
             SQL = r["SQL"].ToString();
             ExtractDate = Convert.ToDateTime(r["ExtractDate"]);
+        }
+
+
+        public void SetExtractionIdentifiers(HashSet<string> releaseIdentifiersSeen)
+        {
+            var repo = (TableRepository) Repository;
+            var server = repo.DiscoveredServer;
+
+            var dt = new DataTable();
+
+            dt.Columns.Add("SuccessfullyExtractedResults_ID", typeof (int));
+            dt.Columns.Add("ReleaseIdentifier", typeof (string));
+
+            foreach (string s in releaseIdentifiersSeen)
+                dt.Rows.Add(ID, s);
+
+            var bulkCopy = new SqlBulkCopy(server.Builder.ConnectionString);
+            bulkCopy.ColumnMappings.Add("SuccessfullyExtractedResults_ID", "SuccessfullyExtractedResults_ID");
+            bulkCopy.ColumnMappings.Add("ReleaseIdentifier", "ReleaseIdentifier");
+
+            UsefulStuff.BulkInsertWithBetterErrorMessages(bulkCopy, dt, repo.DiscoveredServer);
         }
     }
 }

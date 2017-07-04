@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using CatalogueLibrary.Data.Automation;
 using CatalogueLibrary.DataFlowPipeline;
 using DataLoadEngineTests.Integration;
-using LoadModules.Extensions.AutomationPlugins.DataExport;
+using LoadModules.Extensions.AutomationPlugins.Execution;
 using NUnit.Framework;
 using Tests.Common;
 
