@@ -170,6 +170,7 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs
 
         private void CheckPipeline()
         {
+            ragSmileyPipeline.Reset();
             var p = _schedule.Pipeline;
             new AutomatedExtractionPipelineChecker(p).Check(ragSmileyPipeline);
         }

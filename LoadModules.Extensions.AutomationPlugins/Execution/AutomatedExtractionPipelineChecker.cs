@@ -31,7 +31,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution
                 if (_automateExtractionPipeline.PipelineComponents.Any(c => c.Class == typeof (SuccessfullyExtractedResultsDocumenter).FullName))
                     notifier.OnCheckPerformed(new CheckEventArgs("Found SuccessfullyExtractedResultsDocumenter plugin component",CheckResult.Success));
                 else
-                    notifier.OnCheckPerformed(new CheckEventArgs("Automated Extraction can only take place through Pipelines that include a "+typeof(SuccessfullyExtractedResultsDocumenter).Name+" plugin component", CheckResult.Success));
+                    notifier.OnCheckPerformed(new CheckEventArgs("Automated Extraction can only take place through Pipelines that include a "+typeof(SuccessfullyExtractedResultsDocumenter).Name+" plugin component", CheckResult.Fail));
             }
             catch (Exception e)
             {

@@ -19,7 +19,7 @@ using ReusableLibraryCode.Progress;
 
 namespace LoadModules.Extensions.AutomationPlugins.Execution
 {
-    public class SuccessfullyExtractedResultsDocumenter : IPluginDataFlowComponent<DataTable>, IPipelineRequirement<IExtractCommand>, IPipelineRequirement<IRDMPPlatformRepositoryServiceLocator>
+    public class SuccessfullyExtractedResultsDocumenter : IPluginDataFlowComponent<DataTable>, IPipelineRequirement<IExtractCommand>
     {
 
         private IExtractCommand _extractDatasetCommand;
@@ -51,6 +51,13 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution
             {
 
                 _sql = ds.QueryBuilder.SQL;
+
+
+                var finder = new AutomateExtractionRepositoryFinder(ds.RepositoryLocator);
+                _repo = finder.GetRepositoryIfAny() as AutomateExtractionRepository;
+
+                if(_repo == null)
+                    throw new Exception("Could not create AutomateExtractionRepository, are you missing an AutomationPluginsDatabase?");
 
                 var matches = _repo.GetAllObjects<AutomateExtraction>("WHERE ExtractionConfiguration_ID = " + ds.Configuration.ID);
 
@@ -104,12 +111,12 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution
 
         public void Abort(IDataLoadEventListener listener)
         {
-            throw new NotImplementedException();
+            
         }
 
         public void Check(ICheckNotifier notifier)
         {
-            throw new NotImplementedException();
+            
         }
 
         public void PreInitialize(IExtractCommand value, IDataLoadEventListener listener)
@@ -117,11 +124,6 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution
             _extractDatasetCommand = value;
         }
 
-        public void PreInitialize(IRDMPPlatformRepositoryServiceLocator value, IDataLoadEventListener listener)
-        {
-            var finder =  new AutomateExtractionRepositoryFinder(value);
-            _repo = finder.GetRepositoryIfAny() as AutomateExtractionRepository;
-        }
         public void PreInitialize(DataLoadInfo value, IDataLoadEventListener listener)
         {
             _dataLoadInfo = value;
