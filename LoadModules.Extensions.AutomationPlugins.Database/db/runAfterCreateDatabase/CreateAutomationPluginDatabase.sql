@@ -92,3 +92,9 @@ REFERENCES [dbo].[AutomateExtraction] ([ID])
 GO
 ALTER TABLE [dbo].[SuccessfullyExtractedResults] CHECK CONSTRAINT [FK_SuccessfullyExtractedResults_AutomateExtraction]
 GO
+CREATE UNIQUE NONCLUSTERED INDEX [ix_oneResultPerConfigDataset] ON [dbo].[SuccessfullyExtractedResults]
+(
+	[ExtractableDataSet_ID] ASC,
+	[AutomateExtraction_ID] ASC
+)
+GO

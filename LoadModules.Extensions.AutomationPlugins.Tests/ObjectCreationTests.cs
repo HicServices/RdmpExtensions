@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,7 +24,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
         [SetUp]
         public void CreateAutomationDatabase()
         {
-            var db = DiscoveredServerICanCreateRandomDatabasesAndTablesOn.ExpectDatabase("AutomationPluginsTests");
+            var db = DiscoveredServerICanCreateRandomDatabasesAndTablesOn.ExpectDatabase("TEST_AutomationPluginsTests");
             if(db.Exists())
                 db.ForceDrop();
 
@@ -63,7 +64,6 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
             //should cascade delete everything
             schedule.DeleteInDatabase();
             
-            
             config.DeleteInDatabase();
             proj.DeleteInDatabase();
 
@@ -85,7 +85,10 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
             var automateConfig = new AutomateExtraction(_repo, schedule, config);
 
             var results = new SuccessfullyExtractedResults(_repo, "Select * from CannonballLand", automateConfig,ds);
-            
+
+            //shouldn't be able to create a second audit of the same ds
+            Assert.Throws<SqlException>(() => new SuccessfullyExtractedResults(_repo, "Select * from FantasyLand", automateConfig, ds));
+
             Assert.IsTrue(results.Exists());
 
             //ensures accumulator only has the lifetime of a single data load execution
