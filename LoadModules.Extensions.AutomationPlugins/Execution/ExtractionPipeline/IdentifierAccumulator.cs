@@ -46,6 +46,8 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline
 
         public void CommitCurrentState(AutomateExtractionRepository repository, AutomateExtraction automateExtraction)
         {
+            //todo this must be a MERGE if we want it to work with incremental deltas executions
+
             //only clar/commit on one thread at once!
             lock (oAccumulatorsLock)
             {

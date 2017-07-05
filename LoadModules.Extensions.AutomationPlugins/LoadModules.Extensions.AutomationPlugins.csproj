@@ -342,7 +342,7 @@
     <Compile Include="Data\SuccessfullyExtractedResults.cs" />
     <Compile Include="Execution\ExtractionPipeline\BaselineHackerExecuteDatasetExtractionSource.cs" />
     <Compile Include="Execution\ExtractionPipeline\IdentifierAccumulator.cs" />
-    <Compile Include="Execution\ExtractionPipeline\QueryHacker.cs" />
+    <Compile Include="Execution\ExtractionPipeline\DeltaHacker.cs" />
     <Compile Include="Execution\ExtractionPipeline\SuccessfullyExtractedResultsDocumenter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserInterfaceComponents\Tabs\AutomateExtractionScheduleTab.cs">

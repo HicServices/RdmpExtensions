@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CatalogueLibrary.Data;
 using DataExportLibrary.Data.DataTables;
+using DataExportLibrary.ExtractionTime.Commands;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using MapsDirectlyToDatabaseTable;
@@ -104,6 +105,11 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             }
 
             return dt;
+        }
+
+        public SuccessfullyExtractedResults GetSuccessIfAnyFor(IExtractableDataSet ds)
+        {
+            return _repository.GetAllObjects<SuccessfullyExtractedResults>(@"WHERE ExtractableDataSet_ID  = " + ds.ID + " AND AutomateExtraction_ID = " + ID).SingleOrDefault();
         }
     }
 }

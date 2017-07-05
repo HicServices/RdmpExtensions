@@ -15,12 +15,12 @@ using ReusableLibraryCode.Progress;
 
 namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline
 {
-    public class QueryHacker
+    public class DeltaHacker
     {
         private readonly AutomateExtractionRepository _repository;
         private readonly ExtractDatasetCommand _extractDatasetCommand;
 
-        public QueryHacker(AutomateExtractionRepository repository, ExtractDatasetCommand extractDatasetCommand)
+        public DeltaHacker(AutomateExtractionRepository repository, ExtractDatasetCommand extractDatasetCommand)
         {
             _repository = repository;
             _extractDatasetCommand = extractDatasetCommand;
@@ -41,11 +41,10 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline
             //there must be an existing baseline 
 
             //get the ids that the request is for
-            var dsId = _extractDatasetCommand.DatasetBundle.DataSet.ID;
             var configId = _extractDatasetCommand.Configuration.ID;
 
             //find the automation record
-            var automateExtraction = _repository.GetAllObjects<AutomateExtraction>("WHERE ExtractionConfiguration_ID = " + configId + ")");
+            var automateExtraction = _repository.GetAllObjects<AutomateExtraction>("WHERE ExtractionConfiguration_ID = " + configId );
 
             //there should be one! and only 1
             if(automateExtraction.Length != 1)
@@ -55,11 +54,8 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline
                 return BaselineHackEvaluation.NoCompatibleBaselineAvailable;
 
             //see if there is an audit of the previous execution success for this dataset
-            var previousSuccess = _repository.GetAllObjects<SuccessfullyExtractedResults>(@"WHERE
-  ExtractableDataSet_ID = " + dsId + @" 
-  AND
-AutomateExtraction_ID = " + automateExtraction[0].ID).SingleOrDefault();
-
+            var previousSuccess = automateExtraction[0].GetSuccessIfAnyFor(_extractDatasetCommand.DatasetBundle.DataSet);
+                
             //no there is no record of a succesful extraction so a full baseline is needed
             if(previousSuccess == null)
                 return BaselineHackEvaluation.NoCompatibleBaselineAvailable;
@@ -93,7 +89,7 @@ AutomateExtraction_ID = " + automateExtraction[0].ID).SingleOrDefault();
                 throw new Exception("Table '" + tblForJoin + " did not exist!");
 
             var tableForJoinName = tblForJoin.GetFullyQualifiedName();
-
+            
             hackSql = @"
 AND
 (
@@ -109,6 +105,8 @@ AND
 	)
 )
 ";
+
+            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Generated the following Delta Hack SQL:" + Environment.NewLine + hackSql));
 
             return BaselineHackEvaluation.Allowed;
         }

@@ -67,6 +67,11 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline
                     _automateExtraction.BaselineDate = DateTime.Now;
                     _automateExtraction.SaveToDatabase();
                 }
+                
+                //delete any old baseline records 
+                var success = _automateExtraction.GetSuccessIfAnyFor(ds.DatasetBundle.DataSet);
+                if (success != null)
+                    success.DeleteInDatabase();
 
                 _accumulator = IdentifierAccumulator.GetInstance(_dataLoadInfo);
 
