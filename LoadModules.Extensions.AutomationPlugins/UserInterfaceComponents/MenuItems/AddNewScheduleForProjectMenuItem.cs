@@ -6,6 +6,7 @@ using CatalogueManager.Refreshing;
 using DataExportLibrary.Data.DataTables;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data;
+using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 
 namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.MenuItems
 {

@@ -13,6 +13,7 @@ using CatalogueManager.PluginChildProvision;
 using CatalogueManager.Refreshing;
 using DataExportLibrary.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data;
+using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.MenuItems;
 using LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs;
 

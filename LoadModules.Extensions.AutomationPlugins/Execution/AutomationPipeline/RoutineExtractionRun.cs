@@ -4,7 +4,7 @@ using CatalogueLibrary.Data.Automation;
 using RDMPAutomationService;
 using RDMPAutomationService.Interfaces;
 
-namespace LoadModules.Extensions.AutomationPlugins.Execution
+namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 {
     class RoutineExtractionRun : IAutomateable
     {

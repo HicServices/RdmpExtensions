@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using CatalogueLibrary.Data;
 using CatalogueLibrary.Repositories;
 using MapsDirectlyToDatabaseTable;
@@ -11,7 +8,7 @@ using RDMPStartup;
 using ReusableLibraryCode.DataAccess;
 using ReusableUIComponents;
 
-namespace LoadModules.Extensions.AutomationPlugins.Data
+namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
 {
     public class AutomateExtractionRepositoryFinder : PluginRepositoryFinder
     {

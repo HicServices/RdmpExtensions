@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CatalogueLibrary.Repositories;
 using CatalogueLibrary.Repositories.Construction;
-using DataExportLibrary.Repositories;
 using MapsDirectlyToDatabaseTable;
-using RDMPStartup;
 
-namespace LoadModules.Extensions.AutomationPlugins.Data
+namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
 {
     public class AutomateExtractionRepository : TableRepository
     {

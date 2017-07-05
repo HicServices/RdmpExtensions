@@ -11,7 +11,7 @@ using RDMPAutomationService.Interfaces;
 using ReusableLibraryCode.Checks;
 using ReusableLibraryCode.Progress;
 
-namespace LoadModules.Extensions.AutomationPlugins.Execution
+namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 {
     public class AutomatedExtractionSource : IPluginAutomationSource, IPipelineRequirement<IRDMPPlatformRepositoryServiceLocator>, ICheckable
     {

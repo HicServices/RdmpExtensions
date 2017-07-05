@@ -1,4 +1,4 @@
-﻿namespace LoadModules.Extensions.AutomationPlugins.Execution
+﻿namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 {
     class RoutineExtractionRunFinder
     {

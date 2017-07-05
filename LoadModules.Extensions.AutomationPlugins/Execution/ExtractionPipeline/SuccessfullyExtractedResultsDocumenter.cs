@@ -2,33 +2,31 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CatalogueLibrary.DataFlowPipeline;
 using CatalogueLibrary.DataFlowPipeline.Requirements;
-using CatalogueLibrary.Repositories;
 using DataExportLibrary.ExtractionTime;
 using DataExportLibrary.ExtractionTime.Commands;
+using DataExportLibrary.Interfaces.Data.DataTables;
 using DataExportLibrary.Interfaces.ExtractionTime.Commands;
-using DataExportLibrary.Repositories;
 using HIC.Logging;
 using LoadModules.Extensions.AutomationPlugins.Data;
-using MapsDirectlyToDatabaseTable;
+using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using ReusableLibraryCode.Checks;
 using ReusableLibraryCode.Progress;
 
-namespace LoadModules.Extensions.AutomationPlugins.Execution
+namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline
 {
-    public class SuccessfullyExtractedResultsDocumenter : IPluginDataFlowComponent<DataTable>, IPipelineRequirement<IExtractCommand>
+    public class SuccessfullyExtractedResultsDocumenter : IPluginDataFlowComponent<DataTable>, IPipelineRequirement<IExtractCommand>, IPipelineRequirement<DataLoadInfo>
     {
 
         private IExtractCommand _extractDatasetCommand;
         private string _sql = null;
 
-        HashSet<string>  _releaseIdentifiersSeen = new HashSet<string>();
         private AutomateExtractionRepository _repo;
         private AutomateExtraction _automateExtraction;
         private DataLoadInfo _dataLoadInfo;
+        private IdentifierAccumulator _accumulator;
+        private IExtractableDataSet _dataset;
 
         public DataTable ProcessPipelineData(DataTable toProcess, IDataLoadEventListener listener,GracefulCancellationToken cancellationToken)
         {
@@ -49,10 +47,8 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution
         {
             if(_sql == null)
             {
-
                 _sql = ds.QueryBuilder.SQL;
-
-
+                _dataset = ds.DatasetBundle.DataSet;
                 var finder = new AutomateExtractionRepositoryFinder(ds.RepositoryLocator);
                 _repo = finder.GetRepositoryIfAny() as AutomateExtractionRepository;
 
@@ -66,11 +62,13 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution
 
                 //index ensure you can't have multiple so this shouldn't blow up
                 _automateExtraction = matches.Single();
+                if(_automateExtraction.BaselineDate == null)
+                {
+                    _automateExtraction.BaselineDate = DateTime.Now;
+                    _automateExtraction.SaveToDatabase();
+                }
 
-                _automateExtraction.LastAttempt = DateTime.Now;
-                _automateExtraction.LastAttemptDataLoadRunID = _dataLoadInfo.ID;
-                
-                _automateExtraction.SaveToDatabase();
+                _accumulator = IdentifierAccumulator.GetInstance(_dataLoadInfo);
 
             }
             
@@ -83,7 +81,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution
                     if(value == null || value == DBNull.Value)
                         continue;
 
-                    _releaseIdentifiersSeen.Add(value.ToString());
+                    _accumulator.AddIdentifierIfNotSee(value.ToString());
                 }
             }
 
@@ -102,10 +100,10 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution
         public void Dispose(IDataLoadEventListener listener, Exception pipelineFailureExceptionIfAny)
         {
             //it completed succesfully right?
-            if (pipelineFailureExceptionIfAny == null)
+            if (pipelineFailureExceptionIfAny == null && _dataset != null)
             {
-                var successRecord = new SuccessfullyExtractedResults(_repo, _sql);
-                successRecord.SetExtractionIdentifiers(_releaseIdentifiersSeen);
+                var successRecord = new SuccessfullyExtractedResults(_repo, _sql, _automateExtraction, _dataset);
+                _accumulator.CommitCurrentState(_repo, _automateExtraction);
             }
         }
 

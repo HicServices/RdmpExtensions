@@ -4,7 +4,7 @@ using CatalogueLibrary.Data;
 using CatalogueLibrary.ExternalDatabaseServerPatching;
 using CatalogueLibrary.Repositories;
 
-namespace LoadModules.Extensions.AutomationPlugins.Data
+namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
 {
     public class AutomationDatabasePluginPatcher:IPluginPatcher
     {

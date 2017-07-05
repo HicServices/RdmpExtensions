@@ -14,15 +14,21 @@ using CatalogueManager.Refreshing;
 using CatalogueManager.SimpleControls;
 using CatalogueManager.TestsAndSetup.ServicePropogation;
 using DataExportLibrary.Data.DataTables;
+using DataExportLibrary.ExtractionTime.Commands;
 using DataExportLibrary.ExtractionTime.ExtractionPipeline;
+using DataExportLibrary.ExtractionTime.UserPicks;
 using DataExportLibrary.Interfaces.Data.DataTables;
+using HIC.Logging;
 using LoadModules.Extensions.AutomationPlugins.Data;
+using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using LoadModules.Extensions.AutomationPlugins.Execution;
+using LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline;
 using MapsDirectlyToDatabaseTable;
 using MapsDirectlyToDatabaseTableUI;
 using RDMPAutomationService;
 using RDMPObjectVisualisation.Pipelines;
 using ReusableUIComponents;
+using ReusableUIComponents.SqlDialogs;
 using roundhouse.infrastructure.extensions;
 
 namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs
@@ -44,6 +50,7 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs
             ddExecutionTimescale.DataSource = Enum.GetValues(typeof (AutomationTimeScale));
             olvConfigurations.BooleanCheckStateGetter = BooleanCheckStateGetter;
             olvConfigurations.BooleanCheckStatePutter = BooleanCheckStatePutter;
+            olvConfigurations.RowHeight = 19;
 
             _extractionConfiguration = CatalogueIcons.ExtractionConfiguration;
             olvName.ImageGetter = e => _extractionConfiguration;
@@ -51,13 +58,21 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs
             _extractionConfigurationIconAdd = new IconOverlayProvider().GetOverlayNoCache(_extractionConfiguration, OverlayKind.Add);
             btnAddExtractionConfigurations.Image = _extractionConfigurationIconAdd;
 
-            olvConfigurations.UseCellFormatEvents = true;
             olvConfigurations.FormatCell += olvConfigurations_FormatCell;
+            olvConfigurations.UseCellFormatEvents = true;
 
             olvLastAttempt.AspectGetter = LastAttemptAspectGetter;
             olvLastLog.AspectGetter = LastLogAspectGetter;
-            olvSQL.AspectGetter = SQLAspectGetter;
-            olvIdentifiers.AspectGetter = IdentifiersAspectGetter;
+            olvResults.AspectGetter = ResultsAspectGetter;
+
+            olvConfigurations.ButtonClick += olvConfigurations_ButtonClick;
+
+        }
+
+        void olvConfigurations_ButtonClick(object sender, BrightIdeasSoftware.CellClickEventArgs e)
+        {
+            var a = (AutomateExtraction)e.Model;
+
         }
 
         void olvConfigurations_FormatCell(object sender, BrightIdeasSoftware.FormatCellEventArgs e)
@@ -65,13 +80,6 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs
             if (e.ColumnIndex == olvLastAttempt.Index)
             {
                 var a = (AutomateExtraction)e.Model;
-
-                //last attempt was succesful
-                if (a.SuccessfullyExtractedResults_ID != null)
-                {
-                    e.SubItem.ForeColor = Color.Green;
-                    return;
-                }
 
                 //last attempt was not succesful (or didn't audit even if it was allegedly succesful)
                 e.SubItem.ForeColor = Color.Red;
@@ -81,28 +89,21 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs
         private object LastAttemptAspectGetter(object rowObject)
         {
             var a = (AutomateExtraction) rowObject;
-            return a.LastAttempt == null? "Never": a.LastAttempt.ToString();
+            return "Never";
         }
 
         private object LastLogAspectGetter(object rowObject)
         {
             var a = (AutomateExtraction)rowObject;
-            return a.LastAttemptDataLoadRunID != null ? "Log" : null;
+            return "View";
         }
 
-        private object SQLAspectGetter(object rowObject)
+        private object ResultsAspectGetter(object rowObject)
         {
             var a = (AutomateExtraction)rowObject;
-            var results =a.SuccessfullyExtractedResults;
-            return results != null ? "View":null;
+            return"View";
         }
 
-        private object IdentifiersAspectGetter(object rowObject)
-        {
-            var a = (AutomateExtraction)rowObject;
-            var results = a.SuccessfullyExtractedResults;
-            return results != null ? "View" : null;
-        }
 
         private bool BooleanCheckStatePutter(object rowObject, bool newValue)
         {
@@ -141,6 +142,10 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs
                 _selectionUI.Dock = DockStyle.Fill;
                 _selectionUI.PipelineChanged += _selectionUI_PipelineChanged;
                 pPipeline.Controls.Add(_selectionUI);
+
+
+                _selectionUI.InitializationObjectsForPreviewPipeline.Add(ExtractDatasetCommand.EmptyCommand);
+                _selectionUI.InitializationObjectsForPreviewPipeline.Add(DataLoadInfo.Empty);
 
                 saverButton.SetupFor(_schedule,activator.RefreshBus);
             }

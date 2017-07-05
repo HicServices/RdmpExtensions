@@ -46,8 +46,7 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs
             this.olvName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvLastAttempt = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvLastLog = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.olvSQL = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.olvIdentifiers = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvResults = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.label3 = new System.Windows.Forms.Label();
             this.btnAddExtractionConfigurations = new System.Windows.Forms.Button();
             this.ragSmileyPipeline = new ReusableUIComponents.RAGSmiley();
@@ -149,8 +148,7 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs
             this.olvConfigurations.AllColumns.Add(this.olvName);
             this.olvConfigurations.AllColumns.Add(this.olvLastAttempt);
             this.olvConfigurations.AllColumns.Add(this.olvLastLog);
-            this.olvConfigurations.AllColumns.Add(this.olvSQL);
-            this.olvConfigurations.AllColumns.Add(this.olvIdentifiers);
+            this.olvConfigurations.AllColumns.Add(this.olvResults);
             this.olvConfigurations.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.olvConfigurations.CellEditUseWholeCell = false;
@@ -160,8 +158,7 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs
             this.olvName,
             this.olvLastAttempt,
             this.olvLastLog,
-            this.olvSQL,
-            this.olvIdentifiers});
+            this.olvResults});
             this.olvConfigurations.Cursor = System.Windows.Forms.Cursors.Default;
             this.olvConfigurations.Location = new System.Drawing.Point(76, 355);
             this.olvConfigurations.Name = "olvConfigurations";
@@ -175,6 +172,7 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs
             // olvName
             // 
             this.olvName.AspectName = "ToString";
+            this.olvName.ButtonSizing = BrightIdeasSoftware.OLVColumn.ButtonSizingMode.CellBounds;
             this.olvName.Groupable = false;
             this.olvName.Text = "Configuration";
             this.olvName.Width = 300;
@@ -182,28 +180,25 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs
             // olvLastAttempt
             // 
             this.olvLastAttempt.AspectName = "";
+            this.olvLastAttempt.ButtonSizing = BrightIdeasSoftware.OLVColumn.ButtonSizingMode.CellBounds;
             this.olvLastAttempt.Groupable = false;
             this.olvLastAttempt.Text = "Last Attempt";
             this.olvLastAttempt.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.olvLastAttempt.Width = 100;
+            this.olvLastAttempt.Width = 150;
             // 
             // olvLastLog
             // 
+            this.olvLastLog.ButtonSizing = BrightIdeasSoftware.OLVColumn.ButtonSizingMode.CellBounds;
             this.olvLastLog.IsButton = true;
             this.olvLastLog.Text = "Log";
             this.olvLastLog.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // olvSQL
+            // olvResults
             // 
-            this.olvSQL.IsButton = true;
-            this.olvSQL.Text = "SQL";
-            this.olvSQL.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // olvIdentifiers
-            // 
-            this.olvIdentifiers.IsButton = true;
-            this.olvIdentifiers.Text = "Identifiers";
-            this.olvIdentifiers.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.olvResults.ButtonSizing = BrightIdeasSoftware.OLVColumn.ButtonSizingMode.CellBounds;
+            this.olvResults.IsButton = true;
+            this.olvResults.Text = "Results";
+            this.olvResults.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label3
             // 
@@ -277,8 +272,7 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs
         private OLVColumn olvLastAttempt;
         private System.Windows.Forms.Button btnAddExtractionConfigurations;
         private OLVColumn olvLastLog;
-        private OLVColumn olvSQL;
-        private OLVColumn olvIdentifiers;
+        private OLVColumn olvResults;
         private ReusableUIComponents.RAGSmiley ragSmileyPipeline;
     }
 }
