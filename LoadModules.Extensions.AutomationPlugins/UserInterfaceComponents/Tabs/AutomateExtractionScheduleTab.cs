@@ -58,50 +58,40 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs
             _extractionConfigurationIconAdd = new IconOverlayProvider().GetOverlayNoCache(_extractionConfiguration, OverlayKind.Add);
             btnAddExtractionConfigurations.Image = _extractionConfigurationIconAdd;
 
-            olvConfigurations.FormatCell += olvConfigurations_FormatCell;
-            olvConfigurations.UseCellFormatEvents = true;
-
-            olvLastAttempt.AspectGetter = LastAttemptAspectGetter;
-            olvLastLog.AspectGetter = LastLogAspectGetter;
-            olvResults.AspectGetter = ResultsAspectGetter;
+            olvBaselineDate.AspectGetter = LastAttemptAspectGetter;
+            olvDeleteBaselineAudit.AspectGetter = DeleteAspectGetter;
 
             olvConfigurations.ButtonClick += olvConfigurations_ButtonClick;
 
         }
 
+        private object DeleteAspectGetter(object rowObject)
+        {
+            var a = (AutomateExtraction)rowObject;
+            if (a.BaselineDate == null)
+                return null;
+
+            return "Clear";
+        }
+
         void olvConfigurations_ButtonClick(object sender, BrightIdeasSoftware.CellClickEventArgs e)
         {
             var a = (AutomateExtraction)e.Model;
-
-        }
-
-        void olvConfigurations_FormatCell(object sender, BrightIdeasSoftware.FormatCellEventArgs e)
-        {
-            if (e.ColumnIndex == olvLastAttempt.Index)
+            if (e.ColumnIndex == olvDeleteBaselineAudit.Index)
             {
-                var a = (AutomateExtraction)e.Model;
-
-                //last attempt was not succesful (or didn't audit even if it was allegedly succesful)
-                e.SubItem.ForeColor = Color.Red;
+                a.ClearBaselines();
             }
+
         }
+
 
         private object LastAttemptAspectGetter(object rowObject)
         {
             var a = (AutomateExtraction) rowObject;
-            return "Never";
-        }
+            if (a.BaselineDate == null)
+                return "Never";
 
-        private object LastLogAspectGetter(object rowObject)
-        {
-            var a = (AutomateExtraction)rowObject;
-            return "View";
-        }
-
-        private object ResultsAspectGetter(object rowObject)
-        {
-            var a = (AutomateExtraction)rowObject;
-            return"View";
+            return a.BaselineDate;
         }
 
 

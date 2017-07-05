@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -110,6 +111,24 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
         public SuccessfullyExtractedResults GetSuccessIfAnyFor(IExtractableDataSet ds)
         {
             return _repository.GetAllObjects<SuccessfullyExtractedResults>(@"WHERE ExtractableDataSet_ID  = " + ds.ID + " AND AutomateExtraction_ID = " + ID).SingleOrDefault();
+        }
+
+        public void ClearBaselines()
+        {
+            using (var con = _repository.DiscoveredServer.GetConnection())
+            {
+                con.Open();
+                new SqlCommand(@"Delete From 
+  [ReleaseIdentifiersSeen]
+  where
+  AutomateExtraction_ID = " + ID, (SqlConnection) con).ExecuteNonQuery();
+            }
+
+            foreach (SuccessfullyExtractedResults r in _repository.GetAllObjectsWithParent<SuccessfullyExtractedResults>(this))
+                r.DeleteInDatabase();
+            
+            BaselineDate = null;
+            SaveToDatabase();
         }
     }
 }

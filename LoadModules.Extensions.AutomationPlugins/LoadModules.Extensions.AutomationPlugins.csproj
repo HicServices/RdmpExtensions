@@ -359,12 +359,6 @@
     </Compile>
     <Compile Include="UserInterfaceComponents\AutomationPluginInterface.cs" />
     <Compile Include="UserInterfaceComponents\MenuItems\CreateNewAutomationPluginsDatabase.cs" />
-    <Compile Include="UserInterfaceComponents\Tabs\SuccessfullyExtractedResultsUI.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UserInterfaceComponents\Tabs\SuccessfullyExtractedResultsUI.Designer.cs">
-      <DependentUpon>SuccessfullyExtractedResultsUI.cs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -376,9 +370,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UserInterfaceComponents\Tabs\AutomateExtractionScheduleTab.resx">
       <DependentUpon>AutomateExtractionScheduleTab.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UserInterfaceComponents\Tabs\SuccessfullyExtractedResultsUI.resx">
-      <DependentUpon>SuccessfullyExtractedResultsUI.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

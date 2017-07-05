@@ -110,6 +110,10 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
             dt = automateConfig.GetIdentifiersTable();
             Assert.AreEqual(dt.Rows.Count, 3);
 
+            automateConfig.ClearBaselines();
+            dt = automateConfig.GetIdentifiersTable();
+            Assert.AreEqual(dt.Rows.Count, 0);
+
         }
     }
 }
