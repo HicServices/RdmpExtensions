@@ -34,10 +34,11 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline
 
         private IdentifierAccumulator()
         {
-
+            _commitTblName = "Temp"+Guid.NewGuid().ToString().Replace("-", "");
         }
-        
+
         HashSet<string>  identifiers = new HashSet<string>();
+        private string _commitTblName;
 
         public void AddIdentifierIfNotSee(string identifier)
         {
@@ -46,8 +47,6 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline
 
         public void CommitCurrentState(AutomateExtractionRepository repository, AutomateExtraction automateExtraction)
         {
-            //todo this must be a MERGE if we want it to work with incremental deltas executions
-
             //only clar/commit on one thread at once!
             lock (oAccumulatorsLock)
             {
@@ -62,19 +61,39 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline
                     dt.Rows.Add(id, s);
 
                 //clear old history
-                using (SqlConnection con = new SqlConnection(repository.ConnectionString))
+                var tempTable = repository.DiscoveredServer.GetCurrentDatabase().ExpectTable(_commitTblName);
+
+                using (var con = repository.DiscoveredServer.GetConnection())
                 {
                     con.Open();
-                    SqlCommand cmd = new SqlCommand("DELETE FROM ReleaseIdentifiersSeen where AutomateExtraction_ID = " + automateExtraction.ID, con);
-                    cmd.ExecuteNonQuery();
+                    var query = "SELECT TOP 0 * INTO " + tempTable.GetFullyQualifiedName()+" FROM ReleaseIdentifiersSeen";
+                    repository.DiscoveredServer.GetCommand(query, con).ExecuteNonQuery();
                 }
-            
+
                 //bulk insert new history
                 var bulkCopy = new SqlBulkCopy(repository.DiscoveredServer.Builder.ConnectionString);
                 bulkCopy.ColumnMappings.Add("AutomateExtraction_ID", "AutomateExtraction_ID");
                 bulkCopy.ColumnMappings.Add("ReleaseID", "ReleaseID");
-                bulkCopy.DestinationTableName = "ReleaseIdentifiersSeen";
+                bulkCopy.DestinationTableName = tempTable.GetFullyQualifiedName();
                 UsefulStuff.BulkInsertWithBetterErrorMessages(bulkCopy, dt, repository.DiscoveredServer);
+                
+                //clear old history
+                using (SqlConnection con = new SqlConnection(repository.ConnectionString))
+                {
+                    con.Open();
+                    string sql = @"INSERT ReleaseIdentifiersSeen (AutomateExtraction_ID, ReleaseID)  
+SELECT AutomateExtraction_ID, ReleaseID   
+FROM "+_commitTblName+@"
+WHERE NOT EXISTS (SELECT 1 FROM ReleaseIdentifiersSeen A2 WHERE
+A2.AutomateExtraction_ID = " + _commitTblName + @".AutomateExtraction_ID 
+AND
+A2.ReleaseID = " + _commitTblName + @".ReleaseID )";
+                    SqlCommand cmd = new SqlCommand(sql, con);
+                    cmd.ExecuteNonQuery();
+                }
+            
+
+                tempTable.Drop();
             }
         }
     }
