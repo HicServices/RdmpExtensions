@@ -334,7 +334,6 @@
     <Compile Include="AutomatedExtractionEndToEndTest.cs" />
     <Compile Include="NeverAllowAnythingTicketing.cs" />
     <Compile Include="RoutineExtractionRunFinderTests.cs" />
-    <Compile Include="AutomatedExtractionSourceTests.cs" />
     <Compile Include="ObjectCreationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestsRequiringAnAutomationPluginRepository.cs" />

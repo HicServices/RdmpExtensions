@@ -4,6 +4,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using BrightIdeasSoftware;
 using CatalogueManager.Icons.IconOverlays;
 using CatalogueManager.Icons.IconProvision;
 using CatalogueManager.ItemActivation;
@@ -16,6 +17,7 @@ using DataExportLibrary.Interfaces.Data.DataTables;
 using HIC.Logging;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
+using LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline;
 using LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline;
 using MapsDirectlyToDatabaseTable;
 using MapsDirectlyToDatabaseTableUI;
@@ -51,6 +53,8 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
 
             olvBaselineDate.AspectGetter = LastAttemptAspectGetter;
             olvDeleteBaselineAudit.AspectGetter = DeleteAspectGetter;
+            olvCheckAutomation.AspectGetter =(m)=> "Check";
+            olvCheckAutomation.ButtonSizing = OLVColumn.ButtonSizingMode.CellBounds;
 
             olvConfigurations.ButtonClick += olvConfigurations_ButtonClick;
 
@@ -73,8 +77,17 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
                 a.ClearBaselines();
             }
 
-        }
+            if (e.ColumnIndex == olvCheckAutomation.Index)
+            {
+                var finder = new RoutineExtractionRunFinder((AutomateExtractionRepository) _schedule.Repository);
 
+                string reason;
+                if (finder.CanRun(a, out reason))
+                    MessageBox.Show("Good to go");
+                else
+                    MessageBox.Show("Cannot run because:" + reason);
+            }
+        }
 
         private object LastAttemptAspectGetter(object rowObject)
         {

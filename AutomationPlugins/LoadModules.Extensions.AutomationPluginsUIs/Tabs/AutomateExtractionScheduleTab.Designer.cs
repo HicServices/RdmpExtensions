@@ -49,6 +49,7 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             this.label3 = new System.Windows.Forms.Label();
             this.btnAddExtractionConfigurations = new System.Windows.Forms.Button();
             this.ragSmileyPipeline = new ReusableUIComponents.RAGSmiley();
+            this.olvCheckAutomation = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             ((System.ComponentModel.ISupportInitialize)(this.olvConfigurations)).BeginInit();
             this.SuspendLayout();
             // 
@@ -147,6 +148,7 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             this.olvConfigurations.AllColumns.Add(this.olvName);
             this.olvConfigurations.AllColumns.Add(this.olvBaselineDate);
             this.olvConfigurations.AllColumns.Add(this.olvDeleteBaselineAudit);
+            this.olvConfigurations.AllColumns.Add(this.olvCheckAutomation);
             this.olvConfigurations.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.olvConfigurations.CellEditUseWholeCell = false;
@@ -155,7 +157,8 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             this.olvConfigurations.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.olvName,
             this.olvBaselineDate,
-            this.olvDeleteBaselineAudit});
+            this.olvDeleteBaselineAudit,
+            this.olvCheckAutomation});
             this.olvConfigurations.Cursor = System.Windows.Forms.Cursors.Default;
             this.olvConfigurations.Location = new System.Drawing.Point(76, 355);
             this.olvConfigurations.Name = "olvConfigurations";
@@ -218,6 +221,12 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             this.ragSmileyPipeline.Size = new System.Drawing.Size(25, 25);
             this.ragSmileyPipeline.TabIndex = 12;
             // 
+            // olvCheckAutomation
+            // 
+            this.olvCheckAutomation.IsButton = true;
+            this.olvCheckAutomation.Text = "Check Automation";
+            this.olvCheckAutomation.Width = 100;
+            // 
             // AutomateExtractionScheduleTab
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -263,5 +272,6 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
         private System.Windows.Forms.Button btnAddExtractionConfigurations;
         private OLVColumn olvDeleteBaselineAudit;
         private ReusableUIComponents.RAGSmiley ragSmileyPipeline;
+        private OLVColumn olvCheckAutomation;
     }
 }
