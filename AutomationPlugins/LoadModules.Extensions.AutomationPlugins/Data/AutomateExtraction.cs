@@ -57,6 +57,12 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             return _repository.DataExportRepository.GetObjectByID<ExtractionConfiguration>(ExtractionConfiguration_ID);
         } }
 
+        [NoMappingToDatabase]
+        public AutomateExtractionSchedule AutomateExtractionSchedule { get
+        {
+            return _repository.GetObjectByID<AutomateExtractionSchedule>(AutomateExtractionSchedule_ID);
+        }}
+
         #endregion
 
         public AutomateExtraction(AutomateExtractionRepository repository,AutomateExtractionSchedule schedule, IExtractionConfiguration config)

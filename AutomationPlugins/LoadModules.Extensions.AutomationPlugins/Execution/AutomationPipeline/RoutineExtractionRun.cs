@@ -1,40 +1,44 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using CatalogueLibrary.Data.Automation;
+using CatalogueLibrary.Repositories;
+using DataExportLibrary.Data.DataTables;
+using DataExportLibrary.ExtractionTime.Commands;
+using DataExportLibrary.ExtractionTime.ExtractionPipeline;
+using DataExportLibrary.ExtractionTime.UserPicks;
+using DataExportLibrary.Interfaces.Data.DataTables;
+using DataLoadEngineTests.Integration;
 using FluentNHibernate.Conventions;
+using HIC.Logging;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using RDMPAutomationService;
 using RDMPAutomationService.Interfaces;
+using roundhouse.infrastructure.logging;
 
 namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 {
     public class RoutineExtractionRun : IAutomateable
     {
+        public const string LoggingTaskName = "Automated Extracts";
+        private readonly IRDMPPlatformRepositoryServiceLocator _repositoryLocator;
         private AutomationServiceSlot _serviceSlot;
-        private readonly AutomateExtraction _configurationToRun;
+        private readonly AutomateExtraction _automateExtractionConfigurationToRun;
 
         public AutomationJob AutomationJob { get; private set; }
 
         public const string RoutineExtractionJobsPrefix = "RE:";
-        public const string RoutineExtractionJobsNameRegex = "RE:([\\d]+)";
 
-        public RoutineExtractionRun(AutomationServiceSlot serviceSlot, AutomateExtraction configurationToRun)
+        public RoutineExtractionRun(IRDMPPlatformRepositoryServiceLocator repositoryLocator, AutomationServiceSlot serviceSlot, AutomateExtraction automateExtractionConfigurationToRun)
         {
+            _repositoryLocator = repositoryLocator;
             _serviceSlot = serviceSlot;
-            _configurationToRun = configurationToRun;
+            _automateExtractionConfigurationToRun = automateExtractionConfigurationToRun;
 
-            AutomationJob = _serviceSlot.AddNewJob(AutomationJobType.UserCustomPipeline, RoutineExtractionJobsPrefix + "placeholder");
+            AutomationJob = _serviceSlot.AddNewJob(AutomationJobType.UserCustomPipeline, RoutineExtractionJobsPrefix + automateExtractionConfigurationToRun);
         }
 
-        public int GetScheduleIDIfAnyFromJobName(AutomationJob job)
-        {
-            var m = new Regex(RoutineExtractionJobsNameRegex).Match(job.Description);
-            if (m.Success)
-                return int.Parse(m.Groups[1].Value);
-
-            return -1;
-        }
 
         public OnGoingAutomationTask GetTask()
         {
@@ -46,9 +50,28 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             try
             {
                 task.Job.SetLastKnownStatus(AutomationJobStatus.Running);
+                
+                var extractionConfiguration = _automateExtractionConfigurationToRun.ExtractionConfiguration;
+                var datasets = extractionConfiguration.GetAllExtractableDataSets();
 
-                string path = @"C:\temp\" + DateTime.Now.ToString().Replace(":", "_").Replace("/","_") + ".txt";
-                File.WriteAllText(path, "great scottt it works");
+                if(!datasets.Any())
+                    throw new Exception("There are no ExtractableDatasets configured for ExtractionConfiguration '" + extractionConfiguration + "' in AutomateExtraction");
+
+                var logManager = ((ExtractionConfiguration) extractionConfiguration).GetExplicitLoggingDatabaseServerOrDefault();
+                logManager.CreateNewLoggingTaskIfNotExists(LoggingTaskName);
+
+                var dlinfo = logManager.CreateDataLoadInfo(LoggingTaskName, GetType().Name, extractionConfiguration.ToString(), "",false);
+                
+                foreach (IExtractableDataSet ds in datasets)
+                {
+                    var bundle = new ExtractableDatasetBundle(ds);
+                    var cmd = new ExtractDatasetCommand(_repositoryLocator, extractionConfiguration, bundle);
+
+                    var schedule = _automateExtractionConfigurationToRun.AutomateExtractionSchedule;
+
+                    var host = new ExtractionPipelineHost(cmd, _repositoryLocator.CatalogueRepository.MEF,schedule.Pipeline,(DataLoadInfo) dlinfo);
+                    host.Execute(new ThrowImmediatelyDataLoadJob());
+                }
                 
                 //it worked!
                 task.Job.SetLastKnownStatus(AutomationJobStatus.Finished);

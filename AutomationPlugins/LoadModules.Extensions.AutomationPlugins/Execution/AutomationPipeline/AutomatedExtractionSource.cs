@@ -51,7 +51,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             if (automateExtraction == null)
                 return null;
             
-            var routineExtractionRun = new RoutineExtractionRun(_serviceSlot,automateExtraction);
+            var routineExtractionRun = new RoutineExtractionRun(_repositoryLocator,_serviceSlot,automateExtraction);
 
             return new OnGoingAutomationTask(routineExtractionRun.AutomationJob, routineExtractionRun);
         }
