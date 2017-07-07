@@ -3,23 +3,29 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.Python", "LoadModules.Extensions.Python\LoadModules.Extensions.Python.csproj", "{788BB60B-2FAD-4A26-B772-AEE27CEDAE47}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.Python", "Python\LoadModules.Extensions.Python\LoadModules.Extensions.Python.csproj", "{788BB60B-2FAD-4A26-B772-AEE27CEDAE47}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.Python.Tests", "LoadModules.Extensions.Python.Tests\LoadModules.Extensions.Python.Tests.csproj", "{3EF322F4-027C-44EC-B079-2623F28BB315}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.Python.Tests", "Python\LoadModules.Extensions.Python.Tests\LoadModules.Extensions.Python.Tests.csproj", "{3EF322F4-027C-44EC-B079-2623F28BB315}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C586992F-55C2-468F-80C6-599C180DA0B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.Interactive", "LoadModules.Extensions.Interactive\LoadModules.Extensions.Interactive.csproj", "{AF23E2B7-B1F5-4B19-AF06-40D41300D130}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.Interactive", "Interactive\LoadModules.Extensions.Interactive\LoadModules.Extensions.Interactive.csproj", "{AF23E2B7-B1F5-4B19-AF06-40D41300D130}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.Interactive.Tests", "LoadModules.Extensions.Interactive.Tests\LoadModules.Extensions.Interactive.Tests.csproj", "{6806FDE2-5D56-407B-AADE-0018F40EC0C0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.Interactive.Tests", "Interactive\LoadModules.Extensions.Interactive.Tests\LoadModules.Extensions.Interactive.Tests.csproj", "{6806FDE2-5D56-407B-AADE-0018F40EC0C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.AutomationPlugins", "LoadModules.Extensions.AutomationPlugins\LoadModules.Extensions.AutomationPlugins.csproj", "{8F20577C-A47A-4F39-AC1F-092B15E36C63}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.AutomationPlugins", "AutomationPlugins\LoadModules.Extensions.AutomationPlugins\LoadModules.Extensions.AutomationPlugins.csproj", "{8F20577C-A47A-4F39-AC1F-092B15E36C63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.AutomationPlugins.Tests", "LoadModules.Extensions.AutomationPlugins.Tests\LoadModules.Extensions.AutomationPlugins.Tests.csproj", "{B0DB49EE-BF4E-4124-83F5-9FB57CA35471}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.AutomationPlugins.Tests", "AutomationPlugins\LoadModules.Extensions.AutomationPlugins.Tests\LoadModules.Extensions.AutomationPlugins.Tests.csproj", "{B0DB49EE-BF4E-4124-83F5-9FB57CA35471}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.AutomationPlugins.Database", "LoadModules.Extensions.AutomationPlugins.Database\LoadModules.Extensions.AutomationPlugins.Database.csproj", "{B7BD2A84-D440-4B1A-849D-D55284997D55}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.AutomationPlugins.Database", "AutomationPlugins\LoadModules.Extensions.AutomationPlugins.Database\LoadModules.Extensions.AutomationPlugins.Database.csproj", "{B7BD2A84-D440-4B1A-849D-D55284997D55}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.AutomationPluginsUIs", "LoadModules.Extensions.AutomationPluginsUIs\LoadModules.Extensions.AutomationPluginsUIs.csproj", "{24F510E5-B905-4F59-97B6-337A4638A85E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.AutomationPluginsUIs", "AutomationPlugins\LoadModules.Extensions.AutomationPluginsUIs\LoadModules.Extensions.AutomationPluginsUIs.csproj", "{24F510E5-B905-4F59-97B6-337A4638A85E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Python", "Python", "{9E47A57B-7897-4695-BFF4-F659539DCB87}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interactive", "Interactive", "{51106FEA-BB21-4871-B58B-B47D5E1CBAA9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AutomationPlugins", "AutomationPlugins", "{288BB105-95F0-4FE1-B23E-1514AEEEEEE8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,5 +68,15 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{788BB60B-2FAD-4A26-B772-AEE27CEDAE47} = {9E47A57B-7897-4695-BFF4-F659539DCB87}
+		{3EF322F4-027C-44EC-B079-2623F28BB315} = {9E47A57B-7897-4695-BFF4-F659539DCB87}
+		{AF23E2B7-B1F5-4B19-AF06-40D41300D130} = {51106FEA-BB21-4871-B58B-B47D5E1CBAA9}
+		{6806FDE2-5D56-407B-AADE-0018F40EC0C0} = {51106FEA-BB21-4871-B58B-B47D5E1CBAA9}
+		{8F20577C-A47A-4F39-AC1F-092B15E36C63} = {288BB105-95F0-4FE1-B23E-1514AEEEEEE8}
+		{B0DB49EE-BF4E-4124-83F5-9FB57CA35471} = {288BB105-95F0-4FE1-B23E-1514AEEEEEE8}
+		{B7BD2A84-D440-4B1A-849D-D55284997D55} = {288BB105-95F0-4FE1-B23E-1514AEEEEEE8}
+		{24F510E5-B905-4F59-97B6-337A4638A85E} = {288BB105-95F0-4FE1-B23E-1514AEEEEEE8}
 	EndGlobalSection
 EndGlobal
