@@ -305,6 +305,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -329,10 +330,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AutomationRunFinder.cs" />
-    <Compile Include="Class1.cs" />
+    <Compile Include="AllowAnythingTicketing.cs" />
+    <Compile Include="NeverAllowAnythingTicketing.cs" />
+    <Compile Include="RoutineExtractionRunFinderTests.cs" />
+    <Compile Include="AutomatedExtractionSourceTests.cs" />
     <Compile Include="ObjectCreationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestsRequiringAnAutomationPluginRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LoadModules.Extensions.AutomationPlugins.Database\LoadModules.Extensions.AutomationPlugins.Database.csproj">

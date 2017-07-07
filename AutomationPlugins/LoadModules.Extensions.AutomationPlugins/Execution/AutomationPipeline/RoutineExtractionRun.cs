@@ -1,22 +1,39 @@
 ﻿using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using CatalogueLibrary.Data.Automation;
+using FluentNHibernate.Conventions;
+using LoadModules.Extensions.AutomationPlugins.Data;
 using RDMPAutomationService;
 using RDMPAutomationService.Interfaces;
 
 namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 {
-    class RoutineExtractionRun : IAutomateable
+    public class RoutineExtractionRun : IAutomateable
     {
         private AutomationServiceSlot _serviceSlot;
+        private readonly AutomateExtractionSchedule _scheduleToRun;
+
         public AutomationJob AutomationJob { get; private set; }
+
         public const string RoutineExtractionJobsPrefix = "RE:";
-        
-        public RoutineExtractionRun(AutomationServiceSlot serviceSlot)
+        public const string RoutineExtractionJobsNameRegex = "RE:([\\d]+)";
+
+        public RoutineExtractionRun(AutomationServiceSlot serviceSlot, AutomateExtractionSchedule scheduleToRun)
         {
             _serviceSlot = serviceSlot;
-            
+            _scheduleToRun = scheduleToRun;
+
             AutomationJob = _serviceSlot.AddNewJob(AutomationJobType.UserCustomPipeline, RoutineExtractionJobsPrefix + "placeholder");
+        }
+
+        public int GetScheduleIDIfAnyFromJobName(AutomationJob job)
+        {
+            var m = new Regex(RoutineExtractionJobsNameRegex).Match(job.Description);
+            if (m.Success)
+                return int.Parse(m.Groups[1].Value);
+
+            return -1;
         }
 
         public OnGoingAutomationTask GetTask()

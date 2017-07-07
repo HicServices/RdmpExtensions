@@ -6,6 +6,7 @@ using CatalogueLibrary.Data.Automation;
 using CatalogueLibrary.DataFlowPipeline;
 using CatalogueLibrary.DataFlowPipeline.Requirements;
 using CatalogueLibrary.Repositories;
+using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using RDMPAutomationService;
 using RDMPAutomationService.Interfaces;
 using ReusableLibraryCode.Checks;
@@ -17,6 +18,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
     {
         private AutomationServiceSlot _serviceSlot;
         private IRDMPPlatformRepositoryServiceLocator _repositoryLocator;
+        private AutomateExtractionRepository _automateExtractionRepository;
 
         [DemandsInitialization("The start time of day when jobs can run e.g. 18:00 to start jobs from 6pm.  Leave blank for no limit")]
         public string StartTimeWindow { get; set; }
@@ -30,15 +32,27 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             if(_serviceSlot == null)
                 return null;
 
-            //only allow one execution at once
-            if (_serviceSlot.AutomationJobs.Any(j => j.Description.StartsWith(RoutineExtractionRun.RoutineExtractionJobsPrefix)))
-                return null;
-
-            //do not start new jobs if we are not within the execution window
+            //do not start new jobs if we are not within the service execution window
             if (!AreWithinExecutionWindow())
                 return null;
             
-            var routineExtractionRun = new RoutineExtractionRun(_serviceSlot);
+            var repoFinder = new AutomateExtractionRepositoryFinder(_repositoryLocator);
+            _automateExtractionRepository = repoFinder.GetRepositoryIfAny() as AutomateExtractionRepository;
+
+            //there is no automate extractions server (records baselines, when to extract etc)
+            if (_automateExtractionRepository == null)
+                return null;
+
+            //ask the run finder to find a run
+            RoutineExtractionRunFinder runFinder = new RoutineExtractionRunFinder(_automateExtractionRepository);
+            var schedule = runFinder.GetScheduleToRunIfAny(_serviceSlot);
+
+            //there are no new available schedules to run
+            if (schedule == null)
+                return null;
+            
+            var routineExtractionRun = new RoutineExtractionRun(_serviceSlot,schedule);
+
             return new OnGoingAutomationTask(routineExtractionRun.AutomationJob, routineExtractionRun);
         }
 
