@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CatalogueLibrary.Data.Automation;
 using CatalogueLibrary.DataFlowPipeline;
+using CatalogueLibrary.Repositories;
 using DataLoadEngineTests.Integration;
 using LoadModules.Extensions.AutomationPlugins.Execution;
 using LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline;
