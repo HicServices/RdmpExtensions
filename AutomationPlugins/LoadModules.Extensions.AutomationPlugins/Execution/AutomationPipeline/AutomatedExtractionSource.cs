@@ -45,13 +45,13 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 
             //ask the run finder to find a run
             RoutineExtractionRunFinder runFinder = new RoutineExtractionRunFinder(_automateExtractionRepository);
-            var schedule = runFinder.GetScheduleToRunIfAny(_serviceSlot);
+            var automateExtraction = runFinder.GetAutomateExtractionToRunIfAny(_serviceSlot);
 
-            //there are no new available schedules to run
-            if (schedule == null)
+            //there are no new available extractions to run
+            if (automateExtraction == null)
                 return null;
             
-            var routineExtractionRun = new RoutineExtractionRun(_serviceSlot,schedule);
+            var routineExtractionRun = new RoutineExtractionRun(_serviceSlot,automateExtraction);
 
             return new OnGoingAutomationTask(routineExtractionRun.AutomationJob, routineExtractionRun);
         }

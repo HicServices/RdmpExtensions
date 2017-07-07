@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using CatalogueLibrary.Data.Automation;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
+using LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline;
 using ReusableLibraryCode.Checks;
 
 namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
@@ -15,15 +17,53 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             _automateExtractionRepository = automateExtractionRepository;
         }
 
-        public AutomateExtractionSchedule GetScheduleToRunIfAny(AutomationServiceSlot serviceSlot)
+        public AutomateExtraction GetAutomateExtractionToRunIfAny(AutomationServiceSlot serviceSlot)
         {
             var schedules = _automateExtractionRepository.GetAllObjects<AutomateExtractionSchedule>();
 
             //only allow one execution at once (this means no parallel execution of automated extract schedules - although the datasets in them might stilll be executed in parallel)
             if (serviceSlot.AutomationJobs.Any(j => j.Description.StartsWith(RoutineExtractionRun.RoutineExtractionJobsPrefix)))
                 return null;
-            
-            return schedules.FirstOrDefault(IsRunnable);
+
+            //for each schedule
+            foreach (AutomateExtractionSchedule schedule in schedules)
+            {
+                //is the schedule runnable?
+                if (!IsRunnable(schedule))
+                    continue; //no
+
+                //find the first runnable Extraction in the schedule
+                var toRun = schedule.AutomateExtractions.Where(a => !a.Disabled).ToArray();
+
+                foreach (AutomateExtraction runnable in toRun)
+                    if (IsRunnable(schedule, runnable))
+                        return runnable;
+            }
+            return null;
+        }
+
+        private bool IsRunnable(AutomateExtractionSchedule schedule, AutomateExtraction runnable)
+        {
+            if (runnable.BaselineDate == null)
+                return true;
+
+            switch (schedule.ExecutionTimescale)
+            {
+                case AutomationTimeScale.Never:
+                    return false;
+                case AutomationTimeScale.Daily:
+                    return DateTime.Now.Subtract(runnable.BaselineDate.Value).TotalSeconds > 86400;
+                case AutomationTimeScale.Weekly:
+                    return DateTime.Now.Subtract(runnable.BaselineDate.Value).TotalSeconds > 604800;
+                case AutomationTimeScale.BiWeekly:
+                    return DateTime.Now.Subtract(runnable.BaselineDate.Value).TotalSeconds > 1209600;
+                case AutomationTimeScale.Monthly:
+                    return DateTime.Now.Subtract(runnable.BaselineDate.Value).TotalSeconds > 2629746;
+                case AutomationTimeScale.Yearly:
+                    return DateTime.Now.Subtract(runnable.BaselineDate.Value).TotalSeconds> 31556952;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private bool IsRunnable(AutomateExtractionSchedule arg)
@@ -35,6 +75,12 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             //See if the ticketing system is in a state where 
             var mem = new ToMemoryCheckNotifier();
             arg.CheckTicketing(mem);
+
+            if (mem.GetWorst() == CheckResult.Fail)
+                return false;
+
+            var pipelineChecker = new AutomatedExtractionPipelineChecker(arg.Pipeline);
+            pipelineChecker.Check(mem);
 
             if (mem.GetWorst() == CheckResult.Fail)
                 return false;

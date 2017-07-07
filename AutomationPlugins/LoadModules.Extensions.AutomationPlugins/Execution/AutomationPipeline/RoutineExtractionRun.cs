@@ -12,17 +12,17 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
     public class RoutineExtractionRun : IAutomateable
     {
         private AutomationServiceSlot _serviceSlot;
-        private readonly AutomateExtractionSchedule _scheduleToRun;
+        private readonly AutomateExtraction _configurationToRun;
 
         public AutomationJob AutomationJob { get; private set; }
 
         public const string RoutineExtractionJobsPrefix = "RE:";
         public const string RoutineExtractionJobsNameRegex = "RE:([\\d]+)";
 
-        public RoutineExtractionRun(AutomationServiceSlot serviceSlot, AutomateExtractionSchedule scheduleToRun)
+        public RoutineExtractionRun(AutomationServiceSlot serviceSlot, AutomateExtraction configurationToRun)
         {
             _serviceSlot = serviceSlot;
-            _scheduleToRun = scheduleToRun;
+            _configurationToRun = configurationToRun;
 
             AutomationJob = _serviceSlot.AddNewJob(AutomationJobType.UserCustomPipeline, RoutineExtractionJobsPrefix + "placeholder");
         }
