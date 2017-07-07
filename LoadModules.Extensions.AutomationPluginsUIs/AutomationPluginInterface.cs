@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using CatalogueLibrary.Data;
 using CatalogueManager.Icons.IconOverlays;
@@ -14,10 +9,10 @@ using CatalogueManager.Refreshing;
 using DataExportLibrary.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
-using LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.MenuItems;
-using LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs;
+using LoadModules.Extensions.AutomationPluginsUIs.MenuItems;
+using LoadModules.Extensions.AutomationPluginsUIs.Tabs;
 
-namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents
+namespace LoadModules.Extensions.AutomationPluginsUIs
 {
     public class AutomationPluginInterface:PluginUserInterface, IRefreshBusSubscriber
     {

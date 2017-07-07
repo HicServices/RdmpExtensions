@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents {
+namespace LoadModules.Extensions.AutomationPluginsUIs {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.AutomationIcons", typeof(AutomationIcons).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("LoadModules.Extensions.AutomationPluginsUIs.AutomationIcons", typeof(AutomationIcons).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

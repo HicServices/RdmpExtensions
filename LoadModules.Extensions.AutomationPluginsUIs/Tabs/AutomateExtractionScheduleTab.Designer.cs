@@ -2,7 +2,7 @@
 using CatalogueManager.LocationsMenu.Ticketing;
 using CatalogueManager.SimpleControls;
 
-namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs
+namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
 {
     partial class AutomateExtractionScheduleTab
     {

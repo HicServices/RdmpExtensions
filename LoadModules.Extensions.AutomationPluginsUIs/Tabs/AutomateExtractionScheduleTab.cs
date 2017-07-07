@@ -4,34 +4,25 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using CatalogueLibrary.Data;
-using CatalogueManager;
-using CatalogueManager.Collections;
 using CatalogueManager.Icons.IconOverlays;
 using CatalogueManager.Icons.IconProvision;
 using CatalogueManager.ItemActivation;
-using CatalogueManager.Refreshing;
 using CatalogueManager.SimpleControls;
 using CatalogueManager.TestsAndSetup.ServicePropogation;
 using DataExportLibrary.Data.DataTables;
 using DataExportLibrary.ExtractionTime.Commands;
 using DataExportLibrary.ExtractionTime.ExtractionPipeline;
-using DataExportLibrary.ExtractionTime.UserPicks;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using HIC.Logging;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
-using LoadModules.Extensions.AutomationPlugins.Execution;
 using LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline;
 using MapsDirectlyToDatabaseTable;
 using MapsDirectlyToDatabaseTableUI;
-using RDMPAutomationService;
 using RDMPObjectVisualisation.Pipelines;
 using ReusableUIComponents;
-using ReusableUIComponents.SqlDialogs;
-using roundhouse.infrastructure.extensions;
 
-namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.Tabs
+namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
 {
     public partial class AutomateExtractionScheduleTab : AutomateExtractionSchedule_Design,ISaveableUI
     {

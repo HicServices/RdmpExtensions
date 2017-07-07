@@ -4,8 +4,9 @@ using CatalogueManager.Icons.IconOverlays;
 using CatalogueManager.Icons.IconProvision;
 using CatalogueManager.ItemActivation;
 using MapsDirectlyToDatabaseTableUI;
+using roundhouse.databases;
 
-namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.MenuItems
+namespace LoadModules.Extensions.AutomationPluginsUIs.MenuItems
 {
     [System.ComponentModel.DesignerCategory("")]
     public class CreateNewAutomationPluginsDatabase:ToolStripMenuItem
@@ -23,7 +24,8 @@ namespace LoadModules.Extensions.AutomationPlugins.UserInterfaceComponents.MenuI
 
         protected override void OnClick(System.EventArgs e)
         {
-            CreatePlatformDatabase.CreateNewExternalServer(_itemActivator.RepositoryLocator.CatalogueRepository,ServerDefaults.PermissableDefaults.None, typeof (Database.Class1).Assembly);
+            CreatePlatformDatabase.CreateNewExternalServer(_itemActivator.RepositoryLocator.CatalogueRepository,ServerDefaults.PermissableDefaults.None,
+                typeof(LoadModules.Extensions.AutomationPlugins.Database.Class1).Assembly);
             _plugin.RefreshPluginUserInterfaceRepoAndObjects();
         }
     }

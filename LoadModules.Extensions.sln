@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.Auto
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.AutomationPlugins.Database", "LoadModules.Extensions.AutomationPlugins.Database\LoadModules.Extensions.AutomationPlugins.Database.csproj", "{B7BD2A84-D440-4B1A-849D-D55284997D55}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.AutomationPluginsUIs", "LoadModules.Extensions.AutomationPluginsUIs\LoadModules.Extensions.AutomationPluginsUIs.csproj", "{24F510E5-B905-4F59-97B6-337A4638A85E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{B7BD2A84-D440-4B1A-849D-D55284997D55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7BD2A84-D440-4B1A-849D-D55284997D55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7BD2A84-D440-4B1A-849D-D55284997D55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24F510E5-B905-4F59-97B6-337A4638A85E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24F510E5-B905-4F59-97B6-337A4638A85E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24F510E5-B905-4F59-97B6-337A4638A85E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24F510E5-B905-4F59-97B6-337A4638A85E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
