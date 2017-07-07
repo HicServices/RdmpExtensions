@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using CatalogueLibrary.Data;
 using CatalogueLibrary.Data.Automation;
 using CatalogueLibrary.Repositories;
 using DataExportLibrary.Data.DataTables;
@@ -77,9 +78,10 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
                 task.Job.SetLastKnownStatus(AutomationJobStatus.Finished);
                 task.Job.DeleteInDatabase();
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 task.Job.SetLastKnownStatus(AutomationJobStatus.Crashed);
+                new AutomationServiceException(_repositoryLocator.CatalogueRepository, e);
             }
         }
     }

@@ -29,21 +29,13 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
         [SetUp]
         public void SetupSlot()
         {
-            _slot = new AutomationServiceSlot(_repo.CatalogueRepository);
-            _finder = new RoutineExtractionRunFinder(_repo);
+            _slot = new AutomationServiceSlot(Repo.CatalogueRepository);
+            _finder = new RoutineExtractionRunFinder(Repo);
 
-            _proj = new Project(_repo.DataExportRepository, "MyProject");
+            _proj = new Project(Repo.DataExportRepository, "MyProject");
             _extractionConfiguration = new ExtractionConfiguration(DataExportRepository,_proj);
 
-            _validPipeline = new Pipeline(CatalogueRepository);
-
-            var source = new PipelineComponent(CatalogueRepository, _validPipeline,typeof (BaselineHackerExecuteDatasetExtractionSource), 0);
-            var broadcaster = new PipelineComponent(CatalogueRepository, _validPipeline, typeof(SuccessfullyExtractedResultsDocumenter), 1);
-            var destination = new PipelineComponent(CatalogueRepository, _validPipeline, typeof(ExecuteFullExtractionToDatabaseMSSql), 2);
-
-            _validPipeline.SourcePipelineComponent_ID = source.ID;
-            _validPipeline.DestinationPipelineComponent_ID = destination.ID;
-            _validPipeline.SaveToDatabase();
+            _validPipeline = GetValidExtractionPipeline();
 
             //a pipeline that is missing the broadcaster
             _invalidPipeline = new Pipeline(CatalogueRepository);
@@ -55,10 +47,11 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
             _invalidPipeline.DestinationPipelineComponent_ID = destinationInvalid.ID;
             _invalidPipeline.SaveToDatabase();
             
-            _schedule = new AutomateExtractionSchedule(_repo, _proj);
-            _config = new AutomateExtraction(_repo, _schedule, _extractionConfiguration);
+            _schedule = new AutomateExtractionSchedule(Repo, _proj);
+            _config = new AutomateExtraction(Repo, _schedule, _extractionConfiguration);
 
         }
+
 
         [TearDown]
         public void DeleteSlot()
@@ -106,9 +99,9 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
         [Test]
         public void FindRunnableSchedule_TicketStatusIsNo()
         {
-            _repo.CatalogueRepository.MEF.AddTypeToCatalogForTesting(typeof(NeverAllowAnythingTicketing));
+            Repo.CatalogueRepository.MEF.AddTypeToCatalogForTesting(typeof(NeverAllowAnythingTicketing));
 
-            var ticketingSystem = new TicketingSystemConfiguration(_repo.CatalogueRepository, "NeverAllowAnythingTicketing");
+            var ticketingSystem = new TicketingSystemConfiguration(Repo.CatalogueRepository, "NeverAllowAnythingTicketing");
             ticketingSystem.Type = typeof (NeverAllowAnythingTicketing).FullName;
             ticketingSystem.SaveToDatabase();
             
@@ -243,9 +236,9 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
             TicketingSystemConfiguration ticketingSystem = null;
             if (createATicketingSystem)
             {
-                _repo.CatalogueRepository.MEF.AddTypeToCatalogForTesting(typeof(AllowAnythingTicketing));
+                Repo.CatalogueRepository.MEF.AddTypeToCatalogForTesting(typeof(AllowAnythingTicketing));
 
-                ticketingSystem = new TicketingSystemConfiguration(_repo.CatalogueRepository, "AllowAnythingTicketing");
+                ticketingSystem = new TicketingSystemConfiguration(Repo.CatalogueRepository, "AllowAnythingTicketing");
                 ticketingSystem.Type = typeof(AllowAnythingTicketing).FullName;
                 ticketingSystem.SaveToDatabase();
             }

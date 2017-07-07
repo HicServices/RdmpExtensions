@@ -331,6 +331,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AllowAnythingTicketing.cs" />
+    <Compile Include="AutomatedExtractionEndToEndTest.cs" />
     <Compile Include="NeverAllowAnythingTicketing.cs" />
     <Compile Include="RoutineExtractionRunFinderTests.cs" />
     <Compile Include="AutomatedExtractionSourceTests.cs" />
