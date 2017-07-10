@@ -98,3 +98,23 @@ CREATE UNIQUE NONCLUSTERED INDEX [ix_oneResultPerConfigDataset] ON [dbo].[Succes
 	[AutomateExtraction_ID] ASC
 )
 GO
+
+CREATE TABLE [dbo].[QueuedExtraction](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[ExtractionConfiguration_ID] [int] NOT NULL,
+	[Pipeline_ID] [int] NOT NULL,
+	[DueDate] [datetime] NOT NULL,
+	[Requester] [varchar](500) NOT NULL,
+	[RequestDate] [datetime] NOT NULL,
+ CONSTRAINT [PK_QueuedExtraction] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+ALTER TABLE [dbo].[QueuedExtraction] ADD  CONSTRAINT [DF_QueuedExtraction_RequestDate]  DEFAULT (getdate()) FOR [RequestDate]
+GO
+
+

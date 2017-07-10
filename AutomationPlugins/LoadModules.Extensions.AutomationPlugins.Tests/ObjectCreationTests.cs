@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CatalogueLibrary.Data;
+using CatalogueLibrary.Data.Pipelines;
 using DataExportLibrary.Data.DataTables;
 using HIC.Logging;
 using LoadModules.Extensions.AutomationPlugins.Data;
@@ -46,6 +47,27 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
 
             Assert.IsFalse(schedule.Exists());
             Assert.IsFalse(proj.Exists());
+
+        }
+
+        [Test]
+        public void CreateQueuedExecution()
+        {
+            Project project = new Project(Repo.DataExportRepository,"proj");
+            ExtractionConfiguration configuration= new ExtractionConfiguration(Repo.DataExportRepository,project);
+            
+            Pipeline p = new Pipeline(Repo.CatalogueRepository);
+
+            var que = new QueuedExtraction(Repo, configuration, p, DateTime.Now.AddHours(1));
+            Assert.IsTrue(que.Exists());
+            Assert.Greater(que.DueDate, DateTime.Now);
+
+            que.DeleteInDatabase();
+
+            p.DeleteInDatabase();
+
+            project.DeleteInDatabase();
+
         }
 
         [Test]

@@ -253,6 +253,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\AutomateExtraction.cs" />
+    <Compile Include="Data\QueuedExtraction.cs" />
     <Compile Include="Data\Repository\AutomateExtractionRepository.cs" />
     <Compile Include="Data\Repository\AutomateExtractionRepositoryFinder.cs" />
     <Compile Include="Data\Repository\AutomationDatabasePluginPatcher.cs" />
