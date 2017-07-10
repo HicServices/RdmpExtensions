@@ -10,12 +10,13 @@ using DataExportLibrary.ExtractionTime.Commands;
 using DataExportLibrary.ExtractionTime.ExtractionPipeline;
 using DataExportLibrary.ExtractionTime.UserPicks;
 using DataExportLibrary.Interfaces.Data.DataTables;
-using DataLoadEngineTests.Integration;
 using FluentNHibernate.Conventions;
 using HIC.Logging;
+using HIC.Logging.Listeners;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using RDMPAutomationService;
 using RDMPAutomationService.Interfaces;
+using ReusableLibraryCode.Progress;
 using roundhouse.infrastructure.logging;
 
 namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
@@ -71,9 +72,11 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
                     var schedule = _automateExtractionConfigurationToRun.AutomateExtractionSchedule;
 
                     var host = new ExtractionPipelineHost(cmd, _repositoryLocator.CatalogueRepository.MEF,schedule.Pipeline,(DataLoadInfo) dlinfo);
-                    host.Execute(new ThrowImmediatelyDataLoadJob());
+                    host.Execute(new ToConsoleDataLoadEventReceiver());
                 }
                 
+                dlinfo.CloseAndMarkComplete();
+
                 //it worked!
                 task.Job.SetLastKnownStatus(AutomationJobStatus.Finished);
                 task.Job.DeleteInDatabase();
