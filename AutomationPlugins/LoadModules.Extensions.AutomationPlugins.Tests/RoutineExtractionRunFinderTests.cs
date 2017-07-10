@@ -68,7 +68,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
         public void FindRunnableSchedule_NoneExist()
         {
             //nothing available to find
-            Assert.IsNull(_finder.GetAutomateExtractionToRunIfAny(_slot));
+            Assert.IsNull(_finder.GetAutomateExtractionToRunIfAny(RepositoryLocator,_slot));
         }
 
         [Test]
@@ -82,12 +82,12 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
                 _schedule.ExecutionTimescale = AutomationTimeScale.Never;
                 _schedule.SaveToDatabase();
 
-                Assert.IsNull(_finder.GetAutomateExtractionToRunIfAny(_slot));
+                Assert.IsNull(_finder.GetAutomateExtractionToRunIfAny(RepositoryLocator, _slot));
 
                 _schedule.ExecutionTimescale = AutomationTimeScale.Monthly;
                 _schedule.SaveToDatabase();
-                
-                Assert.AreEqual(_config,_finder.GetAutomateExtractionToRunIfAny(_slot));
+
+                Assert.AreEqual(_config.ExtractionConfiguration, _finder.GetAutomateExtractionToRunIfAny(RepositoryLocator, _slot).ExtractionConfiguration);
             }
             finally
             {
@@ -112,10 +112,10 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
 
             try
             {
-                Assert.Null( _finder.GetAutomateExtractionToRunIfAny(_slot));
+                Assert.Null(_finder.GetAutomateExtractionToRunIfAny(RepositoryLocator, _slot));
                 ticketingSystem.DeleteInDatabase();
 
-                Assert.AreEqual(_config,_finder.GetAutomateExtractionToRunIfAny(_slot));
+                Assert.AreEqual(_config.ExtractionConfiguration, _finder.GetAutomateExtractionToRunIfAny(RepositoryLocator, _slot).ExtractionConfiguration);
             }
             finally
             {
@@ -136,13 +136,13 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
             try
             {
                 //other job is in there so it prevents the schedule running
-                Assert.IsNull(_finder.GetAutomateExtractionToRunIfAny(_slot));
+                Assert.IsNull(_finder.GetAutomateExtractionToRunIfAny(RepositoryLocator, _slot));
                 
                 //job completes itself
                 job.DeleteInDatabase();
 
                 //schedule now found
-                Assert.AreEqual(_config, _finder.GetAutomateExtractionToRunIfAny(_slot));
+                Assert.AreEqual(_config.ExtractionConfiguration, _finder.GetAutomateExtractionToRunIfAny(RepositoryLocator, _slot).ExtractionConfiguration);
             }
             finally
             {
@@ -159,13 +159,13 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
 
             try
             {
-                Assert.IsNull(_finder.GetAutomateExtractionToRunIfAny(_slot));
+                Assert.IsNull(_finder.GetAutomateExtractionToRunIfAny(RepositoryLocator, _slot));
 
                 _schedule.Pipeline_ID = _validPipeline.ID;
                 _schedule.SaveToDatabase();
 
                 //schedule now found
-                Assert.AreEqual(_config, _finder.GetAutomateExtractionToRunIfAny(_slot));
+                Assert.AreEqual(_config.ExtractionConfiguration, _finder.GetAutomateExtractionToRunIfAny(RepositoryLocator, _slot).ExtractionConfiguration);
 
             }
             finally
@@ -185,13 +185,13 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
             try
             {
                 //pipeline is invalid so should not be found
-                Assert.IsNull(_finder.GetAutomateExtractionToRunIfAny(_slot));
+                Assert.IsNull(_finder.GetAutomateExtractionToRunIfAny(RepositoryLocator, _slot));
 
                 _schedule.Pipeline_ID = _validPipeline.ID;
                 _schedule.SaveToDatabase();
 
                 //schedule now found
-                Assert.AreEqual(_config, _finder.GetAutomateExtractionToRunIfAny(_slot));
+                Assert.AreEqual(_config.ExtractionConfiguration, _finder.GetAutomateExtractionToRunIfAny(RepositoryLocator, _slot).ExtractionConfiguration);
             }
             finally
             {
@@ -213,15 +213,15 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
                 //configuration was run recently
                 _config.BaselineDate = DateTime.Now;
                 _config.SaveToDatabase();
-                
-                Assert.IsNull(_finder.GetAutomateExtractionToRunIfAny(_slot));
+
+                Assert.IsNull(_finder.GetAutomateExtractionToRunIfAny(RepositoryLocator, _slot));
 
                 //reset the configuration, they will get everything again
                 _config.BaselineDate = null;
                 _config.SaveToDatabase();
 
                 //schedule now found
-                Assert.AreEqual(_config, _finder.GetAutomateExtractionToRunIfAny(_slot));
+                Assert.AreEqual(_config.ExtractionConfiguration, _finder.GetAutomateExtractionToRunIfAny(RepositoryLocator, _slot).ExtractionConfiguration);
             }
             finally
             {
@@ -252,7 +252,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
             try
             {
                 //schedule now found
-                Assert.AreEqual(_config,_finder.GetAutomateExtractionToRunIfAny(_slot));
+                Assert.AreEqual(_config.ExtractionConfiguration, _finder.GetAutomateExtractionToRunIfAny(RepositoryLocator, _slot).ExtractionConfiguration);
             }
             finally
             {

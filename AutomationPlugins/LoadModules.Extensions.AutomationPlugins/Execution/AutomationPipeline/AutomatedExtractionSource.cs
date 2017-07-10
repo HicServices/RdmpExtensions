@@ -45,15 +45,16 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 
             //ask the run finder to find a run
             RoutineExtractionRunFinder runFinder = new RoutineExtractionRunFinder(_automateExtractionRepository);
-            var automateExtraction = runFinder.GetAutomateExtractionToRunIfAny(_serviceSlot);
+            var run = runFinder.GetAutomateExtractionToRunIfAny(_repositoryLocator,_serviceSlot);
 
-            //there are no new available extractions to run
-            if (automateExtraction == null)
-                return null;
             
-            var routineExtractionRun = new RoutineExtractionRun(_repositoryLocator,_serviceSlot,automateExtraction);
+            //there are no new available extractions to run
+            if (run == null)
+                return null;
 
-            return new OnGoingAutomationTask(routineExtractionRun.AutomationJob, routineExtractionRun);
+            run.CreateJob();
+
+            return new OnGoingAutomationTask(run.AutomationJob, run);
         }
 
         public void Dispose(IDataLoadEventListener listener, Exception pipelineFailureExceptionIfAny)

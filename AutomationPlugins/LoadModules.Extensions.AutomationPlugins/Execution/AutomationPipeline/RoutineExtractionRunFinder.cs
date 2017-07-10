@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
 using CatalogueLibrary.Data.Automation;
+using CatalogueLibrary.Repositories;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline;
+using NHibernate.Cfg.Loquacious;
 using ReusableLibraryCode.Checks;
 
 namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
@@ -17,14 +19,19 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             _automateExtractionRepository = automateExtractionRepository;
         }
 
-        public AutomateExtraction GetAutomateExtractionToRunIfAny(AutomationServiceSlot serviceSlot)
+        public RoutineExtractionRun GetAutomateExtractionToRunIfAny(IRDMPPlatformRepositoryServiceLocator repositoryLocator, AutomationServiceSlot serviceSlot)
         {
-            var schedules = _automateExtractionRepository.GetAllObjects<AutomateExtractionSchedule>();
-
             //only allow one execution at once (this means no parallel execution of automated extract schedules - although the datasets in them might stilll be executed in parallel)
             if (serviceSlot.AutomationJobs.Any(j => j.Description.StartsWith(RoutineExtractionRun.RoutineExtractionJobsPrefix)))
                 return null;
 
+            var next = _automateExtractionRepository.GetAllObjects<QueuedExtraction>().FirstOrDefault(q => q.IsDue());
+
+            if(next != null)
+                return new RoutineExtractionRun(repositoryLocator,serviceSlot,next);
+            
+            var schedules = _automateExtractionRepository.GetAllObjects<AutomateExtractionSchedule>();
+            
             //for each schedule
             foreach (AutomateExtractionSchedule schedule in schedules)
             {
@@ -37,7 +44,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 
                 foreach (AutomateExtraction runnable in toRun)
                     if (IsRunnable(schedule, runnable))
-                        return runnable;
+                        return new RoutineExtractionRun(repositoryLocator,serviceSlot,runnable);
             }
             return null;
         }
