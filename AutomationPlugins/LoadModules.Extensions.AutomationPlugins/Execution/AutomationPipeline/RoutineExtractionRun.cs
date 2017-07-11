@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using CachingEngine.Requests.FetchRequestProvider;
 using CatalogueLibrary.Data;
 using CatalogueLibrary.Data.Automation;
 using CatalogueLibrary.Data.Pipelines;
@@ -32,6 +34,8 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
         public IExtractionConfiguration ExtractionConfiguration;
         private string _jobName;
         private QueuedExtraction _que;
+        private AutomateExtraction _automate
+            ;
 
         public AutomationJob AutomationJob { get; private set; }
 
@@ -45,6 +49,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             _pipeline = automateExtractionConfigurationToRun.AutomateExtractionSchedule.Pipeline;
 
             _jobName = RoutineExtractionJobsPrefix + automateExtractionConfigurationToRun;
+            _automate = automateExtractionConfigurationToRun;
         }
         public RoutineExtractionRun(IRDMPPlatformRepositoryServiceLocator repositoryLocator, AutomationServiceSlot serviceSlot, QueuedExtraction que)
         {
@@ -76,6 +81,8 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
         {
             try
             {
+                var startDate = DateTime.Now;
+
                 task.Job.SetLastKnownStatus(AutomationJobStatus.Running);
                 
                 var datasets = ExtractionConfiguration.GetAllExtractableDataSets();
@@ -94,7 +101,15 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
                     var cmd = new ExtractDatasetCommand(_repositoryLocator, ExtractionConfiguration, bundle);
 
                     var host = new ExtractionPipelineHost(cmd, _repositoryLocator.CatalogueRepository.MEF,_pipeline,(DataLoadInfo) dlinfo);
-                    host.Execute(new ToConsoleDataLoadEventReceiver());
+
+                    var toMemory = new ToMemoryDataLoadEventReceiver(false);
+                    host.Execute(toMemory);
+                    if (toMemory.GetWorst() == ProgressEventType.Error)
+                        throw new Exception(
+                            "Failed executing ExtractionConfiguration '" + ExtractionConfiguration + "' DataSet '" + ds +
+                            "'",
+                            new AggregateException(GetExceptions(toMemory))
+                            );
                 }
                 
                 dlinfo.CloseAndMarkComplete();
@@ -102,12 +117,34 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
                 //it worked!
                 task.Job.SetLastKnownStatus(AutomationJobStatus.Finished);
                 task.Job.DeleteInDatabase();
+
+                //if it all worked out ok and we have an automated extraction schedule we can now say that the schedule has been succesfully executed up this date for all datasets
+                if (_automate != null)
+                {
+                    _automate.BaselineDate = startDate;
+                    _automate.SaveToDatabase();
+                }
+                
             }
             catch (Exception e)
             {
                 task.Job.SetLastKnownStatus(AutomationJobStatus.Crashed);
                 new AutomationServiceException(_repositoryLocator.CatalogueRepository, e);
             }
+        }
+
+        private Exception[] GetExceptions(ToMemoryDataLoadEventReceiver toMemory)
+        {
+            List<Exception> exes = new List<Exception>();
+
+            foreach (KeyValuePair<object, List<NotifyEventArgs>> kvp in toMemory.EventsReceivedBySender)
+                foreach (NotifyEventArgs arg in kvp.Value)
+                    if (arg.Exception != null)
+                        exes.Add(arg.Exception);
+                    else if (arg.ProgressEventType == ProgressEventType.Error)
+                        exes.Add(new Exception(arg.Message));
+
+            return exes.ToArray();
         }
     }
 }

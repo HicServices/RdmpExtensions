@@ -62,12 +62,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline
 
                 //index ensure you can't have multiple so this shouldn't blow up
                 _automateExtraction = matches.Single();
-                if(_automateExtraction.BaselineDate == null)
-                {
-                    _automateExtraction.BaselineDate = DateTime.Now;
-                    _automateExtraction.SaveToDatabase();
-                }
-                
+               
                 //delete any old baseline records 
                 var success = _automateExtraction.GetSuccessIfAnyFor(ds.DatasetBundle.DataSet);
                 if (success != null)
