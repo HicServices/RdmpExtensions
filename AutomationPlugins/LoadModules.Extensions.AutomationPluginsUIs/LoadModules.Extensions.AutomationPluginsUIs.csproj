@@ -331,6 +331,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dialogs\EnqueueExtractionConfigurationUI.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\EnqueueExtractionConfigurationUI.Designer.cs">
+      <DependentUpon>EnqueueExtractionConfigurationUI.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\EnQueueExtractionMenuItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AutomationIcons.Designer.cs">
       <DependentUpon>AutomationIcons.resx</DependentUpon>
@@ -351,6 +358,9 @@
     <EmbeddedResource Include="AutomationIcons.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>AutomationIcons.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\EnqueueExtractionConfigurationUI.resx">
+      <DependentUpon>EnqueueExtractionConfigurationUI.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Tabs\AutomateExtractionScheduleTab.resx">
       <DependentUpon>AutomateExtractionScheduleTab.cs</DependentUpon>

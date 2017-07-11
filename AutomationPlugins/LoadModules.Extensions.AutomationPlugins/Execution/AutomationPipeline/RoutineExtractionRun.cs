@@ -31,6 +31,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
         private Pipeline _pipeline;
         public IExtractionConfiguration ExtractionConfiguration;
         private string _jobName;
+        private QueuedExtraction _que;
 
         public AutomationJob AutomationJob { get; private set; }
 
@@ -53,11 +54,16 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             _pipeline = que.Pipeline;
 
             _jobName = RoutineExtractionJobsPrefix + "QUE " + ExtractionConfiguration;
+            _que = que;
         }
 
         public void CreateJob()
         {
             AutomationJob = _serviceSlot.AddNewJob(AutomationJobType.UserCustomPipeline,_jobName);
+
+            //we have created the job so now clear the que so it doesn't get executed again endlessly
+            if(_que != null)
+                _que.DeleteInDatabase();
         }
 
         

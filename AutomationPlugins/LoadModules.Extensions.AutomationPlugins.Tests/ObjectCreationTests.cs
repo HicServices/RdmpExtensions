@@ -112,7 +112,6 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
             automateConfig.ClearBaselines();
             dt = automateConfig.GetIdentifiersTable();
             Assert.AreEqual(dt.Rows.Count, 0);
-
         }
     }
 }
