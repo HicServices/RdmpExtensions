@@ -117,4 +117,12 @@ GO
 ALTER TABLE [dbo].[QueuedExtraction] ADD  CONSTRAINT [DF_QueuedExtraction_RequestDate]  DEFAULT (getdate()) FOR [RequestDate]
 GO
 
+CREATE UNIQUE NONCLUSTERED INDEX [ix_OneSchedulePerProjectOnly] ON [dbo].[AutomateExtractionSchedule]
+(
+	[Project_ID] ASC
+)
 
+CREATE UNIQUE NONCLUSTERED INDEX [ix_OneSchedulePerExtractionConfigurationOnly] ON [dbo].[AutomateExtraction]
+(
+	[ExtractionConfiguration_ID] ASC
+)

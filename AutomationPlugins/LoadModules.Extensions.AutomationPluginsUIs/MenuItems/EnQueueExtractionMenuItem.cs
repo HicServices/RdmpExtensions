@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CatalogueManager.Icons.IconOverlays;
 using CatalogueManager.ItemActivation;
 using DataExportLibrary.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data;
@@ -20,8 +21,7 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.MenuItems
 
         public EnQueueExtractionMenuItem(AutomateExtractionRepository automationRepository, ExtractionConfiguration extractionConfiguration)
         {
-            Image = AutomationIcons.ExecutionSchedule;
-
+            Image = new IconOverlayProvider().GetOverlayNoCache(AutomationIcons.ExecutionSchedule, OverlayKind.Execute);
             _automationRepository = automationRepository;
             _extractionConfiguration = extractionConfiguration;
             Text = "Queue One Off Extraction For Specific Time";
