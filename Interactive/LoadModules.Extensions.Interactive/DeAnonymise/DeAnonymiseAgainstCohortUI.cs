@@ -2,19 +2,16 @@
 using System.Data;
 using System.Windows.Forms;
 using CatalogueLibrary.Repositories;
-using CatalogueManager.TestsAndSetup.ServicePropogation;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using DataExportLibrary.Data.DataTables;
-using DataExportLibrary.Repositories;
 using MapsDirectlyToDatabaseTableUI;
 using RDMPStartup;
 using ReusableLibraryCode;
 using ReusableLibraryCode.Checks;
-using ReusableUIComponents;
 
 namespace LoadModules.Extensions.Interactive.DeAnonymise
 {
-    public partial class DeAnonymiseAgainstCohortUI : RDMPForm, IDeAnonymiseAgainstCohortConfigurationFulfiller
+    public partial class DeAnonymiseAgainstCohortUI : Form, IDeAnonymiseAgainstCohortConfigurationFulfiller
     {
         private readonly DataTable _toProcess;
         private IDataExportRepository _dataExportRepository;
