@@ -15,6 +15,7 @@ using DataLoadEngine.DataProvider;
 using DataLoadEngine.Job;
 using NHibernate.Mapping;
 using ReusableLibraryCode.Checks;
+using ReusableLibraryCode.DatabaseHelpers.Discovery;
 using ReusableLibraryCode.Progress;
 
 namespace LoadModules.Extensions.Python.DataProvider
@@ -155,6 +156,11 @@ namespace LoadModules.Extensions.Python.DataProvider
             info.Arguments = command;
 
             return info;
+        }
+
+        public void Initialize(IHICProjectDirectory hicProjectDirectory, DiscoveredDatabase dbInfo)
+        {
+            
         }
 
         public ExitCodeType Fetch(IDataLoadJob job, GracefulCancellationToken cancellationToken)
