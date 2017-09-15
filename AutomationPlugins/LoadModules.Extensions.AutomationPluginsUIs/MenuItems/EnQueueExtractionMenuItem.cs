@@ -10,6 +10,7 @@ using DataExportLibrary.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using LoadModules.Extensions.AutomationPluginsUIs.Dialogs;
+using ReusableUIComponents.Icons.IconProvision;
 
 namespace LoadModules.Extensions.AutomationPluginsUIs.MenuItems
 {

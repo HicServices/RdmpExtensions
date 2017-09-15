@@ -2,14 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using HIC.Logging;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
-using MapsDirectlyToDatabaseTable;
-using NUnit.Framework;
 using ReusableLibraryCode;
 
 namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline

@@ -102,7 +102,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 
                     var host = new ExtractionPipelineHost(cmd, _repositoryLocator.CatalogueRepository.MEF,_pipeline,(DataLoadInfo) dlinfo);
 
-                    var toMemory = new ToMemoryDataLoadEventReceiver(false);
+                    var toMemory = new ToMemoryDataLoadEventListener(false);
                     host.Execute(toMemory);
                     if (toMemory.GetWorst() == ProgressEventType.Error)
                         throw new Exception(
@@ -133,7 +133,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             }
         }
 
-        private Exception[] GetExceptions(ToMemoryDataLoadEventReceiver toMemory)
+        private Exception[] GetExceptions(ToMemoryDataLoadEventListener toMemory)
         {
             List<Exception> exes = new List<Exception>();
 

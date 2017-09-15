@@ -23,6 +23,7 @@ using MapsDirectlyToDatabaseTable;
 using MapsDirectlyToDatabaseTableUI;
 using RDMPObjectVisualisation.Pipelines;
 using ReusableUIComponents;
+using ReusableUIComponents.Icons.IconProvision;
 
 namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
 {

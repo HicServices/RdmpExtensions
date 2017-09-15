@@ -43,7 +43,7 @@ namespace LoadModules.Extensions.Interactive.Tests
             if (doRedundantOverride)
                 OverrideReleaseIdentifier = "ReleaseID";
 
-            DataTable result = _deAnonymiseAgainstCohort.ProcessPipelineData(dt,new ToConsoleDataLoadEventReceiver(),new GracefulCancellationToken());
+            DataTable result = _deAnonymiseAgainstCohort.ProcessPipelineData(dt, new ThrowImmediatelyDataLoadEventListener(), new GracefulCancellationToken());
             dt = clone;//refetch the original because ProcessPipelineData is a destructive operation
 
             Assert.IsTrue(result.Columns.Contains("PrivateID"));
@@ -73,7 +73,7 @@ namespace LoadModules.Extensions.Interactive.Tests
             OverrideReleaseIdentifier = "HappyFunTimes";
             try
             {
-                DataTable result = _deAnonymiseAgainstCohort.ProcessPipelineData(dt, new ToConsoleDataLoadEventReceiver(), new GracefulCancellationToken());
+                DataTable result = _deAnonymiseAgainstCohort.ProcessPipelineData(dt, new ThrowImmediatelyDataLoadEventListener(), new GracefulCancellationToken());
                 dt = clone;//refetch the original because ProcessPipelineData is a destructive operation
 
                 Assert.IsTrue(result.Columns.Contains("PrivateID"));
@@ -100,7 +100,7 @@ namespace LoadModules.Extensions.Interactive.Tests
             foreach (KeyValuePair<string, string> kvp in _cohortKeysGenerated)
                 dt.Rows.Add("fish");
 
-            var ex = Assert.Throws<ArgumentException>(() => _deAnonymiseAgainstCohort.ProcessPipelineData(dt, new ToConsoleDataLoadEventReceiver(), new GracefulCancellationToken()));
+            var ex = Assert.Throws<ArgumentException>(() => _deAnonymiseAgainstCohort.ProcessPipelineData(dt, new ThrowImmediatelyDataLoadEventListener(), new GracefulCancellationToken()));
 
             Assert.IsTrue(ex.Message.StartsWith("Column 'ReleaseID' does not belong to table"));
         }
@@ -116,7 +116,7 @@ namespace LoadModules.Extensions.Interactive.Tests
 
             OverrideReleaseIdentifier = "HappyFace";
 
-            var ex = Assert.Throws<ArgumentException>(() => _deAnonymiseAgainstCohort.ProcessPipelineData(dt, new ToConsoleDataLoadEventReceiver(), new GracefulCancellationToken()));
+            var ex = Assert.Throws<ArgumentException>(() => _deAnonymiseAgainstCohort.ProcessPipelineData(dt, new ThrowImmediatelyDataLoadEventListener(), new GracefulCancellationToken()));
             Assert.AreEqual(ex.Message,"Cannot DeAnonymise cohort because you specified OverrideReleaseIdentifier of 'HappyFace' but the DataTable toProcess did not contain a column of that name");
         }
 

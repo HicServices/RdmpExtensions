@@ -112,7 +112,7 @@ namespace LoadModules.Extensions.Python.DataProvider
         {
             var info = GetPythonCommand(@"-c ""import sys; print(sys.version)""");
             
-            var toMemory = new ToMemoryDataLoadEventReceiver(true);
+            var toMemory = new ToMemoryDataLoadEventListener(true);
 
             int result = ExecuteProcess(toMemory, info, 600);
             

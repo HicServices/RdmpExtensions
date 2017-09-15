@@ -11,6 +11,7 @@ using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using LoadModules.Extensions.AutomationPluginsUIs.MenuItems;
 using LoadModules.Extensions.AutomationPluginsUIs.Tabs;
+using ReusableUIComponents.Icons.IconProvision;
 
 namespace LoadModules.Extensions.AutomationPluginsUIs
 {

@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using CatalogueLibrary.Data;
 using CatalogueLibrary.Data.Automation;
 using CatalogueLibrary.Data.Pipelines;
@@ -14,7 +11,6 @@ using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline;
 using NUnit.Framework;
 using RDMPAutomationService;
-using roundhouse.infrastructure.extensions;
 
 namespace LoadModules.Extensions.AutomationPlugins.Tests
 {
