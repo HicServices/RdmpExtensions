@@ -16,6 +16,9 @@ namespace LoadModules.Extensions.ReleasePlugins
         [DemandsInitialization("Webdav endpoint")]
         public string Endpoint { get; set; }
 
+        [DemandsInitialization("Webdav Base Path")]
+        public string BasePath { get; set; }
+
         [DemandsInitialization("Webdav remote folder")]
         public string RemoteFolder { get; set; }
 

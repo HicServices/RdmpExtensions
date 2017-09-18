@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using DataExportLibrary.Data.DataTables;
 using DataExportLibrary.DataRelease;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using Ionic.Zip;
+using WebDAVClient;
 
 namespace LoadModules.Extensions.ReleasePlugins
 {
@@ -36,23 +40,38 @@ namespace LoadModules.Extensions.ReleasePlugins
 
             ReleaseSuccessful = false;
 
-            var zipOutput = ZipReleaseFolder(ReleaseSettings.CustomExtractionDirectory, WebdavSettings.ZipPassword);
+            using (var zipOutput = new MemoryStream())
+            {
+                var zipFile = ZipReleaseFolder(ReleaseSettings.CustomExtractionDirectory, WebdavSettings.ZipPassword, zipOutput);
 
-
+                UploadToServer(zipOutput);
+            }
 
             ReleaseSuccessful = true;
         }
 
-        private ZipFile ZipReleaseFolder(DirectoryInfo customExtractionDirectory, string zipPassword)
+        private void UploadToServer(MemoryStream zipOutput)
         {
-            var destination = Path.Combine(customExtractionDirectory.FullName, GetArchiveNameForProject() + ".zip");
+            var client = new Client(new NetworkCredential { UserName = WebdavSettings.Username, Password = WebdavSettings.Password });
+            client.Server = WebdavSettings.Endpoint;
+            client.BasePath = WebdavSettings.BasePath;
 
-            var zip = new ZipFile(destination);
+            var remoteFolder = client.GetFolder(WebdavSettings.RemoteFolder).Result;
+
+            zipOutput.Seek(0, SeekOrigin.Begin);
+            var fileUploaded = client.Upload(remoteFolder.Href, zipOutput, GetArchiveNameForProject() + ".zip").Result;
+        }
+
+        private ZipFile ZipReleaseFolder(DirectoryInfo customExtractionDirectory, string zipPassword, MemoryStream zipOutput)
+        {
+            //var destination = Path.Combine(customExtractionDirectory.FullName, GetArchiveNameForProject() + ".zip");
+
+            var zip = new ZipFile();
             if (!String.IsNullOrWhiteSpace(zipPassword))
                 zip.Password = zipPassword;
                 
             zip.AddDirectory(customExtractionDirectory.FullName);
-            zip.Save();
+            zip.Save(zipOutput);
 
             return zip;
         }
