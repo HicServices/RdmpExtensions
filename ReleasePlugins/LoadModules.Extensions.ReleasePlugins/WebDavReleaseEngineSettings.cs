@@ -8,7 +8,7 @@ namespace LoadModules.Extensions.ReleasePlugins
     public class WebdavReleaseEngineSettings : ICheckable
     {
         [DemandsInitialization("Password for ZIP package")]
-        public string ZipPassword { get; set; }
+        public EncryptedString ZipPassword { get; set; }
 
         [DemandsInitialization("Delete the released files from the origin location if release is succesful", DefaultValue = true)]
         public bool DeleteFilesOnSuccess { get; set; }
@@ -26,7 +26,7 @@ namespace LoadModules.Extensions.ReleasePlugins
         public string Username { get; set; }
 
         [DemandsInitialization("Webdav password")]
-        public string Password { get; set; }
+        public EncryptedString Password { get; set; }
 
         public WebdavReleaseEngineSettings()
         {

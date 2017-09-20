@@ -42,7 +42,7 @@ namespace LoadModules.Extensions.ReleasePlugins
 
             using (var zipOutput = new MemoryStream())
             {
-                var zipFile = ZipReleaseFolder(ReleaseSettings.CustomExtractionDirectory, WebdavSettings.ZipPassword, zipOutput);
+                var zipFile = ZipReleaseFolder(ReleaseSettings.CustomExtractionDirectory, WebdavSettings.ZipPassword.GetDecryptedValue(), zipOutput);
 
                 UploadToServer(zipOutput);
             }
@@ -52,7 +52,7 @@ namespace LoadModules.Extensions.ReleasePlugins
 
         private void UploadToServer(MemoryStream zipOutput)
         {
-            var client = new Client(new NetworkCredential { UserName = WebdavSettings.Username, Password = WebdavSettings.Password });
+            var client = new Client(new NetworkCredential { UserName = WebdavSettings.Username, Password = WebdavSettings.Password.GetDecryptedValue() });
             client.Server = WebdavSettings.Endpoint;
             client.BasePath = WebdavSettings.BasePath;
 
