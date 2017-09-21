@@ -27,7 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AutomationPlugins", "Automa
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ReleasePlugins", "ReleasePlugins", "{265A5533-4AFA-4D1C-8A8B-5359ADD90E2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.ReleasePlugins", "ReleasePlugins\LoadModules.Extensions.ReleasePlugins\LoadModules.Extensions.ReleasePlugins.csproj", "{B54FBD5A-DE01-4AF5-9C8A-03911C64F68F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.ReleasePlugins", "ReleasePlugins\LoadModules.Extensions.ReleasePlugins\LoadModules.Extensions.ReleasePlugins.csproj", "{967AE45A-1DE2-4E8B-B1F1-BC42B73F5E8D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,10 +67,10 @@ Global
 		{24F510E5-B905-4F59-97B6-337A4638A85E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24F510E5-B905-4F59-97B6-337A4638A85E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24F510E5-B905-4F59-97B6-337A4638A85E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B54FBD5A-DE01-4AF5-9C8A-03911C64F68F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B54FBD5A-DE01-4AF5-9C8A-03911C64F68F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B54FBD5A-DE01-4AF5-9C8A-03911C64F68F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B54FBD5A-DE01-4AF5-9C8A-03911C64F68F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{967AE45A-1DE2-4E8B-B1F1-BC42B73F5E8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{967AE45A-1DE2-4E8B-B1F1-BC42B73F5E8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{967AE45A-1DE2-4E8B-B1F1-BC42B73F5E8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{967AE45A-1DE2-4E8B-B1F1-BC42B73F5E8D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -84,6 +84,6 @@ Global
 		{B0DB49EE-BF4E-4124-83F5-9FB57CA35471} = {288BB105-95F0-4FE1-B23E-1514AEEEEEE8}
 		{B7BD2A84-D440-4B1A-849D-D55284997D55} = {288BB105-95F0-4FE1-B23E-1514AEEEEEE8}
 		{24F510E5-B905-4F59-97B6-337A4638A85E} = {288BB105-95F0-4FE1-B23E-1514AEEEEEE8}
-		{B54FBD5A-DE01-4AF5-9C8A-03911C64F68F} = {265A5533-4AFA-4D1C-8A8B-5359ADD90E2F}
+		{967AE45A-1DE2-4E8B-B1F1-BC42B73F5E8D} = {265A5533-4AFA-4D1C-8A8B-5359ADD90E2F}
 	EndGlobalSection
 EndGlobal

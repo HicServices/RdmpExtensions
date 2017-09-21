@@ -22,6 +22,7 @@ using LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline;
 using MapsDirectlyToDatabaseTable;
 using MapsDirectlyToDatabaseTableUI;
 using RDMPObjectVisualisation.Pipelines;
+using RDMPObjectVisualisation.Pipelines.PluginPipelineUsers;
 using ReusableUIComponents;
 using ReusableUIComponents.Icons.IconProvision;
 
@@ -30,7 +31,7 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
     public partial class AutomateExtractionScheduleTab : AutomateExtractionSchedule_Design,ISaveableUI
     {
         private AutomateExtractionSchedule _schedule;
-        PipelineSelectionUI<DataTable> _selectionUI;
+        IPipelineSelectionUI _selectionUI;
 
         private Bitmap _extractionConfiguration;
         private Bitmap _extractionConfigurationIconAdd;
@@ -132,15 +133,17 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
 
             if (_selectionUI == null)
             {
+                var pipelineHost = new ExtractionPipelineHost();
+                var factory = new PipelineSelectionUIFactory(activator.RepositoryLocator.CatalogueRepository, null, pipelineHost);
+
+                _selectionUI = factory.Create();
+
                 _selectionUI = new PipelineSelectionUI<DataTable>(null,null,activator.RepositoryLocator.CatalogueRepository);
-                _selectionUI.Context = ExtractionPipelineHost.Context;
-                _selectionUI.Dock = DockStyle.Fill;
+
+                var selectionUIControl = (Control)_selectionUI;
+                selectionUIControl.Dock = DockStyle.Fill;
                 _selectionUI.PipelineChanged += _selectionUI_PipelineChanged;
-                pPipeline.Controls.Add(_selectionUI);
-
-
-                _selectionUI.InitializationObjectsForPreviewPipeline.Add(ExtractDatasetCommand.EmptyCommand);
-                _selectionUI.InitializationObjectsForPreviewPipeline.Add(DataLoadInfo.Empty);
+                pPipeline.Controls.Add(selectionUIControl);
 
                 saverButton.SetupFor(_schedule,activator.RefreshBus);
             }

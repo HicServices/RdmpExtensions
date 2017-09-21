@@ -100,7 +100,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
                     var bundle = new ExtractableDatasetBundle(ds);
                     var cmd = new ExtractDatasetCommand(_repositoryLocator, ExtractionConfiguration, bundle);
 
-                    var host = new ExtractionPipelineHost(cmd, _repositoryLocator.CatalogueRepository.MEF,_pipeline,(DataLoadInfo) dlinfo);
+                    var host = new ExtractionPipelineHost(cmd, _pipeline, (DataLoadInfo) dlinfo);
 
                     var toMemory = new ToMemoryDataLoadEventListener(false);
                     host.Execute(toMemory);

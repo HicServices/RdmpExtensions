@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,7 @@ using HIC.Logging;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using RDMPObjectVisualisation.Pipelines;
+using RDMPObjectVisualisation.Pipelines.PluginPipelineUsers;
 
 namespace LoadModules.Extensions.AutomationPluginsUIs.Dialogs
 {
@@ -22,7 +24,7 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Dialogs
     {
         private readonly ExtractionConfiguration _config;
         private readonly AutomateExtractionRepository _repository;
-        private PipelineSelectionUI<DataTable> _selectionUI;
+        private IPipelineSelectionUI _selectionUI;
 
         public EnqueueExtractionConfigurationUI(ExtractionConfiguration config, AutomateExtractionRepository repository)
         {
@@ -32,18 +34,19 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Dialogs
             pbExtractionConfiguration.Image = CatalogueIcons.ExtractionConfiguration;
             lblExtractionConfigurationName.Text = config.ToString();
 
-            _selectionUI = new PipelineSelectionUI<DataTable>(null, null, repository.CatalogueRepository);
-            _selectionUI.Context = ExtractionPipelineHost.Context;
-            _selectionUI.Dock = DockStyle.Fill;
-            _selectionUI.PipelineChanged += SelectionUIOnPipelineChanged;
-            pPipeline.Controls.Add(_selectionUI);
+            var pipelineHost = new ExtractionPipelineHost();
+            var factory = new PipelineSelectionUIFactory(repository.CatalogueRepository, null, pipelineHost);
 
-            _selectionUI.InitializationObjectsForPreviewPipeline.Add(ExtractDatasetCommand.EmptyCommand);
-            _selectionUI.InitializationObjectsForPreviewPipeline.Add(DataLoadInfo.Empty);
+            _selectionUI = factory.Create();
+
+            var selectionUIControl = (Control)_selectionUI;
+
+            selectionUIControl.Dock = DockStyle.Fill;
+            _selectionUI.PipelineChanged += SelectionUIOnPipelineChanged;
+            pPipeline.Controls.Add(selectionUIControl);
 
             ddDay.DataSource = Enum.GetValues(typeof (DayDelay));
             ddTimescale.DataSource = Enum.GetValues(typeof(TimeDelay));
-
         }
 
         private void SelectionUIOnPipelineChanged(object sender, EventArgs eventArgs)
