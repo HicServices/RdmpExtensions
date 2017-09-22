@@ -4,6 +4,7 @@ using CatalogueLibrary.Data;
 using CatalogueLibrary.DataFlowPipeline;
 using CatalogueLibrary.DataFlowPipeline.Requirements;
 using DataExportLibrary.Data.DataTables;
+using DataExportLibrary.DataRelease.Audit;
 using DataExportLibrary.DataRelease.ReleasePipeline;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using ReusableLibraryCode.Checks;
@@ -54,10 +55,32 @@ namespace LoadModules.Extensions.ReleasePlugins
 
         public void Dispose(IDataLoadEventListener listener, Exception pipelineFailureExceptionIfAny)
         {
+            if (pipelineFailureExceptionIfAny != null && CurrentRelease != null)
+            {
+                try
+                {
+                    int remnantsDeleted = 0;
+
+                    foreach (ExtractionConfiguration configuration in CurrentRelease.ConfigurationsForRelease.Keys)
+                        foreach (ReleaseLogEntry remnant in configuration.ReleaseLogEntries)
+                        {
+                            remnant.DeleteInDatabase();
+                            remnantsDeleted++;
+                        }
+
+                    if (remnantsDeleted > 0)
+                        listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Because release failed we are deleting ReleaseLogEntries, this resulted in " + remnantsDeleted + " deleted records, you will likely need to re-extract these datasets"));
+                }
+                catch (Exception e1)
+                {
+                    listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Error occurred when trying to clean up remnant ReleaseLogEntries", e1));
+                }
+            }
         }
 
         public void Abort(IDataLoadEventListener listener)
         {
+            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Warning, "This component cannot Abort!"));
         }
 
         public void Check(ICheckNotifier notifier)

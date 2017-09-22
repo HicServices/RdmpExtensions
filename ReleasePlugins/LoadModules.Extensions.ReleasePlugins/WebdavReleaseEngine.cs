@@ -57,12 +57,15 @@ namespace LoadModules.Extensions.ReleasePlugins
 
             zipOutput.Seek(0, SeekOrigin.Begin);
             var fileUploaded = client.Upload(remoteFolder.Href, zipOutput, GetArchiveNameForProject() + ".zip").Result;
+
+            if (!fileUploaded)
+            {
+                throw new Exception("Failed to upload file to remote location");
+            }
         }
 
         private ZipFile ZipReleaseFolder(DirectoryInfo customExtractionDirectory, string zipPassword, MemoryStream zipOutput)
         {
-            //var destination = Path.Combine(customExtractionDirectory.FullName, GetArchiveNameForProject() + ".zip");
-
             var zip = new ZipFile();
             if (!String.IsNullOrWhiteSpace(zipPassword))
                 zip.Password = zipPassword;
@@ -75,13 +78,14 @@ namespace LoadModules.Extensions.ReleasePlugins
 
         private string GetArchiveNameForProject()
         {
+            var prefix = DateTime.UtcNow.ToString("yyyy-MM-dd_");
             var nameToUse = "";
             if (String.IsNullOrWhiteSpace(Project.MasterTicket))
                 nameToUse = Project.ID + "_" + Project.Name;
             else
                 nameToUse = Project.MasterTicket;
 
-            return "Release-" + nameToUse;
+            return prefix + "Release-" + nameToUse;
         }
     }
 }
