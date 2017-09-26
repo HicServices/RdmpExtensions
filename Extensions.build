@@ -26,6 +26,11 @@
     <FileVersion>$(VERSION_NUMBER).$(BUILD_NUMBER)</FileVersion>
     <InformationalVersion>$(VERSION_NUMBER)</InformationalVersion>
   </PropertyGroup>
+    
+  <ItemGroup>
+    <AllFiles Include="packages\HIC.RDMP.Plugin*\**"/>
+    <PluginPackager Include="packages\HIC.RDMP.Plugin*\**\PluginPackager.exe" />
+  </ItemGroup>
 
   <Target Name="Version">
     <Message Text="Version: $(Version)"/>
@@ -36,15 +41,13 @@
   </Target>
   
   <Target Name="GetAssemblyVersion">
-	<GetAssemblyIdentity AssemblyFiles="$(MSBuildThisFileDirectory)\AutomationPlugins\LoadModules.Extensions.AutomationPlugins\bin\$(Configuration)\HIC.RDMP.Plugin.dll">
-		<Output TaskParameter="Assemblies" ItemName="PluginAssembly" />
-	</GetAssemblyIdentity>
-	
-	<Message Text="Version: %(PluginAssembly.Version)" />
+	<Message Text="Packager found: @(PluginPackager)" />
 
 	<PropertyGroup>
-	  <PluginPackager>$(MSBuildThisFileDirectory)packages\HIC.RDMP.Plugin.%(PluginAssembly.Version)\tools\PluginPackager\PluginPackager.exe</PluginPackager>
+	  <PluginPackager>$(MSBuildThisFileDirectory)@(PluginPackager)</PluginPackager>
 	</PropertyGroup>  
+    
+	<Message Text="Executable: $(PluginPackager)" />
   </Target>
   
   <Target Name="ConfigureTests" DependsOnTargets="Build">
