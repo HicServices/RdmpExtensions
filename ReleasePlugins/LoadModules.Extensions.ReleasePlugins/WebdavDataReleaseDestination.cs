@@ -76,6 +76,7 @@ namespace LoadModules.Extensions.ReleasePlugins
                     listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Error occurred when trying to clean up remnant ReleaseLogEntries", e1));
                 }
             }
+            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Pipeline completed..."));
         }
 
         public void Abort(IDataLoadEventListener listener)

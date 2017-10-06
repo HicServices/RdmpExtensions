@@ -81,9 +81,9 @@ namespace LoadModules.Extensions.ReleasePlugins
             var prefix = DateTime.UtcNow.ToString("yyyy-MM-dd_");
             var nameToUse = "";
             if (String.IsNullOrWhiteSpace(Project.MasterTicket))
-                nameToUse = Project.ID + "_" + Project.Name;
+                nameToUse = Project.ID + "_" + Project.Name + "_Proj-" + Project.ProjectNumber;
             else
-                nameToUse = Project.MasterTicket;
+                nameToUse = Project.MasterTicket + "_Proj-" + Project.ProjectNumber;
 
             return prefix + "Release-" + nameToUse;
         }
