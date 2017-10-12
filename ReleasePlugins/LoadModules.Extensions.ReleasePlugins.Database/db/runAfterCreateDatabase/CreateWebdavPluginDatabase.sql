@@ -1,13 +1,18 @@
-﻿/****** Object:  Table [dbo].[AutomateExtraction]    Script Date: 05/07/2017 08:37:46 ******/
+﻿/****** Object:  Table [dbo].[WebdavAutomationAudit]    Script Date: 12/10/2017 17:18:30 ******/
 SET ANSI_NULLS ON
 GO
+
 SET QUOTED_IDENTIFIER ON
 GO
+
+SET ANSI_PADDING ON
+GO
+
 CREATE TABLE [dbo].[WebdavAutomationAudit](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
-	[FileHref] [varchar(4000)] NOT NULL,
-	[FileResult] [int] NOT NULL,
-	[Message] [varchar(4000)] NOT NULL,
+	[FileHref] [varchar](256) NOT NULL,
+	[FileResult] [smallint] NOT NULL,
+	[Message] [varchar](256) NOT NULL,
  CONSTRAINT [PK_WebdavAutomationAudit] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
@@ -15,5 +20,8 @@ CREATE TABLE [dbo].[WebdavAutomationAudit](
 ) ON [PRIMARY]
 
 GO
-ALTER TABLE [dbo].[WebdavAutomationAudit] ADD  CONSTRAINT [DF_WebdavAutomationAudit_FileResult]  DEFAULT ((0)) FOR [FileResult]
+
+SET ANSI_PADDING OFF
 GO
+
+
