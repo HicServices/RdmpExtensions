@@ -34,8 +34,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
         public IExtractionConfiguration ExtractionConfiguration;
         private string _jobName;
         private QueuedExtraction _que;
-        private AutomateExtraction _automate
-            ;
+        private AutomateExtraction _automate;
 
         public AutomationJob AutomationJob { get; private set; }
 
