@@ -45,6 +45,8 @@ namespace LoadModules.Extensions.ReleasePlugins
             
             task.Job.TickLifeline();
             task.Job.SetLastKnownStatus(AutomationJobStatus.Finished);
+
+            task.Job.DeleteInDatabase();
         }
 
         private string DownloadToDestination(Item file)

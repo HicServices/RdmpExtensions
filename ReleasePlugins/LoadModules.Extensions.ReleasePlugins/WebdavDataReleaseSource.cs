@@ -20,6 +20,7 @@ namespace LoadModules.Extensions.ReleasePlugins
     {
         private AutomationServiceSlot _serviceSlot;
         private IRDMPPlatformRepositoryServiceLocator _repositoryLocator;
+        private const string PREFIX = "WEBDAV: ";
 
         [DemandsNestedInitialization()]
         public WebdavAutomationSettings ReleaseSettings { get; set; }
@@ -33,7 +34,8 @@ namespace LoadModules.Extensions.ReleasePlugins
             var allJobs = _serviceSlot.AutomationJobs;
 
             // we want to run one at a time
-            if (allJobs.Any(aj => (aj.LastKnownStatus == AutomationJobStatus.NotYetStarted || aj.LastKnownStatus == AutomationJobStatus.Running) && aj.Description == this.GetType().Name))
+            if (allJobs.Any(aj => (aj.LastKnownStatus == AutomationJobStatus.NotYetStarted || aj.LastKnownStatus == AutomationJobStatus.Running) 
+                                  && aj.Description.StartsWith(PREFIX)))
                 return null;
 
             // throttle failures (do not start if 5 or more crashes in the last 24 hours)
@@ -48,11 +50,11 @@ namespace LoadModules.Extensions.ReleasePlugins
                 return null;
             }
 
-            var job = new AutomationJob(_repositoryLocator.CatalogueRepository, _serviceSlot, AutomationJobType.UserCustomPipeline, this.GetType().Name);
+            var job = _serviceSlot.AddNewJob(AutomationJobType.UserCustomPipeline, PREFIX + file.DisplayName);
 
-            var task = new WebdavAutoDownloader(ReleaseSettings, file);
+            var automaton = new WebdavAutoDownloader(ReleaseSettings, file);
 
-            return new OnGoingAutomationTask(job, task);
+            return new OnGoingAutomationTask(job, automaton);
         }
 
         private Item GetFirstUnprocessed()
