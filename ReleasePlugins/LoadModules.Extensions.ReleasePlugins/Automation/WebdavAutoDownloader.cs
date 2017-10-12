@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
-using System.Threading;
 using CatalogueLibrary.Data.Automation;
 using Ionic.Zip;
+using MapsDirectlyToDatabaseTable;
 using RDMPAutomationService;
 using RDMPAutomationService.Interfaces;
 using WebDAVClient;
 using WebDAVClient.Model;
 
-namespace LoadModules.Extensions.ReleasePlugins
+namespace LoadModules.Extensions.ReleasePlugins.Automation
 {
     public class WebdavAutoDownloader : IAutomateable
     {

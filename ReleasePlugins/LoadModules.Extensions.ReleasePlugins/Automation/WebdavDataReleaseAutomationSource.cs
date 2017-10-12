@@ -7,6 +7,7 @@ using CatalogueLibrary.Data.Automation;
 using CatalogueLibrary.DataFlowPipeline;
 using CatalogueLibrary.DataFlowPipeline.Requirements;
 using CatalogueLibrary.Repositories;
+using MapsDirectlyToDatabaseTable;
 using RDMPAutomationService;
 using RDMPAutomationService.Interfaces;
 using ReusableLibraryCode.Checks;
@@ -14,7 +15,7 @@ using ReusableLibraryCode.Progress;
 using WebDAVClient;
 using WebDAVClient.Model;
 
-namespace LoadModules.Extensions.ReleasePlugins
+namespace LoadModules.Extensions.ReleasePlugins.Automation
 {
     public class WebdavDataReleaseAutomationSource : IPluginAutomationSource, IPipelineRequirement<IRDMPPlatformRepositoryServiceLocator>, ICheckable
     {
@@ -72,11 +73,13 @@ namespace LoadModules.Extensions.ReleasePlugins
             var enumerable = files as Item[] ?? files.ToArray();
 
             // TODO: Get from Logged Jobs!
-            if (!File.Exists(@"C:\temp\processed.txt"))
-                File.Create(@"C:\temp\processed.txt").Dispose();
-            var alreadyProcessed = File.ReadAllLines(@"C:\temp\processed.txt");
+            var allFilesDone = ((TableRepository) _repositoryLocator.CatalogueRepository)
+                                    .GetAllObjects<WebdavAutomationAudit>()
+                                    .Where(f => f.FileResult == FileResult.Done);
 
-            var latest = enumerable.Where(f => f.DisplayName.Contains("Release") && !alreadyProcessed.Contains(f.Href)).OrderBy(f => f.LastModified).FirstOrDefault();
+            var latest = enumerable.Where(f => f.DisplayName.Contains("Release") &&
+                                               allFilesDone.All(done => done.FileHref != f.Href))
+                                   .OrderBy(f => f.LastModified).FirstOrDefault();
 
             return latest;
         }

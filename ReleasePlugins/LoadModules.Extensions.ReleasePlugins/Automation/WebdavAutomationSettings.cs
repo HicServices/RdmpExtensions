@@ -4,7 +4,7 @@ using CatalogueLibrary.Data;
 using ReusableLibraryCode.Checks;
 using WebDAVClient;
 
-namespace LoadModules.Extensions.ReleasePlugins
+namespace LoadModules.Extensions.ReleasePlugins.Automation
 {
     public class WebdavAutomationSettings : ICheckable
     {
