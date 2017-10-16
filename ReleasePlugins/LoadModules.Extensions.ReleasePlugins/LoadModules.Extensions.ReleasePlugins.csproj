@@ -251,6 +251,7 @@
   <ItemGroup>
     <Compile Include="Automation\FileResult.cs" />
     <Compile Include="Automation\WebdavAutomationAudit.cs" />
+    <Compile Include="Data\WebDavDataRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Automation\WebdavAutoDownloader.cs" />
     <Compile Include="Automation\WebdavAutomationSettings.cs" />
@@ -263,6 +264,12 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LoadModules.Extensions.ReleasePlugins.Database\LoadModules.Extensions.ReleasePlugins.Database.csproj">
+      <Project>{f0d66f33-9418-49c7-b07d-bf853179bb96}</Project>
+      <Name>LoadModules.Extensions.ReleasePlugins.Database</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

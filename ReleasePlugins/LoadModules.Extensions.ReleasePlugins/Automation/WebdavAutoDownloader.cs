@@ -4,11 +4,20 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using CatalogueLibrary.Data;
 using CatalogueLibrary.Data.Automation;
+using CatalogueLibrary.Repositories;
+using HIC.Logging;
+using HIC.Logging.Listeners;
 using Ionic.Zip;
+using LoadModules.Extensions.ReleasePlugins.Data;
 using MapsDirectlyToDatabaseTable;
 using RDMPAutomationService;
+using RDMPAutomationService.EventHandlers;
 using RDMPAutomationService.Interfaces;
+using ReusableLibraryCode.Checks;
+using ReusableLibraryCode.DataAccess;
+using ReusableLibraryCode.Progress;
 using WebDAVClient;
 using WebDAVClient.Model;
 
@@ -18,6 +27,7 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
     {
         private readonly WebdavAutomationSettings options;
         private readonly Item file;
+        private const string TASK_NAME = "Webdav Auto Release";
 
         public WebdavAutoDownloader(WebdavAutomationSettings options, Item file)
         {
@@ -35,19 +45,79 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
             task.Job.SetLastKnownStatus(AutomationJobStatus.Running);
             task.Job.TickLifeline();
 
-            var zipFilePath = DownloadToDestination(file);
-            
-            // TODO: Verify I can overwrite existing files (or not?)
-            UnzipToReleaseFolder(zipFilePath);
-            task.Job.TickLifeline();
+            IDataLoadEventListener listener;
 
-            // TODO: Use an alternate method for logging...
-            File.AppendAllText(@"C:\temp\processed.txt", file.Href + "\r\n");
-            
-            task.Job.TickLifeline();
-            task.Job.SetLastKnownStatus(AutomationJobStatus.Finished);
+            var sd = new ServerDefaults((CatalogueRepository) task.Repository);
+            var loggingServer = sd.GetDefaultFor(ServerDefaults.PermissableDefaults.LiveLoggingServer_ID);
+            if (loggingServer != null)
+            {
+                var lm = new LogManager(loggingServer);
+                lm.CreateNewLoggingTaskIfNotExists(TASK_NAME);
+                var dli = lm.CreateDataLoadInfo(TASK_NAME, GetType().Name, task.Job.Description, String.Empty, false);
 
-            task.Job.DeleteInDatabase();
+                listener = new ToLoggingDatabaseDataLoadEventListener(lm, dli);
+
+                task.Job.SetLoggingInfo(loggingServer, dli.ID);
+            }
+            else
+            {
+                // TODO: See if we can log anyway somewhere... or bomb out?
+                listener = new FromCheckNotifierToDataLoadEventListener(new IgnoreAllErrorsCheckNotifier());
+            }
+
+            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Ready to download and unzip: " + file.DisplayName));
+
+            WebDavDataRepository tableRepo = GetAuditRepo(task);
+            if (tableRepo == null)
+            {
+                task.Job.SetLastKnownStatus(AutomationJobStatus.Cancelled);
+                listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Unable to access the Audit Repository"));
+                return;
+            }
+
+            try
+            {
+                var zipFilePath = DownloadToDestination(file);
+
+                // Will bomb if it tries to overwrite existing files!
+                UnzipToReleaseFolder(zipFilePath);
+                task.Job.TickLifeline();
+
+                new WebdavAutomationAudit(tableRepo, file.Href, FileResult.Done, String.Empty);
+
+                task.Job.TickLifeline();
+                task.Job.SetLastKnownStatus(AutomationJobStatus.Finished);
+
+                listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Job done: " + file.DisplayName + " RELEASED!"));
+                task.Job.DeleteInDatabase();
+            }
+            catch (Exception e)
+            {
+                task.Job.SetLastKnownStatus(AutomationJobStatus.Crashed);
+                listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Fatal crash", e));
+                new WebdavAutomationAudit(tableRepo, file.Href, FileResult.Errored, e.Message);
+            }
+            finally
+            {
+                var dbLog = (listener as ToLoggingDatabaseDataLoadEventListener);
+                if (dbLog != null)
+                    dbLog.FinalizeTableLoadInfos();
+            }
+        }
+
+        private WebDavDataRepository GetAuditRepo(OnGoingAutomationTask task)
+        {
+            WebDavDataRepository tableRepo;
+            var repoServer = task.Repository.GetAllObjects<ExternalDatabaseServer>()
+                    .SingleOrDefault(s => s.CreatedByAssembly == typeof (Database.Class1).Assembly.GetName().Name);
+
+            if (repoServer == null)
+                return null;
+
+            var discoveredServer = DataAccessPortal.GetInstance().ExpectServer(repoServer, DataAccessContext.DataExport);
+
+            tableRepo = new WebDavDataRepository(discoveredServer.Builder);
+            return tableRepo;
         }
 
         private string DownloadToDestination(Item file)

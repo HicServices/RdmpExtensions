@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using CatalogueLibrary.Data;
+using LoadModules.Extensions.ReleasePlugins.Data;
 using MapsDirectlyToDatabaseTable;
 
 namespace LoadModules.Extensions.ReleasePlugins.Automation
@@ -30,18 +31,20 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
             get { return _message; }
             set { SetField(ref _message, value); }
         }
-        public WebdavAutomationAudit(IRepository repository/*, TODO Required Construction Properties For NEW*/)
+        public WebdavAutomationAudit(WebDavDataRepository repository, string href, FileResult result, string message)
         {
             repository.InsertAndHydrate(this, new Dictionary<string, object>()
             {
-                //TODO Any parameters here as key value pairs
+                {"FileHref", href},
+                {"FileResult", result},
+                {"Message", message}
             });
 
             if (ID == 0 || Repository != repository)
                 throw new ArgumentException("Repository failed to properly hydrate this class");
         }
-        public WebdavAutomationAudit(IRepository repository, DbDataReader r)
-            : base(repository, r)
+
+        public WebdavAutomationAudit(WebDavDataRepository repository, DbDataReader r) : base(repository, r)
         {
             FileHref = r["FileHref"].ToString();
             FileResult = (FileResult)Enum.Parse(typeof(FileResult), r["FileResult"].ToString());

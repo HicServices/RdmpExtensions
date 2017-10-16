@@ -7,10 +7,12 @@ using CatalogueLibrary.Data.Automation;
 using CatalogueLibrary.DataFlowPipeline;
 using CatalogueLibrary.DataFlowPipeline.Requirements;
 using CatalogueLibrary.Repositories;
+using LoadModules.Extensions.ReleasePlugins.Data;
 using MapsDirectlyToDatabaseTable;
 using RDMPAutomationService;
 using RDMPAutomationService.Interfaces;
 using ReusableLibraryCode.Checks;
+using ReusableLibraryCode.DataAccess;
 using ReusableLibraryCode.Progress;
 using WebDAVClient;
 using WebDAVClient.Model;
@@ -37,14 +39,25 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
             // we want to run one at a time
             if (allJobs.Any(aj => (aj.LastKnownStatus == AutomationJobStatus.NotYetStarted || aj.LastKnownStatus == AutomationJobStatus.Running) 
                                   && aj.Description.StartsWith(PREFIX)))
+            {
                 return null;
+            }
 
             // throttle failures (do not start if 5 or more crashes in the last 24 hours)
             if (allJobs.Where(aj => aj.Lifeline.HasValue && aj.Lifeline > DateTime.UtcNow.AddDays(-1))
                        .Count(aj => (aj.LastKnownStatus == AutomationJobStatus.Crashed)) >= 5)
+            {
                 return null;
+            }
 
-            var file = GetFirstUnprocessed();
+            WebDavDataRepository tableRepo = GetAuditRepo();
+            if (tableRepo == null)
+            {
+                listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Unable to access the Audit Repository"));
+                return null;
+            }
+
+            var file = GetFirstUnprocessed(tableRepo);
             if (file == null)
             {
                 listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "No new files to process..."));
@@ -58,7 +71,7 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
             return new OnGoingAutomationTask(job, automaton);
         }
 
-        private Item GetFirstUnprocessed()
+        private Item GetFirstUnprocessed(WebDavDataRepository tableRepo)
         {
             var client = new Client(new NetworkCredential { UserName = ReleaseSettings.Username, Password = ReleaseSettings.Password.GetDecryptedValue() });
             client.Server = ReleaseSettings.Endpoint;
@@ -71,10 +84,8 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
 
             var files = client.List(remoteFolder.Href).Result;
             var enumerable = files as Item[] ?? files.ToArray();
-
-            // TODO: Get from Logged Jobs!
-            var allFilesDone = ((TableRepository) _repositoryLocator.CatalogueRepository)
-                                    .GetAllObjects<WebdavAutomationAudit>()
+            
+            var allFilesDone = tableRepo.GetAllObjects<WebdavAutomationAudit>()
                                     .Where(f => f.FileResult == FileResult.Done);
 
             var latest = enumerable.Where(f => f.DisplayName.Contains("Release") &&
@@ -83,7 +94,22 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
 
             return latest;
         }
-        
+
+        private WebDavDataRepository GetAuditRepo()
+        {
+            WebDavDataRepository tableRepo;
+            var repoServer = _repositoryLocator.CatalogueRepository.GetAllObjects<ExternalDatabaseServer>()
+                    .SingleOrDefault(s => s.CreatedByAssembly == typeof(Database.Class1).Assembly.GetName().Name);
+
+            if (repoServer == null)
+                return null;
+
+            var discoveredServer = DataAccessPortal.GetInstance().ExpectServer(repoServer, DataAccessContext.DataExport);
+
+            tableRepo = new WebDavDataRepository(discoveredServer.Builder);
+            return tableRepo;
+        }
+
         #region IPluginAutomationSource implementation useless methods
         public void Dispose(IDataLoadEventListener listener, Exception pipelineFailureExceptionIfAny)
         {
