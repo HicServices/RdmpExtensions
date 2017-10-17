@@ -64,9 +64,11 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
                 return null;
             }
 
+            var audit = new WebdavAutomationAudit(tableRepo, file.Href, FileResult.Unknown, "started...");
+
             var job = _serviceSlot.AddNewJob(AutomationJobType.UserCustomPipeline, PREFIX + file.DisplayName);
 
-            var automaton = new WebdavAutoDownloader(ReleaseSettings, file);
+            var automaton = new WebdavAutoDownloader(ReleaseSettings, file, audit);
 
             return new OnGoingAutomationTask(job, automaton);
         }

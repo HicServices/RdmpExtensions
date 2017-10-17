@@ -15,6 +15,7 @@ using MapsDirectlyToDatabaseTable;
 using RDMPAutomationService;
 using RDMPAutomationService.EventHandlers;
 using RDMPAutomationService.Interfaces;
+using ReusableLibraryCode;
 using ReusableLibraryCode.Checks;
 using ReusableLibraryCode.DataAccess;
 using ReusableLibraryCode.Progress;
@@ -27,12 +28,14 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
     {
         private readonly WebdavAutomationSettings options;
         private readonly Item file;
+        private readonly WebdavAutomationAudit audit;
         private const string TASK_NAME = "Webdav Auto Release";
 
-        public WebdavAutoDownloader(WebdavAutomationSettings options, Item file)
+        public WebdavAutoDownloader(WebdavAutomationSettings options, Item file, WebdavAutomationAudit audit)
         {
             this.options = options;
             this.file = file;
+            this.audit = audit;
         }
 
         public OnGoingAutomationTask GetTask()
@@ -83,7 +86,10 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
                 UnzipToReleaseFolder(zipFilePath);
                 task.Job.TickLifeline();
 
-                new WebdavAutomationAudit(tableRepo, file.Href, FileResult.Done, String.Empty);
+                audit.FileResult = FileResult.Done;
+                audit.Updated = DateTime.UtcNow;
+                audit.Message = "RELEASED!";
+                audit.SaveToDatabase();
 
                 task.Job.TickLifeline();
                 task.Job.SetLastKnownStatus(AutomationJobStatus.Finished);
@@ -95,7 +101,10 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
             {
                 task.Job.SetLastKnownStatus(AutomationJobStatus.Crashed);
                 listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Fatal crash", e));
-                new WebdavAutomationAudit(tableRepo, file.Href, FileResult.Errored, e.Message);
+                audit.FileResult = FileResult.Errored;
+                audit.Message = ExceptionHelper.ExceptionToListOfInnerMessages(e);
+                audit.Updated = DateTime.UtcNow;
+                audit.SaveToDatabase();
             }
             finally
             {

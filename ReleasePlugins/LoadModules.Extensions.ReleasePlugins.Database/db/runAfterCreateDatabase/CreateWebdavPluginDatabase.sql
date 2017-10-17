@@ -1,4 +1,4 @@
-﻿/****** Object:  Table [dbo].[WebdavAutomationAudit]    Script Date: 12/10/2017 17:18:30 ******/
+﻿/****** Object:  Table [dbo].[WebdavAutomationAudit]    Script Date: 17/10/2017 12:12:08 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -13,6 +13,8 @@ CREATE TABLE [dbo].[WebdavAutomationAudit](
 	[FileHref] [varchar](256) NOT NULL,
 	[FileResult] [smallint] NOT NULL,
 	[Message] [varchar](256) NOT NULL,
+	[Created] [datetime] NOT NULL,
+	[Updated] [datetime] NOT NULL,
  CONSTRAINT [PK_WebdavAutomationAudit] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
