@@ -11,6 +11,7 @@ using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline;
 using NUnit.Framework;
 using RDMPAutomationService;
+using RDMPAutomationServiceTests.AutomationLoopTests;
 
 namespace LoadModules.Extensions.AutomationPlugins.Tests
 {
@@ -52,8 +53,12 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
             else
                 foreach (var oldExtractionDir in d.GetDirectories())//clear out any remnants
                     oldExtractionDir.Delete(true);
-            
-            RDMPAutomationLoop loop = new RDMPAutomationLoop(RepositoryLocator, slot);
+
+            var options = new MockAutomationServiceOptions(RepositoryLocator)
+            {
+                ForceSlot = slot.ID, ServerName = _serverName
+            };
+            var loop = new RDMPAutomationLoop(options, (type, s) => { Console.WriteLine("{0}: {1}", type.ToString().ToUpper(), s); });
             loop.Start();
 
             int timeout = 500000;

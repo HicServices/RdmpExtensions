@@ -1,18 +1,31 @@
-﻿using CatalogueLibrary.Data;
+﻿using System.Linq;
+using CatalogueLibrary.CommandExecution.AtomicCommands.PluginCommands;
+using CatalogueLibrary.Data;
 using CatalogueLibrary.Repositories;
 using MapsDirectlyToDatabaseTableUI;
 
 namespace LoadModules.Extensions.ReleasePlugins.Database
 {
-    public class Initialize : IPluginDbInitialize
+    public class Initialize : PluginDatabaseAtomicCommand
     {
-        public bool Init(CatalogueRepository catalogueRepository)
+        public Initialize(IRDMPPlatformRepositoryServiceLocator repositoryLocator) : base(repositoryLocator)
         {
-            CreatePlatformDatabase.CreateNewExternalServer(catalogueRepository, ServerDefaults.PermissableDefaults.None,
-                typeof(Database.Class1).Assembly);
-            return true;
+            if (repositoryLocator.CatalogueRepository
+                    .GetAllObjects<ExternalDatabaseServer>()
+                    .Any(s => s.CreatedByAssembly == typeof(Database.Class1).Assembly.GetName().Name))
+                SetImpossible("Webdav Audit DB already exists");
+        }
 
-            //new ToolStripMenuItem("Create New '" + type.Name + "' Server...", addIcon, type.GetMethod("Init"))
+        public override string GetCommandName()
+        {
+            return "Initialize Webdav Audit DB";
+        }
+
+        public override void Execute()
+        {
+            base.Execute();
+            CreatePlatformDatabase.CreateNewExternalServer(RepositoryLocator.CatalogueRepository, ServerDefaults.PermissableDefaults.None,
+                typeof(Database.Class1).Assembly);
         }
     }
 }
