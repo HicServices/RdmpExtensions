@@ -19,6 +19,7 @@ using ReusableLibraryCode;
 using ReusableLibraryCode.Checks;
 using ReusableLibraryCode.DataAccess;
 using ReusableLibraryCode.Progress;
+using roundhouse.infrastructure.commandline.options;
 using WebDAVClient;
 using WebDAVClient.Model;
 
@@ -29,6 +30,8 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
         private readonly WebdavAutomationSettings options;
         private readonly Item file;
         private readonly WebdavAutomationAudit audit;
+
+        private IDataLoadEventListener listener;
         private const string TASK_NAME = "Webdav Auto Release";
 
         public WebdavAutoDownloader(WebdavAutomationSettings options, Item file, WebdavAutomationAudit audit)
@@ -47,9 +50,7 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
         {
             task.Job.SetLastKnownStatus(AutomationJobStatus.Running);
             task.Job.TickLifeline();
-
-            IDataLoadEventListener listener;
-
+            
             var sd = new ServerDefaults((CatalogueRepository) task.Repository);
             var loggingServer = sd.GetDefaultFor(ServerDefaults.PermissableDefaults.LiveLoggingServer_ID);
             if (loggingServer != null)
@@ -86,6 +87,8 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
                 UnzipToReleaseFolder(zipFilePath);
                 task.Job.TickLifeline();
 
+                ArchiveFile(file, "Done");
+
                 audit.FileResult = FileResult.Done;
                 audit.Updated = DateTime.UtcNow;
                 audit.Message = "RELEASED!";
@@ -101,6 +104,9 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
             {
                 task.Job.SetLastKnownStatus(AutomationJobStatus.Crashed);
                 listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Fatal crash", e));
+
+                ArchiveFile(file, "Errored");
+
                 audit.FileResult = FileResult.Errored;
                 audit.Message = ExceptionHelper.ExceptionToListOfInnerMessages(e);
                 audit.Updated = DateTime.UtcNow;
@@ -161,6 +167,17 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
             }
 
             Console.WriteLine("Unzipped all to {0}", destination);
+        }
+
+        private void ArchiveFile(Item file, string archiveLocation)
+        {
+            var client = new Client(new NetworkCredential { UserName = options.Username, Password = options.Password.GetDecryptedValue() });
+            client.Server = options.Endpoint;
+            client.BasePath = options.BasePath;
+
+            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Archived: " + file.DisplayName + " to " + Path.Combine(options.BasePath, options.RemoteFolder, archiveLocation, file.DisplayName).Replace("\\", "/")));
+
+            client.MoveFile(file.Href, Path.Combine(options.BasePath, options.RemoteFolder, archiveLocation, file.DisplayName).Replace("\\","/"));
         }
     }
 }
