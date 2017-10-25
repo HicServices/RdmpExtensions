@@ -17,9 +17,7 @@ namespace LoadModules.Extensions.ReleasePlugins
         public WebdavReleaseEngine(Project project, WebdavReleaseEngineSettings releaseSettings) : base(project, new ReleaseEngineSettings())
         {
             base.ReleaseSettings.CreateReleaseDirectoryIfNotFound = true;
-            base.ReleaseSettings.UseProjectExtractionFolder = false;
-            base.ReleaseSettings.CustomExtractionDirectory = 
-                new DirectoryInfo(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N")));
+            base.ReleaseSettings.UseProjectExtractionFolder = true;
             
             WebdavSettings = releaseSettings;
             if (WebdavSettings == null)
@@ -39,15 +37,16 @@ namespace LoadModules.Extensions.ReleasePlugins
 
             using (var zipOutput = new MemoryStream())
             {
-                var zipFile = ZipReleaseFolder(ReleaseSettings.CustomExtractionDirectory, WebdavSettings.ZipPassword.GetDecryptedValue(), zipOutput);
-
-                UploadToServer(zipOutput);
+                var zipFile = ZipReleaseFolder(ReleaseFolder, WebdavSettings.ZipPassword.GetDecryptedValue(), zipOutput);
+                var releaseFileName = GetArchiveNameForProject() + ".zip";
+                zipFile.Save(Path.Combine(ReleaseFolder.FullName, releaseFileName));
+                UploadToServer(zipOutput, releaseFileName);
             }
 
             ReleaseSuccessful = true;
         }
 
-        private void UploadToServer(MemoryStream zipOutput)
+        private void UploadToServer(MemoryStream zipOutput, string releaseFileName)
         {
             var client = new Client(new NetworkCredential { UserName = WebdavSettings.Username, Password = WebdavSettings.Password.GetDecryptedValue() });
             client.Server = WebdavSettings.Endpoint;
@@ -56,7 +55,7 @@ namespace LoadModules.Extensions.ReleasePlugins
             var remoteFolder = client.GetFolder(WebdavSettings.RemoteFolder).Result;
 
             zipOutput.Seek(0, SeekOrigin.Begin);
-            var fileUploaded = client.Upload(remoteFolder.Href, zipOutput, GetArchiveNameForProject() + ".zip").Result;
+            var fileUploaded = client.Upload(remoteFolder.Href, zipOutput, releaseFileName).Result;
 
             if (!fileUploaded)
             {
