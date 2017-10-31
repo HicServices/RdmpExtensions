@@ -156,9 +156,19 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
         {
             var filename = Path.GetFileNameWithoutExtension(zipFilePath);
             Debug.Assert(filename != null, "filename != null");
-            var linkProj = Regex.Match(filename, "Proj-(\\d+)").Groups[1].Value;
+            var projFolder = Regex.Match(filename, @"\((.*)\)").Groups[1].Value;
 
-            var destination = Path.Combine(options.LocalDestination, "Project " + linkProj, filename);
+            var outputFolder = projFolder;
+            if (String.IsNullOrWhiteSpace(projFolder))
+            {
+                var linkProj = Regex.Match(filename, "Proj-(\\d+)").Groups[1].Value;
+                if (String.IsNullOrWhiteSpace(linkProj))
+                    outputFolder = "Project " + Guid.NewGuid().ToString("N");
+                else
+                    outputFolder = "Project " + linkProj;
+            }
+
+            var destination = Path.Combine(options.LocalDestination, outputFolder, filename);
 
             using (var zip = ZipFile.Read(zipFilePath))
             {

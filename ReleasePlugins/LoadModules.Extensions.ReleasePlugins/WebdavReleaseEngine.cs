@@ -83,7 +83,7 @@ namespace LoadModules.Extensions.ReleasePlugins
             if (String.IsNullOrWhiteSpace(Project.MasterTicket))
                 nameToUse = Project.ID + "_" + Project.Name + "_Proj-" + Project.ProjectNumber;
             else
-                nameToUse = Project.MasterTicket + "_Proj-" + Project.ProjectNumber + "(" + GetSafeHavenFolder(Project.MasterTicket) + ")";
+                nameToUse = Project.MasterTicket + "_Proj-" + Project.ProjectNumber + " (" + GetSafeHavenFolder(Project.MasterTicket) + ")";
 
             return prefix + "Release-" + nameToUse;
         }
