@@ -1,29 +1,39 @@
-﻿using System.Windows.Forms;
+﻿using System.Drawing;
+using System.Windows.Forms;
 using CatalogueLibrary.Data;
+using CatalogueManager.CommandExecution.AtomicCommands;
 using CatalogueManager.Icons.IconProvision;
 using CatalogueManager.ItemActivation;
 using MapsDirectlyToDatabaseTableUI;
+using ReusableUIComponents.CommandExecution.AtomicCommands;
 using ReusableUIComponents.Icons.IconProvision;
 
 namespace LoadModules.Extensions.AutomationPluginsUIs.MenuItems
 {
     [System.ComponentModel.DesignerCategory("")]
-    public class CreateNewAutomationPluginsDatabase:ToolStripMenuItem
+    public class ExecuteCommandCreateNewAutomationPluginsDatabase : BasicUICommandExecution, IAtomicCommand
     {
         private readonly AutomationPluginInterface _plugin;
-        private readonly IActivateItems _itemActivator;
-
-        public CreateNewAutomationPluginsDatabase(AutomationPluginInterface plugin, IActivateItems itemActivator):base(
-            "Create new Automation Plugin Database", 
-            itemActivator.CoreIconProvider.GetImage(RDMPConcept.ExternalDatabaseServer, OverlayKind.Add))
+        
+        public ExecuteCommandCreateNewAutomationPluginsDatabase(AutomationPluginInterface plugin, IActivateItems activator) : base(activator)
         {
             _plugin = plugin;
-            _itemActivator = itemActivator;
         }
 
-        protected override void OnClick(System.EventArgs e)
+        public override string GetCommandName()
         {
-            CreatePlatformDatabase.CreateNewExternalServer(_itemActivator.RepositoryLocator.CatalogueRepository,ServerDefaults.PermissableDefaults.None,
+            return "Create new Automation Plugin Database";
+        }
+
+        public Image GetImage(IIconProvider iconProvider)
+        {
+            return Activator.CoreIconProvider.GetImage(RDMPConcept.ExternalDatabaseServer, OverlayKind.Add);
+        }
+
+        public override void Execute()
+        {
+            base.Execute();
+            CreatePlatformDatabase.CreateNewExternalServer(Activator.RepositoryLocator.CatalogueRepository, ServerDefaults.PermissableDefaults.None,
                 typeof(LoadModules.Extensions.AutomationPlugins.Database.Class1).Assembly);
             _plugin.RefreshPluginUserInterfaceRepoAndObjects();
         }

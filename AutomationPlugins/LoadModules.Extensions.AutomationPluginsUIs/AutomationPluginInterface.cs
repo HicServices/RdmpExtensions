@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows.Forms;
 using CatalogueLibrary.Data;
+using CatalogueManager.CommandExecution.AtomicCommands.UIFactory;
 using CatalogueManager.Icons.IconOverlays;
 using CatalogueManager.ItemActivation;
 using CatalogueManager.PluginChildProvision;
@@ -15,10 +16,11 @@ using ReusableUIComponents.Icons.IconProvision;
 
 namespace LoadModules.Extensions.AutomationPluginsUIs
 {
-    public class AutomationPluginInterface:PluginUserInterface, IRefreshBusSubscriber
+    public class AutomationPluginInterface : PluginUserInterface, IRefreshBusSubscriber
     {
         private AutomateExtractionRepository _automationRepository;
         private Bitmap _executionScheduleIcon;
+        private AtomicCommandUIFactory _atomicCommandFactory;
 
         public AutomateExtractionSchedule[] AllSchedules { get; set; }
 
@@ -51,32 +53,30 @@ namespace LoadModules.Extensions.AutomationPluginsUIs
         {
             var p = databaseEntity as Project;
             var c = databaseEntity as ExtractionConfiguration;
-
+            
             if (p == null && c == null)
                 return null;
+            
+            _atomicCommandFactory = new AtomicCommandUIFactory(ItemActivator.CoreIconProvider);
 
             RefreshPluginUserInterfaceRepoAndObjects();
 
             if (_automationRepository == null)
-                return new[]{new CreateNewAutomationPluginsDatabase(this,ItemActivator)};
+                return new[]
+                {
+                    _atomicCommandFactory.CreateMenuItem(new ExecuteCommandCreateNewAutomationPluginsDatabase(this, ItemActivator))
+                };
 
             if (c != null)
-                return new[] { new EnQueueExtractionMenuItem(_automationRepository, c) };
-            
-            return new[] {new AddNewScheduleForProjectMenuItem(this,_automationRepository,ItemActivator, p)};
-        }
+                return new[]
+                {
+                    _atomicCommandFactory.CreateMenuItem(new ExecuteCommandEnqueueExtractionMenuItem(_automationRepository, c, ItemActivator))
+                };
 
-        public override void Activate(object sender, object model)
-        {
-
-            var schedule = model as AutomateExtractionSchedule;
-
-            //no control because activation isn't for us (could be a Catalogue or anything)
-            if (schedule != null)
+            return new[]
             {
-                var tab = new AutomateExtractionScheduleTab();
-                ItemActivator.ShowRDMPSingleDatabaseObjectControl(tab, schedule);
-            }
+                _atomicCommandFactory.CreateMenuItem(new AddNewScheduleForProjectMenuItem(this, _automationRepository, ItemActivator, p))
+            };
         }
 
         public override Bitmap GetImage(object concept, OverlayKind kind = OverlayKind.None)

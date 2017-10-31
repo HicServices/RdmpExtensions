@@ -30,5 +30,10 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
             exception = null;
             return TicketingReleaseabilityEvaluation.NotReleaseable;
         }
+
+        public string GetProjectFolderName(string masterTicket)
+        {
+            return "Project " + masterTicket;
+        }
     }
 }

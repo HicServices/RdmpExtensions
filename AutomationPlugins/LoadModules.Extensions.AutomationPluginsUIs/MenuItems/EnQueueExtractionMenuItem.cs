@@ -1,36 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CatalogueManager.CommandExecution.AtomicCommands;
 using CatalogueManager.Icons.IconOverlays;
+using CatalogueManager.Icons.IconProvision;
 using CatalogueManager.ItemActivation;
 using DataExportLibrary.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using LoadModules.Extensions.AutomationPluginsUIs.Dialogs;
+using ReusableUIComponents.CommandExecution.AtomicCommands;
 using ReusableUIComponents.Icons.IconProvision;
 
 namespace LoadModules.Extensions.AutomationPluginsUIs.MenuItems
 {
     [System.ComponentModel.DesignerCategory("")]
-    public class EnQueueExtractionMenuItem:ToolStripMenuItem
+    public class ExecuteCommandEnqueueExtractionMenuItem : BasicUICommandExecution, IAtomicCommand
     {
         private readonly AutomateExtractionRepository _automationRepository;
         private readonly ExtractionConfiguration _extractionConfiguration;
 
-        public EnQueueExtractionMenuItem(AutomateExtractionRepository automationRepository, ExtractionConfiguration extractionConfiguration)
+        public ExecuteCommandEnqueueExtractionMenuItem(AutomateExtractionRepository automationRepository, ExtractionConfiguration extractionConfiguration, IActivateItems activator) : base(activator)
         {
-            Image = new IconOverlayProvider().GetOverlayNoCache(AutomationIcons.ExecutionSchedule, OverlayKind.Execute);
             _automationRepository = automationRepository;
             _extractionConfiguration = extractionConfiguration;
-            Text = "Queue One Off Extraction For Specific Time";
         }
 
-        protected override void OnClick(EventArgs e)
+        public override string GetCommandHelp()
         {
-            base.OnClick(e);
+            return "Queue One Off Extraction For Specific Time";
+        }
+
+        public override void Execute()
+        {
+         	base.Execute();
 
             var alreadyQueued = _automationRepository.GetAllObjects<QueuedExtraction>("WHERE ExtractionConfiguration_ID = " + _extractionConfiguration.ID).SingleOrDefault();
 
@@ -54,6 +61,11 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.MenuItems
                 var f = new EnqueueExtractionConfigurationUI(_extractionConfiguration,_automationRepository);
                 f.ShowDialog();
             }
+        }
+
+        public Image GetImage(IIconProvider iconProvider)
+        {
+            return new IconOverlayProvider().GetOverlayNoCache(AutomationIcons.ExecutionSchedule, OverlayKind.Execute);
         }
     }
 }
