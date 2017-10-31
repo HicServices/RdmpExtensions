@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using CatalogueLibrary.Data;
+using CatalogueLibrary.Repositories;
 using DataExportLibrary.Data.DataTables;
 using DataExportLibrary.DataRelease;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using Ionic.Zip;
+using Ticketing;
 using WebDAVClient;
 
 namespace LoadModules.Extensions.ReleasePlugins
@@ -82,9 +85,21 @@ namespace LoadModules.Extensions.ReleasePlugins
             if (String.IsNullOrWhiteSpace(Project.MasterTicket))
                 nameToUse = Project.ID + "_" + Project.Name + "_Proj-" + Project.ProjectNumber;
             else
-                nameToUse = Project.MasterTicket + "_Proj-" + Project.ProjectNumber;
+                nameToUse = Project.MasterTicket + "_Proj-" + Project.ProjectNumber + "(" + GetSafeHavenFolder(Project.MasterTicket) + ")";
 
             return prefix + "Release-" + nameToUse;
+        }
+
+        private string GetSafeHavenFolder(string masterTicket)
+        {
+            var catalogueRepository = (CatalogueRepository) _repository;
+            var factory = new TicketingSystemFactory(catalogueRepository);
+            var system = factory.CreateIfExists(catalogueRepository.GetTicketingSystem());
+
+            if (system == null)
+                return String.Empty;
+
+            return system.GetProjectFolderName(masterTicket);
         }
     }
 }
