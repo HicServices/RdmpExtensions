@@ -1,7 +1,4 @@
-﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
-using CatalogueLibrary.CommandExecution.AtomicCommands;
+﻿using System.Drawing;
 using CatalogueManager.CommandExecution.AtomicCommands;
 using CatalogueManager.Icons.IconOverlays;
 using CatalogueManager.ItemActivation;
@@ -13,7 +10,7 @@ using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using ReusableUIComponents.CommandExecution.AtomicCommands;
 using ReusableUIComponents.Icons.IconProvision;
 
-namespace LoadModules.Extensions.AutomationPluginsUIs.MenuItems
+namespace LoadModules.Extensions.AutomationPluginsUIs.CommandExecution.AtomicCommands
 {
     [System.ComponentModel.DesignerCategory("")]
     public class AddNewScheduleForProjectMenuItem : BasicUICommandExecution, IAtomicCommand

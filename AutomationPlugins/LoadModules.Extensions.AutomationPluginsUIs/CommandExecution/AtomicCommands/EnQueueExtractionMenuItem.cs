@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using CatalogueManager.CommandExecution.AtomicCommands;
 using CatalogueManager.Icons.IconOverlays;
-using CatalogueManager.Icons.IconProvision;
 using CatalogueManager.ItemActivation;
 using DataExportLibrary.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data;
@@ -16,7 +12,7 @@ using LoadModules.Extensions.AutomationPluginsUIs.Dialogs;
 using ReusableUIComponents.CommandExecution.AtomicCommands;
 using ReusableUIComponents.Icons.IconProvision;
 
-namespace LoadModules.Extensions.AutomationPluginsUIs.MenuItems
+namespace LoadModules.Extensions.AutomationPluginsUIs.CommandExecution.AtomicCommands
 {
     [System.ComponentModel.DesignerCategory("")]
     public class ExecuteCommandEnqueueExtractionMenuItem : BasicUICommandExecution, IAtomicCommand
@@ -30,7 +26,7 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.MenuItems
             _extractionConfiguration = extractionConfiguration;
         }
 
-        public override string GetCommandHelp()
+        public override string GetCommandName()
         {
             return "Queue One Off Extraction For Specific Time";
         }

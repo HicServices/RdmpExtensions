@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-using System.Windows.Forms;
 using CatalogueLibrary.Data;
 using CatalogueManager.CommandExecution.AtomicCommands;
 using CatalogueManager.Icons.IconProvision;
@@ -8,7 +7,7 @@ using MapsDirectlyToDatabaseTableUI;
 using ReusableUIComponents.CommandExecution.AtomicCommands;
 using ReusableUIComponents.Icons.IconProvision;
 
-namespace LoadModules.Extensions.AutomationPluginsUIs.MenuItems
+namespace LoadModules.Extensions.AutomationPluginsUIs.CommandExecution.AtomicCommands
 {
     [System.ComponentModel.DesignerCategory("")]
     public class ExecuteCommandCreateNewAutomationPluginsDatabase : BasicUICommandExecution, IAtomicCommand
