@@ -332,7 +332,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandExecution\AtomicCommands\ScheduleThigamabobber.cs" />
+    <Compile Include="CommandExecution\Proposals\ProposeExecutionWhenTargetIsAutomateExtractionSchedule.cs" />
     <Compile Include="Dialogs\EnqueueExtractionConfigurationUI.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -388,9 +388,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="MenuItems\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
