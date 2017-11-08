@@ -102,10 +102,10 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 
             //time is something like 5pm to 8am the next day
             if (windowStart > windowEnd)
-                return timeNow > windowStart.Value && timeNow < windowEnd.Value;
+                return timeNow > windowStart.Value || timeNow < windowEnd.Value;
 
             //time is something like 9am to 5pm (the same day)
-            return timeNow > windowEnd.Value && timeNow < windowStart.Value;
+            return timeNow > windowStart.Value && timeNow < windowEnd.Value;
 
         }
         TimeSpan? StringToTime(string s)

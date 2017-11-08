@@ -190,6 +190,9 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
 
         private void ddExecutionTimescale_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (_schedule == null)
+                return;
+
             _schedule.ExecutionTimescale = (AutomationTimeScale)ddExecutionTimescale.SelectedItem;
         }
 
