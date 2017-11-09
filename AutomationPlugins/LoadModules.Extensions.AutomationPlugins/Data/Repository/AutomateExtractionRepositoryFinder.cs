@@ -14,7 +14,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
     {
         private readonly IRDMPPlatformRepositoryServiceLocator _repositoryLocator;
         private Assembly _databaseAssembly;
-
+        
         public AutomateExtractionRepositoryFinder(IRDMPPlatformRepositoryServiceLocator repositoryLocator) : base(repositoryLocator)
         {
             _repositoryLocator = repositoryLocator;

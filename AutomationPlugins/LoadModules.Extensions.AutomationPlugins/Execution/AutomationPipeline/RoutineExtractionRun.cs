@@ -7,8 +7,12 @@ using CachingEngine.Requests.FetchRequestProvider;
 using CatalogueLibrary.Data;
 using CatalogueLibrary.Data.Automation;
 using CatalogueLibrary.Data.Pipelines;
+using CatalogueLibrary.DataFlowPipeline;
 using CatalogueLibrary.Repositories;
+using DataExportLibrary.CohortCreationPipeline;
 using DataExportLibrary.Data.DataTables;
+using DataExportLibrary.DataRelease;
+using DataExportLibrary.DataRelease.ReleasePipeline;
 using DataExportLibrary.ExtractionTime.Commands;
 using DataExportLibrary.ExtractionTime.ExtractionPipeline;
 using DataExportLibrary.ExtractionTime.UserPicks;
@@ -83,35 +87,14 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
                 var startDate = DateTime.Now;
 
                 task.Job.SetLastKnownStatus(AutomationJobStatus.Running);
-                
-                var datasets = ExtractionConfiguration.GetAllExtractableDataSets();
 
-                if(!datasets.Any())
-                    throw new Exception("There are no ExtractableDatasets configured for ExtractionConfiguration '" + ExtractionConfiguration + "' in AutomateExtraction");
+                if (_automate.RefreshCohort)
+                    RefreshCohort();
 
-                var logManager = ((ExtractionConfiguration) ExtractionConfiguration).GetExplicitLoggingDatabaseServerOrDefault();
-                logManager.CreateNewLoggingTaskIfNotExists(LoggingTaskName);
+                RunExtraction();
 
-                var dlinfo = logManager.CreateDataLoadInfo(LoggingTaskName, GetType().Name, ExtractionConfiguration.ToString(), "",false);
-                
-                foreach (IExtractableDataSet ds in datasets)
-                {
-                    var bundle = new ExtractableDatasetBundle(ds);
-                    var cmd = new ExtractDatasetCommand(_repositoryLocator, ExtractionConfiguration, bundle);
-
-                    var host = new ExtractionPipelineHost(cmd, _pipeline, (DataLoadInfo) dlinfo);
-
-                    var toMemory = new ToMemoryDataLoadEventListener(false);
-                    host.Execute(toMemory);
-                    if (toMemory.GetWorst() == ProgressEventType.Error)
-                        throw new Exception(
-                            "Failed executing ExtractionConfiguration '" + ExtractionConfiguration + "' DataSet '" + ds +
-                            "'",
-                            new AggregateException(GetExceptions(toMemory))
-                            );
-                }
-                
-                dlinfo.CloseAndMarkComplete();
+                if (_automate.Release)
+                    ReleaseExtract();
 
                 //it worked!
                 task.Job.SetLastKnownStatus(AutomationJobStatus.Finished);
@@ -130,6 +113,82 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
                 task.Job.SetLastKnownStatus(AutomationJobStatus.Crashed);
                 new AutomationServiceException(_repositoryLocator.CatalogueRepository, e);
             }
+        }
+
+        private void ReleaseExtract()
+        {
+            var schedule = _automate.AutomateExtractionSchedule;
+            var releasePipeline = schedule.ReleasePipeline;
+
+            if(releasePipeline == null)
+                throw new Exception("Release Pipeline has not been set for AutomateExtractionSchedule '" + schedule +"'");
+
+            //the data we are trying to extract
+            var source = new FixedDataReleaseSource();
+
+
+            var releasePotentialList = new List<ReleasePotential>();
+
+            foreach (var ds in ExtractionConfiguration.GetAllExtractableDataSets())
+                releasePotentialList.Add(new ReleasePotential(_repositoryLocator, ExtractionConfiguration, ds));
+
+
+            source.CurrentRelease = new ReleaseData
+            {
+                ConfigurationsForRelease = new Dictionary<IExtractionConfiguration, List<ReleasePotential>>()
+                {
+                    {ExtractionConfiguration, releasePotentialList}
+                },
+                EnvironmentPotential = new ReleaseEnvironmentPotential(ExtractionConfiguration),
+                ReleaseState = ReleaseState.DoingProperRelease
+            };
+
+            //the release context for the project
+            var context = new ReleaseUseCase((Project) ExtractionConfiguration.Project, source);
+
+            //translated into an engine
+            var engine = context.GetEngine(releasePipeline, new ThrowImmediatelyDataLoadEventListener());
+            
+            //and executed
+            engine.ExecutePipeline(new GracefulCancellationToken());
+        }
+
+        private void RefreshCohort()
+        {
+            var engine = new CohortRefreshEngine(new ThrowImmediatelyDataLoadEventListener(), (ExtractionConfiguration)ExtractionConfiguration);
+            engine.Execute();
+        }
+
+        private void RunExtraction()
+        {
+            var datasets = ExtractionConfiguration.GetAllExtractableDataSets();
+
+            if (!datasets.Any())
+                throw new Exception("There are no ExtractableDatasets configured for ExtractionConfiguration '" + ExtractionConfiguration + "' in AutomateExtraction");
+
+            var logManager = ((ExtractionConfiguration)ExtractionConfiguration).GetExplicitLoggingDatabaseServerOrDefault();
+            logManager.CreateNewLoggingTaskIfNotExists(LoggingTaskName);
+
+            var dlinfo = logManager.CreateDataLoadInfo(LoggingTaskName, GetType().Name, ExtractionConfiguration.ToString(), "", false);
+
+            foreach (IExtractableDataSet ds in datasets)
+            {
+                var bundle = new ExtractableDatasetBundle(ds);
+                var cmd = new ExtractDatasetCommand(_repositoryLocator, ExtractionConfiguration, bundle);
+
+                var host = new ExtractionPipelineHost(cmd, _pipeline, (DataLoadInfo)dlinfo);
+
+                var toMemory = new ToMemoryDataLoadEventListener(false);
+                host.Execute(toMemory);
+                if (toMemory.GetWorst() == ProgressEventType.Error)
+                    throw new Exception(
+                        "Failed executing ExtractionConfiguration '" + ExtractionConfiguration + "' DataSet '" + ds +
+                        "'",
+                        new AggregateException(GetExceptions(toMemory))
+                        );
+            }
+
+            dlinfo.CloseAndMarkComplete();
         }
 
         private Exception[] GetExceptions(ToMemoryDataLoadEventListener toMemory)

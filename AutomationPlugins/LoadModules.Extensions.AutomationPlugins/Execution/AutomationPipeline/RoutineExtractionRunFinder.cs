@@ -54,6 +54,10 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             if (runnable.BaselineDate == null)
                 return true;
 
+            //it's not yet that time of the day
+            if (DateTime.Now.TimeOfDay <= schedule.ExecutionTimeOfDay)
+                return false;
+
             switch (schedule.ExecutionTimescale)
             {
                 case AutomationTimeScale.Never:
