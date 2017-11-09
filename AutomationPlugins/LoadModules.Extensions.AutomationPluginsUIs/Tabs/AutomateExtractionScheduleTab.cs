@@ -65,7 +65,6 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             olvCheckAutomation.ButtonSizing = OLVColumn.ButtonSizingMode.CellBounds;
 
             olvConfigurations.ButtonClick += olvConfigurations_ButtonClick;
-
         }
 
         private object DeleteAspectGetter(object rowObject)
@@ -140,7 +139,7 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             if (_extractionSelectionUI == null)
             {
                 var pipelineHost = new ExtractionPipelineHost();
-                PipelineUser user = new PipelineUser(typeof(AutomateExtractionSchedule).GetProperty("Pipeline_ID"), _schedule);
+                PipelineUser user = new PipelineUser(typeof(AutomateExtractionSchedule).GetProperty("Pipeline_ID"), _schedule, RepositoryLocator.CatalogueRepository);
                 var factory = new PipelineSelectionUIFactory(activator.RepositoryLocator.CatalogueRepository, user, pipelineHost);
                 _extractionSelectionUI = factory.Create(null,DockStyle.Fill,pExtractPipeline);
                 _extractionSelectionUI.CollapseToSingleLineMode();
@@ -156,7 +155,7 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             if (_releaseSelectionUI == null)
             {
                 IPipelineUseCase useCase = new ReleaseUseCase(_schedule.Project,new FixedDataReleaseSource());
-                PipelineUser user = new PipelineUser(typeof(AutomateExtractionSchedule).GetProperty("ReleasePipeline_ID"),_schedule );
+                IPipelineUser user = new PipelineUser(typeof(AutomateExtractionSchedule).GetProperty("ReleasePipeline_ID"), _schedule, RepositoryLocator.CatalogueRepository);
                 var factory = new PipelineSelectionUIFactory(activator.RepositoryLocator.CatalogueRepository, user,useCase);
                 _releaseSelectionUI = factory.Create(null, DockStyle.Fill, pReleasePipeline);
                 _releaseSelectionUI.CollapseToSingleLineMode();
@@ -181,7 +180,17 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
         private void RefreshObjects()
         {
             olvConfigurations.ClearObjects();
-            olvConfigurations.AddObjects(_schedule.AutomateExtractions);
+
+            foreach (var automateExtraction in _schedule.AutomateExtractions)
+            {
+                //these are children so lets just autosave any changes to them
+                var ae = automateExtraction;
+                automateExtraction.PropertyChanged += (s, e) => ae.SaveToDatabase();
+
+                olvConfigurations.AddObject(ae);
+            }
+
+            
         }
 
         void ExtractionSelectionUiPipelineChanged(object sender, EventArgs e)

@@ -47,14 +47,14 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             this.olvBaselineDate = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvDeleteBaselineAudit = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvCheckAutomation = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvRefreshCohort = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvRelease = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.label3 = new System.Windows.Forms.Label();
             this.btnAddExtractionConfigurations = new System.Windows.Forms.Button();
             this.ragSmileyPipeline = new ReusableUIComponents.RAGSmiley();
             this.tbTimeOfDay = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.pReleasePipeline = new System.Windows.Forms.Panel();
-            this.olvRefreshCohorts = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.olvRelease = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             ((System.ComponentModel.ISupportInitialize)(this.olvConfigurations)).BeginInit();
             this.SuspendLayout();
             // 
@@ -154,11 +154,11 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             this.olvConfigurations.AllColumns.Add(this.olvBaselineDate);
             this.olvConfigurations.AllColumns.Add(this.olvDeleteBaselineAudit);
             this.olvConfigurations.AllColumns.Add(this.olvCheckAutomation);
-            this.olvConfigurations.AllColumns.Add(this.olvRefreshCohorts);
+            this.olvConfigurations.AllColumns.Add(this.olvRefreshCohort);
             this.olvConfigurations.AllColumns.Add(this.olvRelease);
             this.olvConfigurations.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.olvConfigurations.CellEditActivation = BrightIdeasSoftware.ObjectListView.CellEditActivateMode.SingleClick;
+            this.olvConfigurations.CellEditUseWholeCell = false;
             this.olvConfigurations.CheckBoxes = true;
             this.olvConfigurations.CheckedAspectName = "";
             this.olvConfigurations.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
@@ -166,15 +166,17 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             this.olvBaselineDate,
             this.olvDeleteBaselineAudit,
             this.olvCheckAutomation,
-            this.olvRefreshCohorts,
+            this.olvRefreshCohort,
             this.olvRelease});
             this.olvConfigurations.Cursor = System.Windows.Forms.Cursors.Default;
             this.olvConfigurations.Location = new System.Drawing.Point(93, 243);
             this.olvConfigurations.Name = "olvConfigurations";
+            this.olvConfigurations.ShowImagesOnSubItems = true;
             this.olvConfigurations.Size = new System.Drawing.Size(850, 143);
             this.olvConfigurations.TabIndex = 9;
             this.olvConfigurations.Text = "label3";
             this.olvConfigurations.UseCompatibleStateImageBehavior = false;
+            this.olvConfigurations.UseSubItemCheckBoxes = true;
             this.olvConfigurations.View = System.Windows.Forms.View.Details;
             this.olvConfigurations.KeyUp += new System.Windows.Forms.KeyEventHandler(this.olvConfigurations_KeyUp);
             // 
@@ -207,6 +209,21 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             this.olvCheckAutomation.IsButton = true;
             this.olvCheckAutomation.Text = "Check Automation";
             this.olvCheckAutomation.Width = 100;
+            // 
+            // olvRefreshCohort
+            // 
+            this.olvRefreshCohort.AspectName = "RefreshCohort";
+            this.olvRefreshCohort.CheckBoxes = true;
+            this.olvRefreshCohort.Text = "Refresh Cohort";
+            this.olvRefreshCohort.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.olvRefreshCohort.Width = 90;
+            // 
+            // olvRelease
+            // 
+            this.olvRelease.AspectName = "Release";
+            this.olvRelease.CheckBoxes = true;
+            this.olvRelease.Text = "Release";
+            this.olvRelease.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label3
             // 
@@ -259,17 +276,6 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             this.pReleasePipeline.Name = "pReleasePipeline";
             this.pReleasePipeline.Size = new System.Drawing.Size(712, 34);
             this.pReleasePipeline.TabIndex = 5;
-            // 
-            // olvRefreshCohorts
-            // 
-            this.olvRefreshCohorts.AspectName = "RefreshCohorts";
-            this.olvRefreshCohorts.Text = "Refresh Cohorts";
-            this.olvRefreshCohorts.Width = 90;
-            // 
-            // olvRelease
-            // 
-            this.olvRelease.AspectName = "Release";
-            this.olvRelease.Text = "Release";
             // 
             // AutomateExtractionScheduleTab
             // 
@@ -324,7 +330,7 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
         private System.Windows.Forms.TextBox tbTimeOfDay;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Panel pReleasePipeline;
-        private OLVColumn olvRefreshCohorts;
+        private OLVColumn olvRefreshCohort;
         private OLVColumn olvRelease;
     }
 }
