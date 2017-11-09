@@ -12,6 +12,7 @@ using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using MapsDirectlyToDatabaseTable;
 using ReusableLibraryCode.Checks;
 using ReusableUIComponents;
+using roundhouse.infrastructure.extensions;
 using Ticketing;
 
 namespace LoadModules.Extensions.AutomationPlugins.Data
@@ -29,9 +30,11 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
         private bool _disabled;
         private int _project_ID;
         private int? _pipeline_ID;
+        private int? _releasePipelineId;
+        private TimeSpan _executionTimeOfDay;
 
         private AutomateExtractionRepository _repository;
-        
+
         public AutomationTimeScale ExecutionTimescale
         {
             get { return _executionTimescale; }
@@ -77,6 +80,19 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             get { return _pipeline_ID; }
             set { SetField(ref _pipeline_ID, value); }
         }
+
+        public TimeSpan ExecutionTimeOfDay
+        {
+            get { return _executionTimeOfDay; }
+            set { SetField(ref _executionTimeOfDay , value); }
+        }
+
+        public int? ReleasePipeline_ID
+        {
+            get { return _releasePipelineId; }
+            set { SetField(ref _releasePipelineId , value); }
+        }
+
         #endregion
 
         #region Database Relationships
@@ -86,6 +102,15 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
         {
             return Pipeline_ID != null ? _repository.CatalogueRepository.GetObjectByID<Pipeline>(Pipeline_ID.Value) : null;
         } }
+
+        [NoMappingToDatabase]
+        public IPipeline ReleasePipeline
+        {
+            get
+            {
+                return ReleasePipeline_ID != null ? _repository.CatalogueRepository.GetObjectByID<Pipeline>(ReleasePipeline_ID.Value) : null;
+            }
+        }
 
         [NoMappingToDatabase]
         public Project Project
@@ -100,7 +125,8 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
         {
             return _repository.GetAllObjectsWithParent<AutomateExtraction>(this);
         } }
-        
+
+
         #endregion
 
         public AutomateExtractionSchedule(AutomateExtractionRepository repository, Project project)
@@ -110,7 +136,8 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             {
                 {"Project_ID",project.ID},
                 {"Name","New Schedule"+Guid.NewGuid()},
-                {"ExecutionTimescale",AutomationTimeScale.Never}
+                {"ExecutionTimescale",AutomationTimeScale.Never},
+                {"ExecutionTimeOfDay","12:00:00"}
             });
 
             if (ID == 0 || Repository != repository)
@@ -130,6 +157,17 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             Disabled = Convert.ToBoolean(r["Disabled"]);
             Project_ID = Convert.ToInt32(r["Project_ID"]);
             Pipeline_ID = ObjectToNullableInt(r["Pipeline_ID"]);
+
+            try
+            {
+                ExecutionTimeOfDay = TimeSpan.Parse(r["ExecutionTimeOfDay"].ToString());
+            }
+            catch (Exception)
+            {
+                ExecutionTimeOfDay = new TimeSpan(12,00,00);
+            }
+            ReleasePipeline_ID = ObjectToNullableInt(r["ReleasePipeline_ID"]);
+
         }
 
         public override string ToString()

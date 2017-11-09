@@ -250,6 +250,9 @@
     <Folder Include="db\sprocs\" />
     <Folder Include="db\up\views\" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="db\up\001_ReleaseAutomation.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

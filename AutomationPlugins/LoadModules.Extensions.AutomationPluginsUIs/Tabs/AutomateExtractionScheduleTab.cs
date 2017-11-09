@@ -5,12 +5,16 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
+using CatalogueLibrary.Data.DataLoad;
+using CatalogueLibrary.Data.Pipelines;
 using CatalogueManager.Icons.IconOverlays;
 using CatalogueManager.Icons.IconProvision;
 using CatalogueManager.ItemActivation;
 using CatalogueManager.SimpleControls;
 using CatalogueManager.TestsAndSetup.ServicePropogation;
 using DataExportLibrary.Data.DataTables;
+using DataExportLibrary.DataRelease;
+using DataExportLibrary.DataRelease.ReleasePipeline;
 using DataExportLibrary.ExtractionTime.Commands;
 using DataExportLibrary.ExtractionTime.ExtractionPipeline;
 using DataExportLibrary.Interfaces.Data.DataTables;
@@ -25,13 +29,15 @@ using RDMPObjectVisualisation.Pipelines;
 using RDMPObjectVisualisation.Pipelines.PluginPipelineUsers;
 using ReusableUIComponents;
 using ReusableUIComponents.Icons.IconProvision;
+using roundhouse.infrastructure.extensions;
 
 namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
 {
     public partial class AutomateExtractionScheduleTab : AutomateExtractionSchedule_Design,ISaveableUI
     {
         private AutomateExtractionSchedule _schedule;
-        IPipelineSelectionUI _selectionUI;
+        IPipelineSelectionUI _extractionSelectionUI;
+        IPipelineSelectionUI _releaseSelectionUI;
 
         private Bitmap _extractionConfiguration;
         private Bitmap _extractionConfigurationIconAdd;
@@ -131,30 +137,43 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             _schedule = databaseObject;
             base.SetDatabaseObject(activator, databaseObject);
 
-            if (_selectionUI == null)
+            if (_extractionSelectionUI == null)
             {
                 var pipelineHost = new ExtractionPipelineHost();
-                var factory = new PipelineSelectionUIFactory(activator.RepositoryLocator.CatalogueRepository, null, pipelineHost);
+                PipelineUser user = new PipelineUser(typeof(AutomateExtractionSchedule).GetProperty("Pipeline_ID"), _schedule);
+                var factory = new PipelineSelectionUIFactory(activator.RepositoryLocator.CatalogueRepository, user, pipelineHost);
+                _extractionSelectionUI = factory.Create(null,DockStyle.Fill,pExtractPipeline);
+                _extractionSelectionUI.CollapseToSingleLineMode();
 
-                _selectionUI = factory.Create();
-
-                _selectionUI = new PipelineSelectionUI<DataTable>(null,null,activator.RepositoryLocator.CatalogueRepository);
-
-                var selectionUIControl = (Control)_selectionUI;
+                var selectionUIControl = (Control)_extractionSelectionUI;
                 selectionUIControl.Dock = DockStyle.Fill;
-                _selectionUI.PipelineChanged += _selectionUI_PipelineChanged;
-                pPipeline.Controls.Add(selectionUIControl);
+                _extractionSelectionUI.PipelineChanged += ExtractionSelectionUiPipelineChanged;
+                _extractionSelectionUI.Pipeline = _schedule.Pipeline;
 
                 saverButton.SetupFor(_schedule,activator.RefreshBus);
             }
 
+            if (_releaseSelectionUI == null)
+            {
+                IPipelineUseCase useCase = new ReleaseUseCase(_schedule.Project,new FixedDataReleaseSource());
+                PipelineUser user = new PipelineUser(typeof(AutomateExtractionSchedule).GetProperty("ReleasePipeline_ID"),_schedule );
+                var factory = new PipelineSelectionUIFactory(activator.RepositoryLocator.CatalogueRepository, user,useCase);
+                _releaseSelectionUI = factory.Create(null, DockStyle.Fill, pReleasePipeline);
+                _releaseSelectionUI.CollapseToSingleLineMode();
+
+                _extractionSelectionUI.Pipeline = _schedule.ReleasePipeline;
+
+            }
+
             ticketingControl1.TicketText = _schedule.Ticket;
             cbDisabled.Checked = _schedule.Disabled;
-            _selectionUI.Pipeline = _schedule.Pipeline;
+            
             ddExecutionTimescale.SelectedItem = _schedule.ExecutionTimescale;
             
             ticketingControl1.ReCheckTicketingSystemInCatalogue();
             lblName.Text = "Name:"+_schedule.Name;
+            tbTimeOfDay.Text = _schedule.ExecutionTimeOfDay.ToString();
+
 
             RefreshObjects();
         }
@@ -165,9 +184,8 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             olvConfigurations.AddObjects(_schedule.AutomateExtractions);
         }
 
-        void _selectionUI_PipelineChanged(object sender, EventArgs e)
+        void ExtractionSelectionUiPipelineChanged(object sender, EventArgs e)
         {
-            _schedule.Pipeline_ID = _selectionUI.Pipeline != null ? _selectionUI.Pipeline.ID : (int?) null;
             CheckPipeline();
         }
 
@@ -243,6 +261,25 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
 
             if(addedAtLeast1)
                 RefreshObjects();
+        }
+
+        private void tbTimeOfDay_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _schedule.ExecutionTimeOfDay = TimeSpan.Parse(tbTimeOfDay.Text);
+                tbTimeOfDay.ForeColor = Color.Black;
+            }
+            catch (Exception)
+            {
+                tbTimeOfDay.ForeColor = Color.Red;
+            }
+
+        }
+
+        private void AutomateExtractionScheduleTab_Load(object sender, EventArgs e)
+        {
+
         }
     }
 

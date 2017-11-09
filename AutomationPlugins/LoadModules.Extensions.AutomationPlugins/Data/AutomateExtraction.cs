@@ -25,6 +25,8 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
         private int _automateExtractionSchedule_ID;
         private bool _disabled;
         private DateTime? _baselineDate;
+        private bool _refreshCohort;
+        private bool _release;
 
         public int ExtractionConfiguration_ID
         {
@@ -46,7 +48,19 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             get { return _baselineDate; }
             set { SetField(ref _baselineDate, value); }
         }
-        
+
+        public bool RefreshCohort
+        {
+            get { return _refreshCohort; }
+            set {SetField(ref _refreshCohort , value); }
+        }
+
+        public bool Release
+        {
+            get { return _release; }
+            set { SetField(ref _release , value);}
+        }
+
         #endregion
 
         #region Relationships
@@ -71,7 +85,10 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             repository.InsertAndHydrate(this, new Dictionary<string, object>()
             {
                 {"AutomateExtractionSchedule_ID",schedule.ID},
-                {"ExtractionConfiguration_ID",config.ID}
+                {"ExtractionConfiguration_ID",config.ID},
+                {"RefreshCohort",false},
+                {"Release",false},
+
             });
 
             if (ID == 0 || Repository != repository)
@@ -85,9 +102,14 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             AutomateExtractionSchedule_ID = Convert.ToInt32(r["AutomateExtractionSchedule_ID"]);
             Disabled = Convert.ToBoolean(r["Disabled"]);
             BaselineDate = ObjectToNullableDateTime(r["BaselineDate"]);
+
+            RefreshCohort = Convert.ToBoolean(r["RefreshCohort"]);
+            Release = Convert.ToBoolean(r["Release"]);
         }
 
         private ExtractionConfiguration _cachedExtractionConfiguration;
+        
+
         public override string ToString()
         {
             if (_cachedExtractionConfiguration == null)

@@ -37,7 +37,7 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             this.tbComment = new System.Windows.Forms.TextBox();
             this.ticketingControl1 = new CatalogueManager.LocationsMenu.Ticketing.TicketingControl();
             this.cbDisabled = new System.Windows.Forms.CheckBox();
-            this.pPipeline = new System.Windows.Forms.Panel();
+            this.pExtractPipeline = new System.Windows.Forms.Panel();
             this.label2 = new System.Windows.Forms.Label();
             this.ddExecutionTimescale = new System.Windows.Forms.ComboBox();
             this.saverButton = new CatalogueManager.SimpleControls.ObjectSaverButton();
@@ -46,10 +46,15 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             this.olvName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvBaselineDate = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvDeleteBaselineAudit = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvCheckAutomation = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.label3 = new System.Windows.Forms.Label();
             this.btnAddExtractionConfigurations = new System.Windows.Forms.Button();
             this.ragSmileyPipeline = new ReusableUIComponents.RAGSmiley();
-            this.olvCheckAutomation = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.tbTimeOfDay = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.pReleasePipeline = new System.Windows.Forms.Panel();
+            this.olvRefreshCohorts = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvRelease = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             ((System.ComponentModel.ISupportInitialize)(this.olvConfigurations)).BeginInit();
             this.SuspendLayout();
             // 
@@ -99,17 +104,17 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             this.cbDisabled.UseVisualStyleBackColor = true;
             this.cbDisabled.CheckedChanged += new System.EventHandler(this.cbDisabled_CheckedChanged);
             // 
-            // pPipeline
+            // pExtractPipeline
             // 
-            this.pPipeline.Location = new System.Drawing.Point(74, 152);
-            this.pPipeline.Name = "pPipeline";
-            this.pPipeline.Size = new System.Drawing.Size(712, 146);
-            this.pPipeline.TabIndex = 4;
+            this.pExtractPipeline.Location = new System.Drawing.Point(74, 152);
+            this.pExtractPipeline.Name = "pExtractPipeline";
+            this.pExtractPipeline.Size = new System.Drawing.Size(712, 34);
+            this.pExtractPipeline.TabIndex = 4;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(3, 307);
+            this.label2.Location = new System.Drawing.Point(20, 195);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(108, 13);
             this.label2.TabIndex = 5;
@@ -119,7 +124,7 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             // 
             this.ddExecutionTimescale.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ddExecutionTimescale.FormattingEnabled = true;
-            this.ddExecutionTimescale.Location = new System.Drawing.Point(117, 304);
+            this.ddExecutionTimescale.Location = new System.Drawing.Point(134, 192);
             this.ddExecutionTimescale.Name = "ddExecutionTimescale";
             this.ddExecutionTimescale.Size = new System.Drawing.Size(465, 21);
             this.ddExecutionTimescale.TabIndex = 6;
@@ -127,11 +132,11 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             // 
             // saverButton
             // 
-            this.saverButton.Location = new System.Drawing.Point(74, 504);
+            this.saverButton.Location = new System.Drawing.Point(94, 429);
+            this.saverButton.Margin = new System.Windows.Forms.Padding(0);
             this.saverButton.Name = "saverButton";
-            this.saverButton.Size = new System.Drawing.Size(76, 23);
+            this.saverButton.Size = new System.Drawing.Size(57, 29);
             this.saverButton.TabIndex = 7;
-            this.saverButton.Text = "Save";
             // 
             // ragSmileyTicketing
             // 
@@ -149,20 +154,24 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             this.olvConfigurations.AllColumns.Add(this.olvBaselineDate);
             this.olvConfigurations.AllColumns.Add(this.olvDeleteBaselineAudit);
             this.olvConfigurations.AllColumns.Add(this.olvCheckAutomation);
+            this.olvConfigurations.AllColumns.Add(this.olvRefreshCohorts);
+            this.olvConfigurations.AllColumns.Add(this.olvRelease);
             this.olvConfigurations.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.olvConfigurations.CellEditUseWholeCell = false;
+            this.olvConfigurations.CellEditActivation = BrightIdeasSoftware.ObjectListView.CellEditActivateMode.SingleClick;
             this.olvConfigurations.CheckBoxes = true;
             this.olvConfigurations.CheckedAspectName = "";
             this.olvConfigurations.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.olvName,
             this.olvBaselineDate,
             this.olvDeleteBaselineAudit,
-            this.olvCheckAutomation});
+            this.olvCheckAutomation,
+            this.olvRefreshCohorts,
+            this.olvRelease});
             this.olvConfigurations.Cursor = System.Windows.Forms.Cursors.Default;
-            this.olvConfigurations.Location = new System.Drawing.Point(76, 355);
+            this.olvConfigurations.Location = new System.Drawing.Point(93, 243);
             this.olvConfigurations.Name = "olvConfigurations";
-            this.olvConfigurations.Size = new System.Drawing.Size(744, 143);
+            this.olvConfigurations.Size = new System.Drawing.Size(850, 143);
             this.olvConfigurations.TabIndex = 9;
             this.olvConfigurations.Text = "label3";
             this.olvConfigurations.UseCompatibleStateImageBehavior = false;
@@ -193,10 +202,16 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             this.olvDeleteBaselineAudit.Text = "Clear";
             this.olvDeleteBaselineAudit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
+            // olvCheckAutomation
+            // 
+            this.olvCheckAutomation.IsButton = true;
+            this.olvCheckAutomation.Text = "Check Automation";
+            this.olvCheckAutomation.Width = 100;
+            // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(74, 336);
+            this.label3.Location = new System.Drawing.Point(91, 224);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(135, 13);
             this.label3.TabIndex = 10;
@@ -204,7 +219,7 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             // 
             // btnAddExtractionConfigurations
             // 
-            this.btnAddExtractionConfigurations.Location = new System.Drawing.Point(47, 355);
+            this.btnAddExtractionConfigurations.Location = new System.Drawing.Point(64, 243);
             this.btnAddExtractionConfigurations.Name = "btnAddExtractionConfigurations";
             this.btnAddExtractionConfigurations.Size = new System.Drawing.Size(26, 26);
             this.btnAddExtractionConfigurations.TabIndex = 11;
@@ -221,16 +236,48 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             this.ragSmileyPipeline.Size = new System.Drawing.Size(25, 25);
             this.ragSmileyPipeline.TabIndex = 12;
             // 
-            // olvCheckAutomation
+            // tbTimeOfDay
             // 
-            this.olvCheckAutomation.IsButton = true;
-            this.olvCheckAutomation.Text = "Check Automation";
-            this.olvCheckAutomation.Width = 100;
+            this.tbTimeOfDay.Location = new System.Drawing.Point(680, 192);
+            this.tbTimeOfDay.Name = "tbTimeOfDay";
+            this.tbTimeOfDay.Size = new System.Drawing.Size(157, 20);
+            this.tbTimeOfDay.TabIndex = 13;
+            this.tbTimeOfDay.TextChanged += new System.EventHandler(this.tbTimeOfDay_TextChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(605, 195);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(69, 13);
+            this.label4.TabIndex = 14;
+            this.label4.Text = "Time Of Day:";
+            // 
+            // pReleasePipeline
+            // 
+            this.pReleasePipeline.Location = new System.Drawing.Point(93, 392);
+            this.pReleasePipeline.Name = "pReleasePipeline";
+            this.pReleasePipeline.Size = new System.Drawing.Size(712, 34);
+            this.pReleasePipeline.TabIndex = 5;
+            // 
+            // olvRefreshCohorts
+            // 
+            this.olvRefreshCohorts.AspectName = "RefreshCohorts";
+            this.olvRefreshCohorts.Text = "Refresh Cohorts";
+            this.olvRefreshCohorts.Width = 90;
+            // 
+            // olvRelease
+            // 
+            this.olvRelease.AspectName = "Release";
+            this.olvRelease.Text = "Release";
             // 
             // AutomateExtractionScheduleTab
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.pReleasePipeline);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.tbTimeOfDay);
             this.Controls.Add(this.ragSmileyPipeline);
             this.Controls.Add(this.btnAddExtractionConfigurations);
             this.Controls.Add(this.label3);
@@ -239,14 +286,15 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
             this.Controls.Add(this.saverButton);
             this.Controls.Add(this.ddExecutionTimescale);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.pPipeline);
+            this.Controls.Add(this.pExtractPipeline);
             this.Controls.Add(this.cbDisabled);
             this.Controls.Add(this.ticketingControl1);
             this.Controls.Add(this.tbComment);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lblName);
             this.Name = "AutomateExtractionScheduleTab";
-            this.Size = new System.Drawing.Size(835, 564);
+            this.Size = new System.Drawing.Size(959, 564);
+            this.Load += new System.EventHandler(this.AutomateExtractionScheduleTab_Load);
             ((System.ComponentModel.ISupportInitialize)(this.olvConfigurations)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -260,7 +308,7 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
         private System.Windows.Forms.TextBox tbComment;
         private TicketingControl ticketingControl1;
         private System.Windows.Forms.CheckBox cbDisabled;
-        private System.Windows.Forms.Panel pPipeline;
+        private System.Windows.Forms.Panel pExtractPipeline;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox ddExecutionTimescale;
         private ObjectSaverButton saverButton;
@@ -273,5 +321,10 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
         private OLVColumn olvDeleteBaselineAudit;
         private ReusableUIComponents.RAGSmiley ragSmileyPipeline;
         private OLVColumn olvCheckAutomation;
+        private System.Windows.Forms.TextBox tbTimeOfDay;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Panel pReleasePipeline;
+        private OLVColumn olvRefreshCohorts;
+        private OLVColumn olvRelease;
     }
 }
