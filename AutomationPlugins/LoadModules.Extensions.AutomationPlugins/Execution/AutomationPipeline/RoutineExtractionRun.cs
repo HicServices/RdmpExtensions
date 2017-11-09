@@ -126,7 +126,6 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             //the data we are trying to extract
             var source = new FixedDataReleaseSource();
 
-
             var releasePotentialList = new List<ReleasePotential>();
 
             foreach (var ds in ExtractionConfiguration.GetAllExtractableDataSets())
@@ -155,8 +154,15 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 
         private void RefreshCohort()
         {
+            int? before = ExtractionConfiguration.Cohort_ID;
+
             var engine = new CohortRefreshEngine(new ThrowImmediatelyDataLoadEventListener(), (ExtractionConfiguration)ExtractionConfiguration);
             engine.Execute();
+
+            ExtractionConfiguration.RevertToDatabaseState();
+
+            if(before == ExtractionConfiguration.Cohort_ID)
+                throw new Exception("Despite running the CohortRefreshEngine the Cohort_ID of the ExtractionConfiguration did not change!");
         }
 
         private void RunExtraction()

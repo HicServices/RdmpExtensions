@@ -160,7 +160,7 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
                 _releaseSelectionUI = factory.Create(null, DockStyle.Fill, pReleasePipeline);
                 _releaseSelectionUI.CollapseToSingleLineMode();
 
-                _extractionSelectionUI.Pipeline = _schedule.ReleasePipeline;
+                _releaseSelectionUI.Pipeline = _schedule.ReleasePipeline;
 
             }
 
