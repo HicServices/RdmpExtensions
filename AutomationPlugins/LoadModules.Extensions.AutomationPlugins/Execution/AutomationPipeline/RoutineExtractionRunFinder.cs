@@ -58,20 +58,23 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             if (DateTime.Now.TimeOfDay <= schedule.ExecutionTimeOfDay)
                 return false;
 
+            var now = DateTime.Now.Date;
+            var then = runnable.BaselineDate.Value.Date;
+
             switch (schedule.ExecutionTimescale)
             {
                 case AutomationTimeScale.Never:
                     return false;
                 case AutomationTimeScale.Daily:
-                    return DateTime.Now.Subtract(runnable.BaselineDate.Value).TotalSeconds > 86400;
+                    return now.Subtract(then).TotalSeconds >= 86400;
                 case AutomationTimeScale.Weekly:
-                    return DateTime.Now.Subtract(runnable.BaselineDate.Value).TotalSeconds > 604800;
+                    return now.Subtract(then).TotalSeconds >= 604800;
                 case AutomationTimeScale.BiWeekly:
-                    return DateTime.Now.Subtract(runnable.BaselineDate.Value).TotalSeconds > 1209600;
+                    return now.Subtract(then).TotalSeconds >= 1209600;
                 case AutomationTimeScale.Monthly:
-                    return DateTime.Now.Subtract(runnable.BaselineDate.Value).TotalSeconds > 2629746;
+                    return now.Subtract(then).TotalSeconds >= 2629746;
                 case AutomationTimeScale.Yearly:
-                    return DateTime.Now.Subtract(runnable.BaselineDate.Value).TotalSeconds> 31556952;
+                    return now.Subtract(then).TotalSeconds >= 31556952;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

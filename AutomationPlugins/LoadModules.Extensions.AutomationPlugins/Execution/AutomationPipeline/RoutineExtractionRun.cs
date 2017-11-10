@@ -13,6 +13,7 @@ using DataExportLibrary.CohortCreationPipeline;
 using DataExportLibrary.Data.DataTables;
 using DataExportLibrary.DataRelease;
 using DataExportLibrary.DataRelease.ReleasePipeline;
+using DataExportLibrary.ExtractionTime;
 using DataExportLibrary.ExtractionTime.Commands;
 using DataExportLibrary.ExtractionTime.ExtractionPipeline;
 using DataExportLibrary.ExtractionTime.UserPicks;
@@ -182,33 +183,44 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 
         private void RunExtraction()
         {
-            if(ExtractionConfiguration.IsReleased)
-                ((ExtractionConfiguration)ExtractionConfiguration).Unfreeze();
+            if (ExtractionConfiguration.IsReleased)
+                ((ExtractionConfiguration) ExtractionConfiguration).Unfreeze();
 
             var datasets = ExtractionConfiguration.GetAllExtractableDataSets();
 
             if (!datasets.Any())
-                throw new Exception("There are no ExtractableDatasets configured for ExtractionConfiguration '" + ExtractionConfiguration + "' in AutomateExtraction");
+                throw new Exception("There are no ExtractableDatasets configured for ExtractionConfiguration '" +
+                                    ExtractionConfiguration + "' in AutomateExtraction");
 
             StartLoggingIfNotStartedYet();
 
             var toMemory = new ToMemoryDataLoadEventListener(false);
-            var fork = new ForkDataLoadEventListener(_toLogging, toMemory);
-
+            
             foreach (IExtractableDataSet ds in datasets)
             {
                 var bundle = new ExtractableDatasetBundle(ds);
                 var cmd = new ExtractDatasetCommand(_repositoryLocator, ExtractionConfiguration, bundle);
 
-                var host = new ExtractionPipelineHost(cmd, _pipeline, (DataLoadInfo)_dlinfo);
-                
-                host.Execute(fork);
+                var host = new ExtractionPipelineHost(cmd, _pipeline, (DataLoadInfo) _dlinfo);
+
+                host.Execute(toMemory);
                 if (toMemory.GetWorst() == ProgressEventType.Error)
                     throw new Exception(
                         "Failed executing ExtractionConfiguration '" + ExtractionConfiguration + "' DataSet '" + ds +
                         "'",
                         new AggregateException(GetExceptions(toMemory))
                         );
+
+                var wordDataWritter = new WordDataWritter(host);
+
+                if (wordDataWritter.RequirementsMet()) //if Microsoft Word is installed
+                {
+                    wordDataWritter.GenerateWordFile(); //run the report
+
+                    //if there were any exceptions
+                    if (wordDataWritter.ExceptionsGeneratingWordFile.Any())
+                        throw new AggregateException(wordDataWritter.ExceptionsGeneratingWordFile);
+                }
             }
         }
 
