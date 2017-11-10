@@ -39,6 +39,9 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
         private string _jobName;
         private QueuedExtraction _que;
         private AutomateExtraction _automate;
+        private LogManager _logManager;
+        private IDataLoadInfo _dlinfo;
+        private ToLoggingDatabaseDataLoadEventListener _toLogging;
 
         public AutomationJob AutomationJob { get; private set; }
 
@@ -106,12 +109,19 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
                     _automate.BaselineDate = startDate;
                     _automate.SaveToDatabase();
                 }
-                
             }
             catch (Exception e)
             {
                 task.Job.SetLastKnownStatus(AutomationJobStatus.Crashed);
                 new AutomationServiceException(_repositoryLocator.CatalogueRepository, e);
+            }
+            finally
+            {
+                if (_toLogging != null)
+                    _toLogging.FinalizeTableLoadInfos();
+
+                if(_dlinfo != null && !_dlinfo.IsClosed)
+                    _dlinfo.CloseAndMarkComplete();
             }
         }
 
@@ -122,7 +132,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 
             if(releasePipeline == null)
                 throw new Exception("Release Pipeline has not been set for AutomateExtractionSchedule '" + schedule +"'");
-
+            
             //the data we are trying to extract
             var source = new FixedDataReleaseSource();
 
@@ -130,7 +140,6 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 
             foreach (var ds in ExtractionConfiguration.GetAllExtractableDataSets())
                 releasePotentialList.Add(new ReleasePotential(_repositoryLocator, ExtractionConfiguration, ds));
-
 
             source.CurrentRelease = new ReleaseData
             {
@@ -145,8 +154,11 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             //the release context for the project
             var context = new ReleaseUseCase((Project) ExtractionConfiguration.Project, source);
 
+            StartLoggingIfNotStartedYet();
+            var fork = new ForkDataLoadEventListener(_toLogging, new ThrowImmediatelyDataLoadEventListener());
+
             //translated into an engine
-            var engine = context.GetEngine(releasePipeline, new ThrowImmediatelyDataLoadEventListener());
+            var engine = context.GetEngine(releasePipeline, fork);
             
             //and executed
             engine.ExecutePipeline(new GracefulCancellationToken());
@@ -156,7 +168,10 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
         {
             int? before = ExtractionConfiguration.Cohort_ID;
 
-            var engine = new CohortRefreshEngine(new ThrowImmediatelyDataLoadEventListener(), (ExtractionConfiguration)ExtractionConfiguration);
+            StartLoggingIfNotStartedYet();
+            var fork = new ForkDataLoadEventListener(_toLogging, new ThrowImmediatelyDataLoadEventListener());
+
+            var engine = new CohortRefreshEngine(fork, (ExtractionConfiguration)ExtractionConfiguration);
             engine.Execute();
 
             ExtractionConfiguration.RevertToDatabaseState();
@@ -167,25 +182,27 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 
         private void RunExtraction()
         {
+            if(ExtractionConfiguration.IsReleased)
+                ((ExtractionConfiguration)ExtractionConfiguration).Unfreeze();
+
             var datasets = ExtractionConfiguration.GetAllExtractableDataSets();
 
             if (!datasets.Any())
                 throw new Exception("There are no ExtractableDatasets configured for ExtractionConfiguration '" + ExtractionConfiguration + "' in AutomateExtraction");
 
-            var logManager = ((ExtractionConfiguration)ExtractionConfiguration).GetExplicitLoggingDatabaseServerOrDefault();
-            logManager.CreateNewLoggingTaskIfNotExists(LoggingTaskName);
+            StartLoggingIfNotStartedYet();
 
-            var dlinfo = logManager.CreateDataLoadInfo(LoggingTaskName, GetType().Name, ExtractionConfiguration.ToString(), "", false);
+            var toMemory = new ToMemoryDataLoadEventListener(false);
+            var fork = new ForkDataLoadEventListener(_toLogging, toMemory);
 
             foreach (IExtractableDataSet ds in datasets)
             {
                 var bundle = new ExtractableDatasetBundle(ds);
                 var cmd = new ExtractDatasetCommand(_repositoryLocator, ExtractionConfiguration, bundle);
 
-                var host = new ExtractionPipelineHost(cmd, _pipeline, (DataLoadInfo)dlinfo);
-
-                var toMemory = new ToMemoryDataLoadEventListener(false);
-                host.Execute(toMemory);
+                var host = new ExtractionPipelineHost(cmd, _pipeline, (DataLoadInfo)_dlinfo);
+                
+                host.Execute(fork);
                 if (toMemory.GetWorst() == ProgressEventType.Error)
                     throw new Exception(
                         "Failed executing ExtractionConfiguration '" + ExtractionConfiguration + "' DataSet '" + ds +
@@ -193,8 +210,19 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
                         new AggregateException(GetExceptions(toMemory))
                         );
             }
+        }
 
-            dlinfo.CloseAndMarkComplete();
+        private void StartLoggingIfNotStartedYet()
+        {
+            if(_logManager != null)
+                return;
+
+            _logManager = ((ExtractionConfiguration)ExtractionConfiguration).GetExplicitLoggingDatabaseServerOrDefault();
+            _logManager.CreateNewLoggingTaskIfNotExists(LoggingTaskName);
+
+            _dlinfo = _logManager.CreateDataLoadInfo(LoggingTaskName, GetType().Name, ExtractionConfiguration.ToString(), "", false);
+            _toLogging = new ToLoggingDatabaseDataLoadEventListener(_logManager, _dlinfo);
+
         }
 
         private Exception[] GetExceptions(ToMemoryDataLoadEventListener toMemory)
