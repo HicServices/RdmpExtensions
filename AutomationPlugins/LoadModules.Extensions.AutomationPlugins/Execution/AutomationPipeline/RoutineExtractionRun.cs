@@ -92,12 +92,12 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 
                 task.Job.SetLastKnownStatus(AutomationJobStatus.Running);
 
-                if (_automate.RefreshCohort)
+                if (_automate != null && _automate.RefreshCohort)
                     RefreshCohort();
 
                 RunExtraction();
 
-                if (_automate.Release)
+                if (_automate != null && _automate.Release)
                     ReleaseExtract();
 
                 //it worked!
