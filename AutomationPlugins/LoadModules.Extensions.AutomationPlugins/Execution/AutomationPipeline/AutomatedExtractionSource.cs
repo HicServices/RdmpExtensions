@@ -35,7 +35,10 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             //do not start new jobs if we are not within the service execution window
             if (!AreWithinExecutionWindow())
                 return null;
-            
+
+            //this finder is used in the UI by people who might not have access to the server 
+            AutomateExtractionRepositoryFinder.Timeout = ReusableLibraryCode.DatabaseCommandHelper.GlobalTimeout;
+
             var repoFinder = new AutomateExtractionRepositoryFinder(_repositoryLocator);
             _automateExtractionRepository = repoFinder.GetRepositoryIfAny() as AutomateExtractionRepository;
 

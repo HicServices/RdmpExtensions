@@ -12,6 +12,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
 {
     public class AutomateExtractionRepositoryFinder : PluginRepositoryFinder
     {
+        public static int Timeout = 5;
         private readonly IRDMPPlatformRepositoryServiceLocator _repositoryLocator;
         private Assembly _databaseAssembly;
         
@@ -39,8 +40,8 @@ namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
             var server = DataAccessPortal.GetInstance().ExpectServer(compatibleServers[0], DataAccessContext.InternalDataProcessing);
 
             Exception ex;
-            if (!server.RespondsWithinTime(5, out ex))
-                ExceptionViewer.Show(ex);
+            if (!server.RespondsWithinTime(Timeout, out ex))
+                throw new Exception("Automate Extraction Server '" + server +"' could not be reached",ex);
 
             return new AutomateExtractionRepository(_repositoryLocator,server.Builder);
         }
