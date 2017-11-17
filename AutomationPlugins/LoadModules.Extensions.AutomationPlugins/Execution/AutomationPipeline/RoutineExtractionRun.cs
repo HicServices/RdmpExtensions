@@ -213,14 +213,11 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 
                 var wordDataWritter = new WordDataWritter(host);
 
-                if (wordDataWritter.RequirementsMet()) //if Microsoft Word is installed
-                {
-                    wordDataWritter.GenerateWordFile(); //run the report
+                wordDataWritter.GenerateWordFile(); //run the report
 
-                    //if there were any exceptions
-                    if (wordDataWritter.ExceptionsGeneratingWordFile.Any())
-                        throw new AggregateException(wordDataWritter.ExceptionsGeneratingWordFile);
-                }
+                //if there were any exceptions
+                if (wordDataWritter.ExceptionsGeneratingWordFile.Any())
+                    throw new AggregateException(wordDataWritter.ExceptionsGeneratingWordFile);
             }
         }
 
