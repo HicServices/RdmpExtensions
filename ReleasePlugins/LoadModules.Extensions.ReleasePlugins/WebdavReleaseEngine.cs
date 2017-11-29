@@ -20,7 +20,6 @@ namespace LoadModules.Extensions.ReleasePlugins
         public WebdavReleaseEngine(Project project, WebdavReleaseEngineSettings releaseSettings) : base(project, new ReleaseEngineSettings())
         {
             base.ReleaseSettings.CreateReleaseDirectoryIfNotFound = true;
-            base.ReleaseSettings.UseProjectExtractionFolder = true;
             
             WebdavSettings = releaseSettings;
             if (WebdavSettings == null)

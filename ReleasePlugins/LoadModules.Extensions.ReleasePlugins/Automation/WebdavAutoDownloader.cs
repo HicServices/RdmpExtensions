@@ -95,14 +95,14 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
                 audit.SaveToDatabase();
 
                 task.Job.TickLifeline();
-                task.Job.SetLastKnownStatus(AutomationJobStatus.Finished);
 
                 listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Job done: " + file.DisplayName + " RELEASED!"));
+
+                task.Job.SetLastKnownStatus(AutomationJobStatus.Finished);
                 task.Job.DeleteInDatabase();
             }
             catch (Exception e)
             {
-                task.Job.SetLastKnownStatus(AutomationJobStatus.Crashed);
                 listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Fatal crash", e));
 
                 ArchiveFile(file, "Errored");
@@ -111,6 +111,8 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
                 audit.Message = ExceptionHelper.ExceptionToListOfInnerMessages(e);
                 audit.Updated = DateTime.UtcNow;
                 audit.SaveToDatabase();
+
+                task.Job.SetLastKnownStatus(AutomationJobStatus.Crashed);
             }
             finally
             {
@@ -185,9 +187,10 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
             client.Server = options.Endpoint;
             client.BasePath = options.BasePath;
 
-            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Archived: " + file.DisplayName + " to " + Path.Combine(options.BasePath, options.RemoteFolder, archiveLocation, file.DisplayName).Replace("\\", "/")));
+            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Archived: " + file.DisplayName + " to " + Path.Combine(options.RemoteFolder, archiveLocation, file.DisplayName).Replace("\\", "/")));
 
-            client.MoveFile(file.Href, Path.Combine(options.BasePath, options.RemoteFolder, archiveLocation, file.DisplayName).Replace("\\","/"));
+            if(!client.MoveFile(file.Href, Path.Combine(options.RemoteFolder, archiveLocation, file.DisplayName).Replace("\\","/")).Result)
+                listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Error archiving file!"));
         }
     }
 }
