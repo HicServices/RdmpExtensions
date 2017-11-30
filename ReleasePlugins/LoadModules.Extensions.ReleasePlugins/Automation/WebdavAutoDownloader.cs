@@ -74,8 +74,9 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
             WebDavDataRepository tableRepo = GetAuditRepo(task);
             if (tableRepo == null)
             {
-                task.Job.SetLastKnownStatus(AutomationJobStatus.Cancelled);
+                task.Job.SetLastKnownStatus(AutomationJobStatus.Crashed);
                 listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Unable to access the Audit Repository"));
+                FinalizeLogs();
                 return;
             }
 
@@ -83,12 +84,26 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
             {
                 var zipFilePath = DownloadToDestination(file);
 
-                // Will bomb if it tries to overwrite existing files!
-                UnzipToReleaseFolder(zipFilePath);
+                if (String.IsNullOrWhiteSpace(zipFilePath))
+                {
+                    listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Warning, "Download failed, will retry later (max 5 times in a 24hr period)"));
+                    task.Job.SetLastKnownStatus(AutomationJobStatus.Crashed);
+                    FinalizeLogs();
+                    return;
+                }
+
+                if (!UnzipToReleaseFolder(zipFilePath))
+                {
+                    listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Warning, "Unzipping failed, will retry later (max 5 times in a 24hr period)"));
+                    task.Job.SetLastKnownStatus(AutomationJobStatus.Crashed);
+                    FinalizeLogs();
+                    return;
+                }
+
                 task.Job.TickLifeline();
 
-                ArchiveFile(file, "Done");
-
+                var archivedOk = ArchiveFile(file, "Done");
+                
                 audit.FileResult = FileResult.Done;
                 audit.Updated = DateTime.UtcNow;
                 audit.Message = "RELEASED!";
@@ -98,17 +113,28 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
 
                 listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Job done: " + file.DisplayName + " RELEASED!"));
 
-                task.Job.SetLastKnownStatus(AutomationJobStatus.Finished);
-                task.Job.DeleteInDatabase();
+                if (archivedOk)
+                {
+                    task.Job.SetLastKnownStatus(AutomationJobStatus.Finished);
+                    task.Job.DeleteInDatabase();
+                }
+                else
+                {
+                    listener.OnNotify(this,
+                        new NotifyEventArgs(ProgressEventType.Warning,
+                            "Archiving failed: file has been released but could not be archived on the webdav server. " +
+                            "It will not be picked up again but you may want to move the file manually using a webdav client."));
+                    task.Job.SetLastKnownStatus(AutomationJobStatus.Crashed);
+                }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Fatal crash", e));
-
-                ArchiveFile(file, "Errored");
+                listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Unexpected error! " +
+                                                                                     "Despair not: the file will be picked up again at the next iteration " +
+                                                                                     "(max 5 times in a 24hr period).", ex));
 
                 audit.FileResult = FileResult.Errored;
-                audit.Message = ExceptionHelper.ExceptionToListOfInnerMessages(e);
+                audit.Message = ExceptionHelper.ExceptionToListOfInnerMessages(ex);
                 audit.Updated = DateTime.UtcNow;
                 audit.SaveToDatabase();
 
@@ -116,9 +142,7 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
             }
             finally
             {
-                var dbLog = (listener as ToLoggingDatabaseDataLoadEventListener);
-                if (dbLog != null)
-                    dbLog.FinalizeTableLoadInfos();
+                FinalizeLogs();
             }
         }
 
@@ -142,19 +166,26 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
             var client = new Client(new NetworkCredential { UserName = options.Username, Password = options.Password.GetDecryptedValue() });
             client.Server = options.Endpoint;
             client.BasePath = options.BasePath;
-
-            using (var fileStream = File.Create(Path.Combine(options.LocalDestination, file.DisplayName)))
+            try
             {
-                var content = client.Download(file.Href).Result;
-                content.CopyTo(fileStream);
+                using (var fileStream = File.Create(Path.Combine(options.LocalDestination, file.DisplayName)))
+                {
+                    var content = client.Download(file.Href).Result;
+                    content.CopyTo(fileStream);
+                }
+            }
+            catch(Exception ex)
+            {
+                listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Error downloading file!", ex));
+                return null;
             }
 
-            Console.WriteLine("Downloaded to {0}", Path.Combine(options.LocalDestination, file.DisplayName));
+            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, String.Format("Downloaded to {0}", Path.Combine(options.LocalDestination, file.DisplayName))));
 
             return Path.Combine(options.LocalDestination, file.DisplayName);
         }
 
-        private void UnzipToReleaseFolder(string zipFilePath)
+        private bool UnzipToReleaseFolder(string zipFilePath)
         {
             var filename = Path.GetFileNameWithoutExtension(zipFilePath);
             Debug.Assert(filename != null, "filename != null");
@@ -170,27 +201,52 @@ namespace LoadModules.Extensions.ReleasePlugins.Automation
                     outputFolder = "Project " + linkProj;
             }
 
-            var destination = Path.Combine(options.LocalDestination, outputFolder, filename);
-
-            using (var zip = ZipFile.Read(zipFilePath))
+            var destination = new DirectoryInfo(Path.Combine(options.LocalDestination, outputFolder, filename));
+            if (destination.Exists && destination.EnumerateFileSystemInfos().Any())
             {
-                zip.Password = options.ZipPassword.GetDecryptedValue();
-                zip.ExtractAll(destination);
+                listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Destination folder is not empty!"));
+                return false;
             }
 
-            Console.WriteLine("Unzipped all to {0}", destination);
+            try
+            {
+                using (var zip = ZipFile.Read(zipFilePath))
+                {
+                    zip.Password = options.ZipPassword.GetDecryptedValue();
+                    zip.ExtractAll(destination.FullName);
+                }
+            }
+            catch (Exception ex)
+            {
+                listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Error unzipping file!", ex));
+                return false;
+            }
+
+            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, String.Format("Unzipped all to {0}", destination)));
+            return true;
         }
 
-        private void ArchiveFile(Item file, string archiveLocation)
+        private bool ArchiveFile(Item file, string archiveLocation)
         {
             var client = new Client(new NetworkCredential { UserName = options.Username, Password = options.Password.GetDecryptedValue() });
             client.Server = options.Endpoint;
             client.BasePath = options.BasePath;
 
-            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Archived: " + file.DisplayName + " to " + Path.Combine(options.RemoteFolder, archiveLocation, file.DisplayName).Replace("\\", "/")));
+            var archived = client.MoveFile(file.Href, Path.Combine(options.RemoteFolder, archiveLocation, file.DisplayName).Replace("\\","/")).Result;
 
-            if(!client.MoveFile(file.Href, Path.Combine(options.RemoteFolder, archiveLocation, file.DisplayName).Replace("\\","/")).Result)
+            if(archived)
+                listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Archived: " + file.DisplayName + " to " + Path.Combine(options.RemoteFolder, archiveLocation, file.DisplayName).Replace("\\", "/")));
+            else
                 listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Error archiving file!"));
+
+            return archived;
+        }
+
+        private void FinalizeLogs()
+        {
+            var dbLog = (listener as ToLoggingDatabaseDataLoadEventListener);
+            if (dbLog != null)
+                dbLog.FinalizeTableLoadInfos();
         }
     }
 }
