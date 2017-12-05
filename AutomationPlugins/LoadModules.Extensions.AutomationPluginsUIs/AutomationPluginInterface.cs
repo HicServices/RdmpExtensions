@@ -48,8 +48,8 @@ namespace LoadModules.Extensions.AutomationPluginsUIs
 
             return AllSchedules.Where(s => s.Project_ID == p.ID).ToArray();
         }
-
-        public override ToolStripMenuItem[] GetAdditionalRightClickMenuItems(DatabaseEntity databaseEntity)
+        
+        public override ToolStripMenuItem[] GetAdditionalRightClickMenuItems(object databaseEntity)
         {
             var p = databaseEntity as Project;
             var c = databaseEntity as ExtractionConfiguration;
