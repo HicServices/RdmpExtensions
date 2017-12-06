@@ -53,6 +53,11 @@ Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "ResearchDataManagementPlatf
 		AttachLaunchAction = No
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{D5A22432-7AC4-432D-B781-A093E3D48225}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
