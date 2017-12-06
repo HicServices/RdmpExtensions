@@ -9,6 +9,7 @@ using CatalogueLibrary.Data.DataLoad;
 using CatalogueLibrary.DataFlowPipeline;
 using DataLoadEngineTests.Integration;
 using LoadModules.Extensions.Python.DataProvider;
+using LoadModules.Extensions.Python.Tests.Unit;
 using NUnit.Framework;
 using ReusableLibraryCode.Progress;
 
@@ -16,6 +17,13 @@ namespace LoadModules.Extensions.Python.Tests
 {
     public class ScriptExecutionTests
     {
+        [SetUp]
+        public void IsPython2ANDPython3Installed()
+        {
+            new Python2InstalledTests().IsPython2Installed();
+            new Python3InstalledTests().IsPython3Installed();
+        }
+
         [Test]
         public void SlowRollerTest()
         {
