@@ -28,7 +28,7 @@
   </PropertyGroup>
     
   <ItemGroup>
-    <PluginPackager Include="$(MSBuildThisFileDirectory)AutomationPlugins\LoadModules.Extensions.AutomationPlugins.Tests\bin\$(Configuration)\PluginPackager\PluginPackager.exe" />
+    <PluginPackager Include="$(MSBuildThisFileDirectory)AutomationPlugins\LoadModules.Extensions.AutomationPlugins.Tests\bin\$(Configuration)\PluginPackager.exe" />
   </ItemGroup>
 
   <Target Name="Version">
