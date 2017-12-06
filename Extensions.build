@@ -49,19 +49,19 @@
 	
 	<Error Condition="'@(NUnitToolPath)'==''" Text="Could not find NUnit executable. Looked in $(MSBuildThisFileDirectory)packages\NUnit.Runners.*\tools\nunit-console.exe. If not installed, execute 'Install-Package NUnit.Runners -Version 2.6.4' into Package Manager Console" />
 	
-    <Message Text="Test Assemblies: @(TestAssembly)" />
+    <Message Text="Test Assemblies: @(TestAssembly -> '%(Identity)', ' ')" />
   </Target>
   
   <Target Name="RunUnitTests" DependsOnTargets="ConfigureTests">
-    <Exec Command="@(NUnitToolPath->'%(fullpath)') @(TestAssembly) /result=$(NUnitResultsFile) /exclude=&quot;Integration,Database&quot;" />
+    <Exec Command="@(NUnitToolPath->'%(fullpath)') @(TestAssembly -> '%(Identity)', ' ') /result=$(NUnitResultsFile) /exclude=&quot;Integration,Database&quot;" />
   </Target>
   
   <Target Name="RunIntegrationTests" DependsOnTargets="ConfigureTests">
-    <Exec Command="@(NUnitToolPath->'%(fullpath)') @(TestAssembly) /result=$(NUnitResultsFile) /include=&quot;Integration,Database&quot;" />
+    <Exec Command="@(NUnitToolPath->'%(fullpath)') @(TestAssembly -> '%(Identity)', ' ') /result=$(NUnitResultsFile) /include=&quot;Integration,Database&quot;" />
   </Target>
   
   <Target Name="RunAllTests" DependsOnTargets="ConfigureTests">
-    <Exec Command="@(NUnitToolPath->'%(fullpath)') @(TestAssembly) /result=$(NUnitResultsFile)" />
+    <Exec Command="@(NUnitToolPath->'%(fullpath)') @(TestAssembly -> '%(Identity)', ' ') /result=$(NUnitResultsFile)" />
   </Target>
   
   <Target Name="PackagePlugin">
