@@ -67,8 +67,8 @@
   <Target Name="PackagePlugin">
 	<!-- Get the version of the CatalogueLibrary assembly so we can correctly locate the HIC.RDMP.Plugin package directory. This is necessary because nuget (possibly a bug) does not remove an old package directory after installing an updated version. -->
    	<Message Text="Using Packager: @(PluginPackager)" />
-	<Exec Command="$(PluginPackager) $(MSBuildThisFileDirectory)LoadModules.Extensions.sln $(MSBuildThisFileDirectory)Extensions.zip" WorkingDirectory="$(MSBuildThisFileDirectory)" />
-	<RemoveDir Directories="$(MSBuildThisFileDirectory)\Package" />
+	<Exec Command="@(PluginPackager) $(MSBuildThisFileDirectory)LoadModules.Extensions.sln $(MSBuildThisFileDirectory)Extensions.zip" WorkingDirectory="$(MSBuildThisFileDirectory)" />
+	<RemoveDir Directories="$(MSBuildThisFileDirectory)Package" />
   </Target>
  
 </Project>
