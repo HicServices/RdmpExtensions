@@ -9,8 +9,8 @@ using DataExportLibrary.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using LoadModules.Extensions.AutomationPluginsUIs.Dialogs;
-using ReusableUIComponents.CommandExecution.AtomicCommands;
-using ReusableUIComponents.Icons.IconProvision;
+using ReusableLibraryCode.CommandExecution.AtomicCommands;
+using ReusableLibraryCode.Icons.IconProvision;
 
 namespace LoadModules.Extensions.AutomationPluginsUIs.CommandExecution.AtomicCommands
 {

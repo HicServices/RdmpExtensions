@@ -211,7 +211,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
                         new AggregateException(GetExceptions(toMemory))
                         );
 
-                var wordDataWritter = new WordDataWritter(host);
+                var wordDataWritter = new WordDataWriter(host);
 
                 wordDataWritter.GenerateWordFile(); //run the report
 

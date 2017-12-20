@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CatalogueLibrary.Data;
 using CatalogueLibrary.Data.Pipelines;
 using DataExportLibrary.Data.DataTables;
@@ -11,8 +9,6 @@ using DataExportLibrary.Interfaces.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using MapsDirectlyToDatabaseTable;
 using ReusableLibraryCode.Checks;
-using ReusableUIComponents;
-using roundhouse.infrastructure.extensions;
 using Ticketing;
 
 namespace LoadModules.Extensions.AutomationPlugins.Data

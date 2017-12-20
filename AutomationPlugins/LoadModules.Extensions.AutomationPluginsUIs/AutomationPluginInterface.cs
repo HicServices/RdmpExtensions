@@ -3,7 +3,6 @@ using System.Linq;
 using System.Windows.Forms;
 using CatalogueLibrary.Data;
 using CatalogueManager.CommandExecution.AtomicCommands.UIFactory;
-using CatalogueManager.Icons.IconOverlays;
 using CatalogueManager.ItemActivation;
 using CatalogueManager.PluginChildProvision;
 using CatalogueManager.Refreshing;
@@ -11,8 +10,7 @@ using DataExportLibrary.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using LoadModules.Extensions.AutomationPluginsUIs.CommandExecution.AtomicCommands;
-using LoadModules.Extensions.AutomationPluginsUIs.Tabs;
-using ReusableUIComponents.Icons.IconProvision;
+using ReusableLibraryCode.Icons.IconProvision;
 
 namespace LoadModules.Extensions.AutomationPluginsUIs
 {

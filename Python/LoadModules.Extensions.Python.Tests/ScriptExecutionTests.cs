@@ -164,5 +164,13 @@ eprint(""Test Error"")
                 file.Delete();
             }
         }
+
+        [Test]
+        public void TestCodeSources()
+        {
+            var tomemory = new ToMemoryDataLoadJob();
+            tomemory.OnNotify(this, new NotifyEventArgs(ProgressEventType.Warning, "pippo"));
+
+        }
     }
 }

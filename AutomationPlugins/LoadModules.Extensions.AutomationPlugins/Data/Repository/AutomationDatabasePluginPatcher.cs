@@ -27,5 +27,15 @@ namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
                 .Where(s => s.CreatedByAssembly != null && s.CreatedByAssembly.Equals(dbAssemblyName))
                 .ToArray();
         }
+
+        public Assembly GetHostAssembly()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Assembly GetDbAssembly()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

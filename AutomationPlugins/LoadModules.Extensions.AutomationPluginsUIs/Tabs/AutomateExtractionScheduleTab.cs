@@ -1,11 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
-using CatalogueLibrary.Data.DataLoad;
 using CatalogueLibrary.Data.Pipelines;
 using CatalogueManager.Icons.IconOverlays;
 using CatalogueManager.Icons.IconProvision;
@@ -13,12 +11,9 @@ using CatalogueManager.ItemActivation;
 using CatalogueManager.SimpleControls;
 using CatalogueManager.TestsAndSetup.ServicePropogation;
 using DataExportLibrary.Data.DataTables;
-using DataExportLibrary.DataRelease;
 using DataExportLibrary.DataRelease.ReleasePipeline;
-using DataExportLibrary.ExtractionTime.Commands;
 using DataExportLibrary.ExtractionTime.ExtractionPipeline;
 using DataExportLibrary.Interfaces.Data.DataTables;
-using HIC.Logging;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline;
@@ -27,9 +22,8 @@ using MapsDirectlyToDatabaseTable;
 using MapsDirectlyToDatabaseTableUI;
 using RDMPObjectVisualisation.Pipelines;
 using RDMPObjectVisualisation.Pipelines.PluginPipelineUsers;
+using ReusableLibraryCode.Icons.IconProvision;
 using ReusableUIComponents;
-using ReusableUIComponents.Icons.IconProvision;
-using roundhouse.infrastructure.extensions;
 
 namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
 {

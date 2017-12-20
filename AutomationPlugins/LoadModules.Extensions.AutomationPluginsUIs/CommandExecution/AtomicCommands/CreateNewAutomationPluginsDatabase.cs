@@ -4,8 +4,8 @@ using CatalogueManager.CommandExecution.AtomicCommands;
 using CatalogueManager.Icons.IconProvision;
 using CatalogueManager.ItemActivation;
 using MapsDirectlyToDatabaseTableUI;
-using ReusableUIComponents.CommandExecution.AtomicCommands;
-using ReusableUIComponents.Icons.IconProvision;
+using ReusableLibraryCode.CommandExecution.AtomicCommands;
+using ReusableLibraryCode.Icons.IconProvision;
 
 namespace LoadModules.Extensions.AutomationPluginsUIs.CommandExecution.AtomicCommands
 {
