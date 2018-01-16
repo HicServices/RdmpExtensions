@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CatalogueLibrary.Data;
+using CatalogueLibrary.Triggers;
 using DataExportLibrary.ExtractionTime.Commands;
 using DataLoadEngine.Migration;
 using LoadModules.Extensions.AutomationPlugins.Data;
@@ -115,7 +116,7 @@ AND
         {
             ColumnInfo validFromField = null;
             bool wasPrimaryExtractionTable = false;
-            const string validFromFieldName = StagingToLiveMigrationFieldProcessor.ValidFromField;
+            const string validFromFieldName = SpecialFieldNames.ValidFrom;
 
             foreach (TableInfo tableInfo in _extractDatasetCommand.QueryBuilder.TablesUsedInQuery)
             {

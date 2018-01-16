@@ -4,10 +4,13 @@ using System.Windows.Forms;
 using CatalogueLibrary.Repositories;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using DataExportLibrary.Data.DataTables;
+using DataLoadEngine.Migration;
+using DataQualityEngine.Data;
 using MapsDirectlyToDatabaseTableUI;
 using RDMPStartup;
 using ReusableLibraryCode;
 using ReusableLibraryCode.Checks;
+using ReusableLibraryCode.DatabaseHelpers.Discovery.Microsoft;
 
 namespace LoadModules.Extensions.Interactive.DeAnonymise
 {
@@ -67,7 +70,7 @@ namespace LoadModules.Extensions.Interactive.DeAnonymise
 
         private void CheckCohortHasCorrectColumns()
         {
-            string release = OverrideReleaseIdentifier ?? SqlSyntaxHelper.GetRuntimeName(ChosenCohort.GetReleaseIdentifier());
+            string release = OverrideReleaseIdentifier ?? new MicrosoftQuerySyntaxHelper().GetRuntimeName(ChosenCohort.GetReleaseIdentifier());
 
             if (!_toProcess.Columns.Contains(release))
                 checksUI1.OnCheckPerformed(

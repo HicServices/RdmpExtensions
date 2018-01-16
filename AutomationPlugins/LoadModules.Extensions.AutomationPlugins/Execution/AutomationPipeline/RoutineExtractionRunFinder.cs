@@ -5,7 +5,6 @@ using CatalogueLibrary.Repositories;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline;
-using NHibernate.Cfg.Loquacious;
 using ReusableLibraryCode.Checks;
 
 namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline

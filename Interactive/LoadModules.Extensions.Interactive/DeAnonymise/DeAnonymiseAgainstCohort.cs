@@ -6,6 +6,7 @@ using DataExportLibrary.Repositories;
 using RDMPStartup;
 using ReusableLibraryCode;
 using ReusableLibraryCode.Checks;
+using ReusableLibraryCode.DatabaseHelpers.Discovery.Microsoft;
 using ReusableLibraryCode.Progress;
 
 namespace LoadModules.Extensions.Interactive.DeAnonymise
@@ -39,7 +40,7 @@ namespace LoadModules.Extensions.Interactive.DeAnonymise
 
             if (ConfigurationGetter.OverrideReleaseIdentifier != null)
             {
-                string replacementName = SqlSyntaxHelper.GetRuntimeName(ConfigurationGetter.ChosenCohort.GetReleaseIdentifier());
+                string replacementName = new MicrosoftQuerySyntaxHelper().GetRuntimeName(ConfigurationGetter.ChosenCohort.GetReleaseIdentifier());
 
                 if (!toProcess.Columns.Contains(ConfigurationGetter.OverrideReleaseIdentifier))
                     throw new ArgumentException("Cannot DeAnonymise cohort because you specified OverrideReleaseIdentifier of '" + ConfigurationGetter.OverrideReleaseIdentifier + "' but the DataTable toProcess did not contain a column of that name");

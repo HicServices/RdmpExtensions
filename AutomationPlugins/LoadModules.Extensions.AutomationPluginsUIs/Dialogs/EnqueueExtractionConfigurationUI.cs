@@ -34,7 +34,7 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Dialogs
             pbExtractionConfiguration.Image = CatalogueIcons.ExtractionConfiguration;
             lblExtractionConfigurationName.Text = config.ToString();
 
-            var pipelineHost = new ExtractionPipelineHost();
+            var pipelineHost = new ExtractionPipelineUseCase();
             var factory = new PipelineSelectionUIFactory(repository.CatalogueRepository, null, pipelineHost);
 
             _selectionUI = factory.Create();

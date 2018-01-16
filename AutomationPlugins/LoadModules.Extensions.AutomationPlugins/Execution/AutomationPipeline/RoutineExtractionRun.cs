@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using CachingEngine.Requests.FetchRequestProvider;
 using CatalogueLibrary.Data;
 using CatalogueLibrary.Data.Automation;
 using CatalogueLibrary.Data.Pipelines;
@@ -18,14 +15,12 @@ using DataExportLibrary.ExtractionTime.Commands;
 using DataExportLibrary.ExtractionTime.ExtractionPipeline;
 using DataExportLibrary.ExtractionTime.UserPicks;
 using DataExportLibrary.Interfaces.Data.DataTables;
-using FluentNHibernate.Conventions;
 using HIC.Logging;
 using HIC.Logging.Listeners;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using RDMPAutomationService;
 using RDMPAutomationService.Interfaces;
 using ReusableLibraryCode.Progress;
-using roundhouse.infrastructure.logging;
 
 namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 {
@@ -201,7 +196,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
                 var bundle = new ExtractableDatasetBundle(ds);
                 var cmd = new ExtractDatasetCommand(_repositoryLocator, ExtractionConfiguration, bundle);
 
-                var host = new ExtractionPipelineHost(cmd, _pipeline, (DataLoadInfo) _dlinfo);
+                var host = new ExtractionPipelineUseCase(cmd, _pipeline, (DataLoadInfo) _dlinfo);
 
                 host.Execute(toMemory);
                 if (toMemory.GetWorst() == ProgressEventType.Error)

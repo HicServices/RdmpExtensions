@@ -13,7 +13,6 @@ using CatalogueLibrary.DataFlowPipeline;
 using DataLoadEngine;
 using DataLoadEngine.DataProvider;
 using DataLoadEngine.Job;
-using NHibernate.Mapping;
 using ReusableLibraryCode.Checks;
 using ReusableLibraryCode.DatabaseHelpers.Discovery;
 using ReusableLibraryCode.Progress;

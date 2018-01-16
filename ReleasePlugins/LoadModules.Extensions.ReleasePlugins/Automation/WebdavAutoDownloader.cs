@@ -19,7 +19,6 @@ using ReusableLibraryCode;
 using ReusableLibraryCode.Checks;
 using ReusableLibraryCode.DataAccess;
 using ReusableLibraryCode.Progress;
-using roundhouse.infrastructure.commandline.options;
 using WebDAVClient;
 using WebDAVClient.Model;
 
