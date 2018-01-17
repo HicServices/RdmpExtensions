@@ -6,7 +6,6 @@ using CatalogueLibrary.Repositories;
 using MapsDirectlyToDatabaseTable;
 using RDMPStartup;
 using ReusableLibraryCode.DataAccess;
-using ReusableUIComponents;
 
 namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
 {
@@ -32,7 +31,9 @@ namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
                 .Where(e => e.CreatedByAssembly == _databaseAssembly.GetName().Name).ToArray();
 
             if (compatibleServers.Length > 1)
-                WideMessageBox.Show("There are 2+ ExternalDatabaseServers of type '" + _databaseAssembly.GetName().Name + "'.  This is not allowed, you must delete one.  The servers were called:" + string.Join(",", compatibleServers.Select(s => s.ToString())));
+                throw new Exception("There are 2+ ExternalDatabaseServers of type '" + _databaseAssembly.GetName().Name + 
+                                    "'.  This is not allowed, you must delete one.  The servers were called:" + 
+                                    string.Join(",", compatibleServers.Select(s => s.ToString())));
 
             if (compatibleServers.Length == 0)
                 return null;
