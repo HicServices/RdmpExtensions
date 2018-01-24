@@ -48,6 +48,9 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             _repositoryLocator = repositoryLocator;
             _serviceSlot = serviceSlot;
             ExtractionConfiguration = automateExtractionConfigurationToRun.ExtractionConfiguration;
+            if (ExtractionConfiguration == null)
+                throw new ArgumentException("ExtractionConfig " + automateExtractionConfigurationToRun.ExtractionConfiguration_ID + "is NULL, maybe there is an orphan in the AutomateExtraction table?");
+            
             _pipeline = automateExtractionConfigurationToRun.AutomateExtractionSchedule.Pipeline;
 
             _jobName = RoutineExtractionJobsPrefix + automateExtractionConfigurationToRun;
@@ -58,6 +61,9 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             _repositoryLocator = repositoryLocator;
             _serviceSlot = serviceSlot;
             ExtractionConfiguration = que.ExtractionConfiguration;
+            if (ExtractionConfiguration == null)
+                throw new ArgumentException("ExtractionConfig " + que.ExtractionConfiguration_ID + "is NULL, maybe there is an orphan in the AutomateExtraction table?");
+            
             _pipeline = que.Pipeline;
 
             _jobName = RoutineExtractionJobsPrefix + "QUE " + ExtractionConfiguration;

@@ -42,7 +42,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
 
             Exception ex;
             if (!server.RespondsWithinTime(Timeout, out ex))
-                throw new Exception("Automate Extraction Server '" + server +"' could not be reached",ex);
+                throw new Exception("Automate Extraction Server '" + server + "' could not be reached",ex);
 
             return new AutomateExtractionRepository(_repositoryLocator,server.Builder);
         }

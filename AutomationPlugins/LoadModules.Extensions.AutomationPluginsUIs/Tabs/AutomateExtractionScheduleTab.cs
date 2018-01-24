@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
@@ -174,17 +175,27 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
         private void RefreshObjects()
         {
             olvConfigurations.ClearObjects();
-
+            
             foreach (var automateExtraction in _schedule.AutomateExtractions)
             {
                 //these are children so lets just autosave any changes to them
                 var ae = automateExtraction;
+                IExtractionConfiguration conf = null;
+                try
+                {
+                    conf = ae.ExtractionConfiguration;
+                }
+                catch (KeyNotFoundException ex)
+                {
+                    if (conf == null)
+                        ae.DeleteInDatabase();
+                    continue;
+                }
+
                 automateExtraction.PropertyChanged += (s, e) => ae.SaveToDatabase();
 
                 olvConfigurations.AddObject(ae);
             }
-
-            
         }
 
         void ExtractionSelectionUiPipelineChanged(object sender, EventArgs e)

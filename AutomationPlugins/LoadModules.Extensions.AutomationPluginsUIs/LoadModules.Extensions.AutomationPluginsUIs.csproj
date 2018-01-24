@@ -467,7 +467,9 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="Icons\ExecutionSchedule.png" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LoadModules.Extensions.AutomationPlugins.Database\LoadModules.Extensions.AutomationPlugins.Database.csproj">
