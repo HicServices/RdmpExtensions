@@ -19,13 +19,12 @@ namespace LoadModules.Extensions.ReleasePlugins
 
         public ReleaseData CurrentRelease { get; set; }
         private Project _project;
+        private WebdavReleaseEngine _engine;
 
         public ReleaseData ProcessPipelineData(ReleaseData currentRelease, IDataLoadEventListener listener, GracefulCancellationToken cancellationToken)
         {
             this.CurrentRelease = currentRelease;
-
-            WebdavReleaseEngine engine = new WebdavReleaseEngine(_project, ReleaseSettings);
-
+            
             if (CurrentRelease.ReleaseState == ReleaseState.DoingPatch)
             {
                 listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "CumulativeExtractionResults for datasets not included in the Patch will now be erased."));
@@ -48,7 +47,7 @@ namespace LoadModules.Extensions.ReleasePlugins
                 listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Deleted " + recordsDeleted + " old CumulativeExtractionResults (That were not included in the final Patch you are preparing)"));
             }
 
-            engine.DoRelease(CurrentRelease.ConfigurationsForRelease, CurrentRelease.EnvironmentPotential, isPatch: CurrentRelease.ReleaseState == ReleaseState.DoingPatch);
+            _engine.DoRelease(CurrentRelease.ConfigurationsForRelease, CurrentRelease.EnvironmentPotential, isPatch: CurrentRelease.ReleaseState == ReleaseState.DoingPatch);
 
             return CurrentRelease;
         }
@@ -86,12 +85,14 @@ namespace LoadModules.Extensions.ReleasePlugins
 
         public void Check(ICheckNotifier notifier)
         {
-            ((ICheckable) ReleaseSettings).Check(notifier);
+            ((ICheckable)ReleaseSettings).Check(notifier);
+            _engine.Check(notifier);
         }
 
         public void PreInitialize(Project value, IDataLoadEventListener listener)
         {
             _project = value;
+            _engine = new WebdavReleaseEngine(_project, ReleaseSettings, listener);
         }
     }
 }

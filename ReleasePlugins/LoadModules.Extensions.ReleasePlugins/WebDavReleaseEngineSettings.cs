@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using CatalogueLibrary.Data;
+using CatalogueLibrary.Data.Remoting;
 using DataExportLibrary.DataRelease;
 using LoadModules.Generic.DataProvider;
 using ReusableLibraryCode.Checks;
@@ -16,20 +17,8 @@ namespace LoadModules.Extensions.ReleasePlugins
         [DemandsInitialization("Delete the released files from the origin location if release is succesful", DefaultValue = true)]
         public bool DeleteFilesOnSuccess { get; set; }
 
-        [DemandsInitialization("Webdav endpoint")]
-        public string Endpoint { get; set; }
-
-        [DemandsInitialization("Webdav Base Path")]
-        public string BasePath { get; set; }
-
-        [DemandsInitialization("Webdav remote folder")]
-        public string RemoteFolder { get; set; }
-
-        [DemandsInitialization("Webdav username")]
-        public string Username { get; set; }
-
-        [DemandsInitialization("Webdav password")]
-        public EncryptedString Password { get; set; }
+        [DemandsInitialization("Remote RDMP instance")]
+        public RemoteRDMP RemoteRDMP { get; set; }
 
         public WebdavReleaseEngineSettings()
         {
@@ -38,24 +27,21 @@ namespace LoadModules.Extensions.ReleasePlugins
 
         public void Check(ICheckNotifier notifier)
         {
-            var client = new Client(new NetworkCredential { UserName = this.Username, Password = this.Password.GetDecryptedValue() });
-            client.Server = this.Endpoint;
-            client.BasePath = this.BasePath;
-
+            var client = new WebClient();// (new NetworkCredential { UserName = this.RemoteRDMP.Username, Password = this.RemoteRDMP.GetDecryptedPassword() });
+            client.Credentials = new NetworkCredential
+            {
+                UserName = this.RemoteRDMP.Username,
+                Password = this.RemoteRDMP.GetDecryptedPassword()
+            };
             try
             {
-                var remoteFolder = client.GetFolder(this.RemoteFolder).Result;
-                if (remoteFolder == null)
-                    notifier.OnCheckPerformed(new CheckEventArgs("Checks failed", CheckResult.Fail));
+                var check = client.DownloadString(this.RemoteRDMP.URL);
+                notifier.OnCheckPerformed(new CheckEventArgs("Checks passed " + check, CheckResult.Success));
             }
             catch (Exception e)
             {
                 notifier.OnCheckPerformed(new CheckEventArgs("Checks failed", CheckResult.Fail, e));
             }
-
-            notifier.OnCheckPerformed(new CheckEventArgs("Checks passed", CheckResult.Success));
-            // test if release is a valid folder;
-            //                                  ^- IMPORTANT semicolon or test will fail!  
         }
     }
 }

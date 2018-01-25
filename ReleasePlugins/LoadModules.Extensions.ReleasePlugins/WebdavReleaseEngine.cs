@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using CatalogueLibrary.Data;
 using CatalogueLibrary.Repositories;
 using DataExportLibrary.Data.DataTables;
 using DataExportLibrary.DataRelease;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using Ionic.Zip;
+using Newtonsoft.Json;
+using ReusableLibraryCode.Progress;
 using Ticketing;
 using WebDAVClient;
 
@@ -17,7 +20,7 @@ namespace LoadModules.Extensions.ReleasePlugins
     {
         public WebdavReleaseEngineSettings WebdavSettings { get; set; }
 
-        public WebdavReleaseEngine(Project project, WebdavReleaseEngineSettings releaseSettings) : base(project, new ReleaseEngineSettings())
+        public WebdavReleaseEngine(Project project, WebdavReleaseEngineSettings releaseSettings, IDataLoadEventListener listener) : base(project, new ReleaseEngineSettings(), listener)
         {
             base.ReleaseSettings.CreateReleaseDirectoryIfNotFound = true;
             
@@ -30,6 +33,9 @@ namespace LoadModules.Extensions.ReleasePlugins
 
         public override void DoRelease(Dictionary<IExtractionConfiguration, List<ReleasePotential>> toRelease, ReleaseEnvironmentPotential environment, bool isPatch)
         {
+            base.ReleaseSettings.DeleteFilesOnSuccess = false;
+            base.ReleaseSettings.FreezeReleasedConfigurations = false;
+
             base.DoRelease(toRelease, environment, isPatch);
 
             if (!ReleaseSuccessful)
@@ -38,33 +44,70 @@ namespace LoadModules.Extensions.ReleasePlugins
             ReleaseSuccessful = false;
 
             var releaseFileName = GetArchiveNameForProject() + ".zip";
+            var projectSafeHavenFolder = GetSafeHavenFolder(Project.MasterTicket);
             var zipOutput = Path.Combine(ReleaseFolder.FullName, releaseFileName);
             ZipReleaseFolder(ReleaseFolder, WebdavSettings.ZipPassword.GetDecryptedValue(), zipOutput);
                 
-            UploadToServer(zipOutput, releaseFileName);
+            UploadToRemote(zipOutput, releaseFileName, projectSafeHavenFolder);
             
             ReleaseSuccessful = true;
-        }
 
-        private void UploadToServer(string zipOutput, string releaseFileName)
-        {
-            var client = new Client(new NetworkCredential { UserName = WebdavSettings.Username, Password = WebdavSettings.Password.GetDecryptedValue() });
-            client.Server = WebdavSettings.Endpoint;
-            client.BasePath = WebdavSettings.BasePath;
-
-            var remoteFolder = client.GetFolder(WebdavSettings.RemoteFolder).Result;
-
-            using (var file = File.Open(zipOutput, FileMode.Open))
+            if (WebdavSettings.DeleteFilesOnSuccess)
             {
-                var fileUploaded = client.Upload(remoteFolder.Href, file, releaseFileName).Result;
-
-                if (!fileUploaded)
-                {
-                    throw new Exception("Failed to upload file to remote location");
-                }
+                _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Cleaning up..."));
+                CleanupExtractionFolders(this.Project.ExtractionDirectory);
+            }
+            
+            // we can freeze the configuration now:
+            foreach (KeyValuePair<IExtractionConfiguration, List<ReleasePotential>> kvp in toRelease)
+            {
+                kvp.Key.IsReleased = true;
+                kvp.Key.SaveToDatabase();
             }
         }
 
+        private void UploadToRemote(string zipOutput, string releaseFileName, string projectSafeHavenFolder)
+        {
+            //var client = new WebClient();// (new NetworkCredential { UserName = WebdavSettings.Username, Password = WebdavSettings.Password.GetDecryptedValue() });
+            //client.Credentials = new NetworkCredential(WebdavSettings.RemoteRDMP.Username, WebdavSettings.RemoteRDMP.GetDecryptedPassword());
+            
+            using (var client = new HttpClient())
+            using (var content = new MultipartFormDataContent())
+            {
+                content.Add(new StreamContent(File.OpenRead(zipOutput)), "file", Path.GetFileName(releaseFileName));
+                var settings = new
+                {
+                    Destination = projectSafeHavenFolder,
+                    Password = WebdavSettings.ZipPassword
+                };
+                content.Add(new StringContent(JsonConvert.SerializeObject(settings)), "settings");
+
+                try
+                {
+                    var result = client.PostAsync(WebdavSettings.RemoteRDMP.GetUrlFor<ReleaseEngine>(), content).Result;
+                    var resultStream = result.Content.ReadAsStringAsync().Result;
+                    var messages = JsonConvert.DeserializeObject<List<NotifyEventArgs>>(resultStream);
+                    foreach (var eventArg in messages)
+                    {
+                        _listener.OnNotify(this, eventArg);
+                    }
+                    if (result.IsSuccessStatusCode)
+                    {
+                        _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Upload succeeded"));
+                    }
+                    else
+                    {
+                        _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Upload failed: " + result.ReasonPhrase));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Failed to upload data", ex));
+                    throw;
+                }
+            }
+        }
+        
         private void ZipReleaseFolder(DirectoryInfo customExtractionDirectory, string zipPassword, string zipOutput)
         {
             var zip = new ZipFile();
@@ -78,17 +121,15 @@ namespace LoadModules.Extensions.ReleasePlugins
         private string GetArchiveNameForProject()
         {
             var prefix = DateTime.UtcNow.ToString("yyyy-MM-dd_");
-            var nameToUse = "";
-            if (String.IsNullOrWhiteSpace(Project.MasterTicket))
-                nameToUse = Project.ID + "_" + Project.Name + "_Proj-" + Project.ProjectNumber;
-            else
-                nameToUse = Project.MasterTicket + "_Proj-" + Project.ProjectNumber + " (" + GetSafeHavenFolder(Project.MasterTicket) + ")";
-
+            var nameToUse = "Proj-" + Project.ProjectNumber;
             return prefix + "Release-" + nameToUse;
         }
 
         private string GetSafeHavenFolder(string masterTicket)
         {
+            if (String.IsNullOrWhiteSpace(masterTicket))
+                return "Proj-" + Project.ProjectNumber;
+            
             var catalogueRepository = Project.DataExportRepository.CatalogueRepository;
             var factory = new TicketingSystemFactory(catalogueRepository);
             var system = factory.CreateIfExists(catalogueRepository.GetTicketingSystem());
