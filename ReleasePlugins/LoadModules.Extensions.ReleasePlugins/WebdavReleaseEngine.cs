@@ -77,8 +77,8 @@ namespace LoadModules.Extensions.ReleasePlugins
                 content.Add(new StreamContent(File.OpenRead(zipOutput)), "file", Path.GetFileName(releaseFileName));
                 var settings = new
                 {
-                    Destination = projectSafeHavenFolder,
-                    Password = WebdavSettings.ZipPassword
+                    ProjectFolder = projectSafeHavenFolder,
+                    ZipPassword = WebdavSettings.ZipPassword.GetDecryptedValue()
                 };
                 content.Add(new StringContent(JsonConvert.SerializeObject(settings)), "settings");
 
