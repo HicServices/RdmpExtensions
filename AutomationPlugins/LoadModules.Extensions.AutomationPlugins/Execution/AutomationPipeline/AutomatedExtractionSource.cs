@@ -19,6 +19,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
         private AutomationServiceSlot _serviceSlot;
         private IRDMPPlatformRepositoryServiceLocator _repositoryLocator;
         private AutomateExtractionRepository _automateExtractionRepository;
+        private IDataLoadEventListener _listener;
 
         [DemandsInitialization("The start time of day when jobs can run e.g. 18:00 to start jobs from 6pm.  Leave blank for no limit")]
         public string StartTimeWindow { get; set; }
@@ -30,11 +31,17 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
         {
             //we don't have our slot yet
             if(_serviceSlot == null)
+            {
+                _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "No service slot set, exiting."));
                 return null;
+            }
 
             //do not start new jobs if we are not within the service execution window
             if (!AreWithinExecutionWindow())
+            {
+                _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "We are outside the execution window, exiting."));
                 return null;
+            }
 
             //this finder is used in the UI by people who might not have access to the server 
             AutomateExtractionRepositoryFinder.Timeout = ReusableLibraryCode.DatabaseCommandHelper.GlobalTimeout;
@@ -44,16 +51,21 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 
             //there is no automate extractions server (records baselines, when to extract etc)
             if (_automateExtractionRepository == null)
+            {
+                _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Warning, "An automate extraction repository does not exist yet, exiting."));
                 return null;
+            }
 
             //ask the run finder to find a run
-            RoutineExtractionRunFinder runFinder = new RoutineExtractionRunFinder(_automateExtractionRepository);
+            RoutineExtractionRunFinder runFinder = new RoutineExtractionRunFinder(_automateExtractionRepository, _listener);
             var run = runFinder.GetAutomateExtractionToRunIfAny(_repositoryLocator,_serviceSlot);
 
-            
             //there are no new available extractions to run
             if (run == null)
+            {
+                _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "No new extractions to run, exiting."));
                 return null;
+            }
 
             run.CreateJob();
 
@@ -78,11 +90,13 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
         public void PreInitialize(AutomationServiceSlot value, IDataLoadEventListener listener)
         {
             _serviceSlot = value;
+            _listener = listener;
         }
 
         public void PreInitialize(IRDMPPlatformRepositoryServiceLocator value, IDataLoadEventListener listener)
         {
             _repositoryLocator = value;
+            _listener = listener;
         }
 
         bool AreWithinExecutionWindow()

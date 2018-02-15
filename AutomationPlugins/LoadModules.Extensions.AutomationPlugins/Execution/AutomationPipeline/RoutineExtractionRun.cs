@@ -20,6 +20,7 @@ using HIC.Logging.Listeners;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using RDMPAutomationService;
 using RDMPAutomationService.Interfaces;
+using ReusableLibraryCode.Checks;
 using ReusableLibraryCode.Progress;
 
 namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
@@ -135,15 +136,12 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             if(releasePipeline == null)
                 throw new Exception("Release Pipeline has not been set for AutomateExtractionSchedule '" + schedule +"'");
             
-            //the data we are trying to extract
-            var source = new FixedDataReleaseSource();
-
             var releasePotentialList = new List<ReleasePotential>();
 
             foreach (var ds in ExtractionConfiguration.GetAllExtractableDataSets())
                 releasePotentialList.Add(new ReleasePotential(_repositoryLocator, ExtractionConfiguration, ds));
 
-            source.CurrentRelease = new ReleaseData
+            var _currentRelease = new ReleaseData
             {
                 ConfigurationsForRelease = new Dictionary<IExtractionConfiguration, List<ReleasePotential>>()
                 {
@@ -154,13 +152,14 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             };
 
             //the release context for the project
-            var context = new ReleaseUseCase((Project) ExtractionConfiguration.Project, source);
+            var context = new ReleaseUseCase((Project) ExtractionConfiguration.Project, _currentRelease);
 
             StartLoggingIfNotStartedYet();
             var fork = new ForkDataLoadEventListener(_toLogging, new ThrowImmediatelyDataLoadEventListener());
 
             //translated into an engine
             var engine = context.GetEngine(releasePipeline, fork);
+            engine.Check(new ThrowImmediatelyCheckNotifier());
             
             //and executed
             engine.ExecutePipeline(new GracefulCancellationToken());

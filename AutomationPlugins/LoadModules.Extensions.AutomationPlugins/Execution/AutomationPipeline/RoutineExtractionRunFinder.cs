@@ -6,28 +6,37 @@ using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline;
 using ReusableLibraryCode.Checks;
+using ReusableLibraryCode.Progress;
 
 namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
 {
     public class RoutineExtractionRunFinder
     {
         private readonly AutomateExtractionRepository _automateExtractionRepository;
+        private readonly IDataLoadEventListener _listener;
 
-        public RoutineExtractionRunFinder(AutomateExtractionRepository automateExtractionRepository)
+        public RoutineExtractionRunFinder(AutomateExtractionRepository automateExtractionRepository, IDataLoadEventListener listener = null)
         {
             _automateExtractionRepository = automateExtractionRepository;
+            this._listener = listener;
         }
 
         public RoutineExtractionRun GetAutomateExtractionToRunIfAny(IRDMPPlatformRepositoryServiceLocator repositoryLocator, AutomationServiceSlot serviceSlot)
         {
             //only allow one execution at once (this means no parallel execution of automated extract schedules - although the datasets in them might stilll be executed in parallel)
             if (serviceSlot.AutomationJobs.Any(j => j.Description.StartsWith(RoutineExtractionRun.RoutineExtractionJobsPrefix)))
+            {
+                _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Debug, "One extraction is already running, skipping for now."));
                 return null;
+            }
 
             var next = _automateExtractionRepository.GetAllObjects<QueuedExtraction>().FirstOrDefault(q => q.IsDue());
 
-            if(next != null)
+            if (next != null)
+            {
+                _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Debug, String.Format("Found queued extraction {0}, running it", next.ExtractionConfiguration.Name)));
                 return new RoutineExtractionRun(repositoryLocator,serviceSlot,next);
+            }
             
             var schedules = _automateExtractionRepository.GetAllObjects<AutomateExtractionSchedule>();
             
@@ -35,8 +44,12 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             foreach (AutomateExtractionSchedule schedule in schedules)
             {
                 //is the schedule runnable?
-                if (!IsRunnable(schedule))
+                string reason;
+                if (!IsRunnable(schedule, out reason))
+                {
+                    _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Debug, String.Format("Schedule {0} not runnable: {1}", schedule.Name, reason)));
                     continue; //no
+                }
 
                 //find the first runnable Extraction in the schedule
                 var toRun = schedule.AutomateExtractions.Where(a => !a.Disabled).ToArray();
