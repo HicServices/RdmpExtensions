@@ -30,6 +30,8 @@ namespace LoadModules.Extensions.ReleasePlugins
             if (releaseAudit.ReleaseFolder == null)
             {
                 releaseAudit.ReleaseFolder = new DirectoryInfo(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N")));
+                if (!releaseAudit.ReleaseFolder.Exists)
+                    releaseAudit.ReleaseFolder.Create();
                 listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Warning, "No destination folder specified! Did you forget to introduce and initialize the ReleaseFolderProvider in the pipeline? " +
                                                                                        "The release output will be located in " + releaseAudit.ReleaseFolder.FullName));
             }
