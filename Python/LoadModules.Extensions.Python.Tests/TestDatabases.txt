@@ -1,2 +1,0 @@
-ServerName:CHILTERN8564
-Prefix:TEST_

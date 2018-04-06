@@ -6,6 +6,7 @@ using CatalogueLibrary.Data.Automation;
 using CatalogueLibrary.Data.Pipelines;
 using CatalogueLibrary.DataFlowPipeline;
 using CatalogueLibrary.Repositories;
+using CatalogueLibrary.Repositories.Construction;
 using DataExportLibrary.CohortCreationPipeline;
 using DataExportLibrary.Data.DataTables;
 using DataExportLibrary.DataRelease;
@@ -13,6 +14,7 @@ using DataExportLibrary.DataRelease.ReleasePipeline;
 using DataExportLibrary.ExtractionTime;
 using DataExportLibrary.ExtractionTime.Commands;
 using DataExportLibrary.ExtractionTime.ExtractionPipeline;
+using DataExportLibrary.ExtractionTime.ExtractionPipeline.Destinations;
 using DataExportLibrary.ExtractionTime.UserPicks;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using HIC.Logging;
@@ -139,7 +141,18 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
             var releasePotentialList = new List<ReleasePotential>();
 
             foreach (var ds in ExtractionConfiguration.GetAllExtractableDataSets())
-                releasePotentialList.Add(new ReleasePotential(_repositoryLocator, ExtractionConfiguration, ds));
+            {
+                ExtractableDataSet dataSet = (ExtractableDataSet) ds;
+                var extractionResults = ExtractionConfiguration.CumulativeExtractionResults.FirstOrDefault(r => r.ExtractableDataSet_ID == dataSet.ID);
+                if (extractionResults == null || extractionResults.DestinationDescription == null)
+                    releasePotentialList.Add(new NoReleasePotential(_repositoryLocator, ExtractionConfiguration, dataSet));
+                else
+                {
+                    var releasePotential = ((IExecuteDatasetExtractionDestination)new ObjectConstructor().Construct(extractionResults.GetDestinationType()))
+                                                .GetReleasePotential(_repositoryLocator, ExtractionConfiguration, dataSet);
+                    releasePotentialList.Add(releasePotential);
+                }
+            }
 
             var _currentRelease = new ReleaseData
             {

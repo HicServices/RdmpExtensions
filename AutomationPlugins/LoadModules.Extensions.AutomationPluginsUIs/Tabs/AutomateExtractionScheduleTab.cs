@@ -133,7 +133,7 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
 
             if (_extractionSelectionUI == null)
             {
-                var pipelineHost = new ExtractionPipelineUseCase();
+                var pipelineHost = new ExtractionPipelineUseCase(databaseObject.Project);
                 PipelineUser user = new PipelineUser(typeof(AutomateExtractionSchedule).GetProperty("Pipeline_ID"), _schedule, RepositoryLocator.CatalogueRepository);
                 var factory = new PipelineSelectionUIFactory(activator.RepositoryLocator.CatalogueRepository, user, pipelineHost);
                 _extractionSelectionUI = factory.Create(null,DockStyle.Fill,pExtractPipeline);
