@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using CatalogueLibrary.Data;
@@ -7,6 +9,7 @@ using CatalogueLibrary.DataFlowPipeline.Requirements;
 using DataExportLibrary.Data.DataTables;
 using DataExportLibrary.DataRelease.Audit;
 using DataExportLibrary.DataRelease.ReleasePipeline;
+using DataExportLibrary.ExtractionTime;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using ReusableLibraryCode.Checks;
 using ReusableLibraryCode.Progress;
@@ -21,6 +24,7 @@ namespace LoadModules.Extensions.ReleasePlugins
         private RemoteRDMPReleaseEngine _remoteRDMPReleaseEngineengine;
         private Project _project;
         private ReleaseData _releaseData;
+        private List<IExtractionConfiguration> _configurationReleased;
 
         public ReleaseAudit ProcessPipelineData(ReleaseAudit releaseAudit, IDataLoadEventListener listener, GracefulCancellationToken cancellationToken)
         {
@@ -62,6 +66,7 @@ namespace LoadModules.Extensions.ReleasePlugins
 
             _remoteRDMPReleaseEngineengine.DoRelease(_releaseData.ConfigurationsForRelease, _releaseData.EnvironmentPotential, isPatch: _releaseData.ReleaseState == ReleaseState.DoingPatch);
 
+            _configurationReleased = _remoteRDMPReleaseEngineengine.ConfigurationsReleased;
             return null;
         }
 
@@ -87,9 +92,27 @@ namespace LoadModules.Extensions.ReleasePlugins
                 {
                     listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Error occurred when trying to clean up remnant ReleaseLogEntries", e1));
                 }
+                listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Pipeline completed..."));
             }
 
-            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Pipeline completed..."));
+            if (pipelineFailureExceptionIfAny == null)
+            {
+                listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Data release succeded into: " + RDMPReleaseSettings.RemoteRDMP.Name));
+                
+                // we can freeze the configuration now:
+                foreach (var config in _configurationReleased)
+                {
+                    config.IsReleased = true;
+                    config.SaveToDatabase();
+                }
+                if (RDMPReleaseSettings.DeleteFilesOnSuccess)
+                {
+                    listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Cleaning up..."));
+                    ExtractionDirectory.CleanupExtractionDirectory(this, _project.ExtractionDirectory, _configurationReleased, listener);
+                }
+
+                listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "All done!"));
+            }
         }
 
         public void Abort(IDataLoadEventListener listener)

@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using DataExportLibrary.Data.DataTables;
 using DataExportLibrary.DataRelease;
+using DataExportLibrary.DataRelease.ReleasePipeline;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using Ionic.Zip;
 using LoadModules.Extensions.ReleasePlugins.Data;
@@ -18,20 +19,15 @@ namespace LoadModules.Extensions.ReleasePlugins
     {
         public RemoteRDMPReleaseEngineSettings RemoteRDMPSettings { get; set; }
 
-        public RemoteRDMPReleaseEngine(Project project, RemoteRDMPReleaseEngineSettings releaseSettings, IDataLoadEventListener listener, DirectoryInfo releaseFolder) : base(project, new ReleaseEngineSettings(), listener, releaseFolder)
+        public RemoteRDMPReleaseEngine(Project project, RemoteRDMPReleaseEngineSettings releaseSettings, IDataLoadEventListener listener, DirectoryInfo releaseFolder) : base(project, new ReleaseEngineSettings(), listener, new ReleaseAudit() { ReleaseFolder = releaseFolder })
         {
             RemoteRDMPSettings = releaseSettings;
             if (RemoteRDMPSettings == null)
                 RemoteRDMPSettings = new RemoteRDMPReleaseEngineSettings();
-
-            base.ReleaseSettings.DeleteFilesOnSuccess = RemoteRDMPSettings.DeleteFilesOnSuccess;
         }
 
         public override void DoRelease(Dictionary<IExtractionConfiguration, List<ReleasePotential>> toRelease, ReleaseEnvironmentPotential environment, bool isPatch)
         {
-            base.ReleaseSettings.DeleteFilesOnSuccess = false;
-            base.ReleaseSettings.FreezeReleasedConfigurations = false;
-
             base.DoRelease(toRelease, environment, isPatch);
 
             if (!ReleaseSuccessful)
@@ -41,25 +37,12 @@ namespace LoadModules.Extensions.ReleasePlugins
 
             var releaseFileName = GetArchiveNameForProject() + ".zip";
             var projectSafeHavenFolder = GetSafeHavenFolder(Project.MasterTicket);
-            var zipOutput = Path.Combine(ReleaseFolder.FullName, releaseFileName);
-            ZipReleaseFolder(ReleaseFolder, RemoteRDMPSettings.ZipPassword.GetDecryptedValue(), zipOutput);
+            var zipOutput = Path.Combine(ReleaseAudit.ReleaseFolder.FullName, releaseFileName);
+            ZipReleaseFolder(ReleaseAudit.ReleaseFolder, RemoteRDMPSettings.ZipPassword.GetDecryptedValue(), zipOutput);
                 
             UploadToRemote(zipOutput, releaseFileName, projectSafeHavenFolder);
             
             ReleaseSuccessful = true;
-
-            if (RemoteRDMPSettings.DeleteFilesOnSuccess)
-            {
-                _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Cleaning up..."));
-                CleanupExtractionFolders(this.Project.ExtractionDirectory);
-            }
-            
-            // we can freeze the configuration now:
-            foreach (KeyValuePair<IExtractionConfiguration, List<ReleasePotential>> kvp in toRelease)
-            {
-                kvp.Key.IsReleased = true;
-                kvp.Key.SaveToDatabase();
-            }
         }
 
         private void UploadToRemote(string zipOutput, string releaseFileName, string projectSafeHavenFolder)
