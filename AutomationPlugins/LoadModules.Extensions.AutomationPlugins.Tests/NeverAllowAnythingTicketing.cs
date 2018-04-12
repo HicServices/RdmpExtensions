@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using CatalogueLibrary.Ticketing;
 using ReusableLibraryCode.Checks;
-using Ticketing;
 
 namespace LoadModules.Extensions.AutomationPlugins.Tests
 {

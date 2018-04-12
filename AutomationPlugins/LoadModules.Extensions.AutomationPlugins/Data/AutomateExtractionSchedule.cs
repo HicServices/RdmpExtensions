@@ -4,12 +4,12 @@ using System.Data.Common;
 using System.Linq;
 using CatalogueLibrary.Data;
 using CatalogueLibrary.Data.Pipelines;
+using CatalogueLibrary.Ticketing;
 using DataExportLibrary.Data.DataTables;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using MapsDirectlyToDatabaseTable;
 using ReusableLibraryCode.Checks;
-using Ticketing;
 
 namespace LoadModules.Extensions.AutomationPlugins.Data
 {

@@ -21,7 +21,6 @@ namespace LoadModules.Extensions.Interactive.DeAnonymise
         public IExtractableCohort ChosenCohort { get; set; }
         public string OverrideReleaseIdentifier { get; set; }
         
-
         public DeAnonymiseAgainstCohortUI(DataTable toProcess)
         {
             _toProcess = toProcess;
@@ -29,7 +28,7 @@ namespace LoadModules.Extensions.Interactive.DeAnonymise
 
             try
             {
-                var finder = new RegistryRepositoryFinder();
+                var finder = new UserSettingsRepositoryFinder();
                 _dataExportRepository = finder.DataExportRepository;
             }
             catch (Exception e)

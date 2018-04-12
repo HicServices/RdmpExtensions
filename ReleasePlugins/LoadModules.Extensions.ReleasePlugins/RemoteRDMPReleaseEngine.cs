@@ -11,7 +11,7 @@ using Ionic.Zip;
 using LoadModules.Extensions.ReleasePlugins.Data;
 using Newtonsoft.Json;
 using ReusableLibraryCode.Progress;
-using Ticketing;
+using CatalogueLibrary.Ticketing;
 
 namespace LoadModules.Extensions.ReleasePlugins
 {
