@@ -32,15 +32,15 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline
         {
             //it is a request for custom data
             var ds = _extractDatasetCommand as ExtractDatasetCommand;
-            var customData = _extractDatasetCommand as ExtractCohortCustomTableCommand;
+            var global = _extractDatasetCommand as ExtractGlobalsCommand;
 
             if (ds != null)
                 return ProcessPipelineData(ds, toProcess, listener, cancellationToken);
 
-            if(customData != null)
-                return ProcessPipelineData(customData, toProcess, listener, cancellationToken);
+            if(global != null)
+                return ProcessPipelineData(global, toProcess, listener, cancellationToken);
 
-            throw new NotSupportedException("Expected IExtractCommand to be ExtractDatasetCommand or ExtractCohortCustomTableCommand");
+            throw new NotSupportedException("Expected IExtractCommand to be ExtractDatasetCommand or ExtractGlobalsCommand");
         }
 
         private DataTable ProcessPipelineData(ExtractDatasetCommand ds, DataTable toProcess, IDataLoadEventListener listener, GracefulCancellationToken cancellationToken)
@@ -88,9 +88,9 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline
             return toProcess;
         }
         
-        private DataTable ProcessPipelineData(ExtractCohortCustomTableCommand customData, DataTable toProcess, IDataLoadEventListener listener, GracefulCancellationToken cancellationToken)
+        private DataTable ProcessPipelineData(ExtractGlobalsCommand globalData, DataTable toProcess, IDataLoadEventListener listener, GracefulCancellationToken cancellationToken)
         {
-            listener.OnNotify(this,new NotifyEventArgs(ProgressEventType.Warning, "Custom Data is not audited and supported by " + GetType().Name));
+            listener.OnNotify(this,new NotifyEventArgs(ProgressEventType.Warning, "Global Data is not audited and supported by " + GetType().Name));
 
             //we don't do these yet
             return toProcess;
