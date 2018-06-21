@@ -149,7 +149,7 @@ namespace LoadModules.Extensions.AutomationPluginsUIs.Tabs
 
             if (_releaseSelectionUI == null)
             {
-                IPipelineUseCase useCase = new ReleaseUseCase(_schedule.Project, new ReleaseData() { IsDesignTime = true });
+                IPipelineUseCase useCase = new ReleaseUseCase(_schedule.Project, new ReleaseData(RepositoryLocator) { IsDesignTime = true });
                 IPipelineUser user = new PipelineUser(typeof(AutomateExtractionSchedule).GetProperty("ReleasePipeline_ID"), _schedule, RepositoryLocator.CatalogueRepository);
                 var factory = new PipelineSelectionUIFactory(activator.RepositoryLocator.CatalogueRepository, user,useCase);
                 _releaseSelectionUI = factory.Create(null, DockStyle.Fill, pReleasePipeline);

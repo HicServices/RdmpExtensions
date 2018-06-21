@@ -154,7 +154,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.AutomationPipeline
                 }
             }
 
-            var _currentRelease = new ReleaseData
+            var _currentRelease = new ReleaseData(_repositoryLocator)
             {
                 ConfigurationsForRelease = new Dictionary<IExtractionConfiguration, List<ReleasePotential>>()
                 {

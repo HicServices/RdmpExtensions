@@ -37,7 +37,7 @@ namespace LoadModules.Extensions.ReleasePlugins
             try
             {
                 var baseUri = new UriBuilder(new Uri(this.RemoteRDMP.URL));
-                baseUri.Path += "/api/values/";
+                baseUri.Path += "/api/plugin/";
                 var message = new HttpRequestMessage(HttpMethod.Head, baseUri.ToString());
                 var check = client.SendAsync(message).Result;
                 check.EnsureSuccessStatusCode();
