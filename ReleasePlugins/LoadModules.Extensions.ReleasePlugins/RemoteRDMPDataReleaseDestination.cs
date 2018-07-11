@@ -6,6 +6,7 @@ using System.Linq;
 using CatalogueLibrary.Data;
 using CatalogueLibrary.DataFlowPipeline;
 using CatalogueLibrary.DataFlowPipeline.Requirements;
+using CatalogueLibrary.Ticketing;
 using DataExportLibrary.Data.DataTables;
 using DataExportLibrary.DataRelease.Audit;
 using DataExportLibrary.DataRelease.ReleasePipeline;
@@ -122,7 +123,28 @@ namespace LoadModules.Extensions.ReleasePlugins
 
         public void Check(ICheckNotifier notifier)
         {
+            var projectSafeHavenFolder = GetSafeHavenFolder(_project.MasterTicket);
+            if (string.IsNullOrWhiteSpace(projectSafeHavenFolder))
+                notifier.OnCheckPerformed(new CheckEventArgs("No Safe Haven folder specified in the Project Master Ticket", CheckResult.Fail));
+            else
+                notifier.OnCheckPerformed(new CheckEventArgs("Project Master Ticket contains Safe Haven folder", CheckResult.Success));
+            
             ((ICheckable)RDMPReleaseSettings).Check(notifier);
+        }
+
+        private string GetSafeHavenFolder(string masterTicket)
+        {
+            if (String.IsNullOrWhiteSpace(masterTicket))
+                return "Proj-" + _project.ProjectNumber;
+
+            var catalogueRepository = _project.DataExportRepository.CatalogueRepository;
+            var factory = new TicketingSystemFactory(catalogueRepository);
+            var system = factory.CreateIfExists(catalogueRepository.GetTicketingSystem());
+
+            if (system == null)
+                return String.Empty;
+
+            return system.GetProjectFolderName(masterTicket).Replace("/", "");
         }
 
         public void PreInitialize(Project value, IDataLoadEventListener listener)

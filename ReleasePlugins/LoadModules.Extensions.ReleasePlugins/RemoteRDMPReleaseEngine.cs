@@ -37,11 +37,14 @@ namespace LoadModules.Extensions.ReleasePlugins
 
             var releaseFileName = GetArchiveNameForProject() + ".zip";
             var projectSafeHavenFolder = GetSafeHavenFolder(Project.MasterTicket);
+            if (projectSafeHavenFolder.Equals(string.Empty))
+                throw new Exception("No Safe Haven folder specified in the Project Master Ticket");
+
             var zipOutput = Path.Combine(ReleaseAudit.ReleaseFolder.FullName, releaseFileName);
             ZipReleaseFolder(ReleaseAudit.ReleaseFolder, RemoteRDMPSettings.ZipPassword.GetDecryptedValue(), zipOutput);
-                
-            UploadToRemote(zipOutput, releaseFileName, projectSafeHavenFolder);
             
+            UploadToRemote(zipOutput, releaseFileName, projectSafeHavenFolder);
+        
             ReleaseSuccessful = true;
         }
 
