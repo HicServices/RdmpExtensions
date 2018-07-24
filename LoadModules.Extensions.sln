@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.Python", "Python\LoadModules.Extensions.Python\LoadModules.Extensions.Python.csproj", "{788BB60B-2FAD-4A26-B772-AEE27CEDAE47}"
 EndProject
@@ -14,19 +14,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.AutomationPlugins", "AutomationPlugins\LoadModules.Extensions.AutomationPlugins\LoadModules.Extensions.AutomationPlugins.csproj", "{8F20577C-A47A-4F39-AC1F-092B15E36C63}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.AutomationPlugins.Tests", "AutomationPlugins\LoadModules.Extensions.AutomationPlugins.Tests\LoadModules.Extensions.AutomationPlugins.Tests.csproj", "{B0DB49EE-BF4E-4124-83F5-9FB57CA35471}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.AutomationPlugins.Database", "AutomationPlugins\LoadModules.Extensions.AutomationPlugins.Database\LoadModules.Extensions.AutomationPlugins.Database.csproj", "{B7BD2A84-D440-4B1A-849D-D55284997D55}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.AutomationPluginsUIs", "AutomationPlugins\LoadModules.Extensions.AutomationPluginsUIs\LoadModules.Extensions.AutomationPluginsUIs.csproj", "{24F510E5-B905-4F59-97B6-337A4638A85E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{788BB60B-2FAD-4A26-B772-AEE27CEDAE47} = {788BB60B-2FAD-4A26-B772-AEE27CEDAE47}
-		{F0D66F33-9418-49C7-B07D-BF853179BB96} = {F0D66F33-9418-49C7-B07D-BF853179BB96}
-		{967AE45A-1DE2-4E8B-B1F1-BC42B73F5E8D} = {967AE45A-1DE2-4E8B-B1F1-BC42B73F5E8D}
-		{AF23E2B7-B1F5-4B19-AF06-40D41300D130} = {AF23E2B7-B1F5-4B19-AF06-40D41300D130}
-		{6806FDE2-5D56-407B-AADE-0018F40EC0C0} = {6806FDE2-5D56-407B-AADE-0018F40EC0C0}
-		{B0DB49EE-BF4E-4124-83F5-9FB57CA35471} = {B0DB49EE-BF4E-4124-83F5-9FB57CA35471}
-		{3EF322F4-027C-44EC-B079-2623F28BB315} = {3EF322F4-027C-44EC-B079-2623F28BB315}
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Python", "Python", "{9E47A57B-7897-4695-BFF4-F659539DCB87}"
 EndProject
@@ -58,6 +45,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{D5A224
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoadModules.Extensions.AutomationPlugins.Database", "AutomationPlugins\LoadModules.Extensions.AutomationPlugins.Database\LoadModules.Extensions.AutomationPlugins.Database.csproj", "{B7BD2A84-D440-4B1A-849D-D55284997D55}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,14 +77,6 @@ Global
 		{B0DB49EE-BF4E-4124-83F5-9FB57CA35471}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0DB49EE-BF4E-4124-83F5-9FB57CA35471}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0DB49EE-BF4E-4124-83F5-9FB57CA35471}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B7BD2A84-D440-4B1A-849D-D55284997D55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B7BD2A84-D440-4B1A-849D-D55284997D55}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B7BD2A84-D440-4B1A-849D-D55284997D55}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B7BD2A84-D440-4B1A-849D-D55284997D55}.Release|Any CPU.Build.0 = Release|Any CPU
-		{24F510E5-B905-4F59-97B6-337A4638A85E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{24F510E5-B905-4F59-97B6-337A4638A85E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{24F510E5-B905-4F59-97B6-337A4638A85E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{24F510E5-B905-4F59-97B6-337A4638A85E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{967AE45A-1DE2-4E8B-B1F1-BC42B73F5E8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{967AE45A-1DE2-4E8B-B1F1-BC42B73F5E8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{967AE45A-1DE2-4E8B-B1F1-BC42B73F5E8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -104,8 +85,12 @@ Global
 		{F0D66F33-9418-49C7-B07D-BF853179BB96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0D66F33-9418-49C7-B07D-BF853179BB96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0D66F33-9418-49C7-B07D-BF853179BB96}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8C6E20C7-9425-4EBF-B1BA-6D8CDAE009F1}.Debug|Any CPU.ActiveCfg = Debug
-		{8C6E20C7-9425-4EBF-B1BA-6D8CDAE009F1}.Release|Any CPU.ActiveCfg = Debug
+		{8C6E20C7-9425-4EBF-B1BA-6D8CDAE009F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C6E20C7-9425-4EBF-B1BA-6D8CDAE009F1}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7BD2A84-D440-4B1A-849D-D55284997D55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7BD2A84-D440-4B1A-849D-D55284997D55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7BD2A84-D440-4B1A-849D-D55284997D55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7BD2A84-D440-4B1A-849D-D55284997D55}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -117,9 +102,8 @@ Global
 		{6806FDE2-5D56-407B-AADE-0018F40EC0C0} = {51106FEA-BB21-4871-B58B-B47D5E1CBAA9}
 		{8F20577C-A47A-4F39-AC1F-092B15E36C63} = {288BB105-95F0-4FE1-B23E-1514AEEEEEE8}
 		{B0DB49EE-BF4E-4124-83F5-9FB57CA35471} = {288BB105-95F0-4FE1-B23E-1514AEEEEEE8}
-		{B7BD2A84-D440-4B1A-849D-D55284997D55} = {288BB105-95F0-4FE1-B23E-1514AEEEEEE8}
-		{24F510E5-B905-4F59-97B6-337A4638A85E} = {288BB105-95F0-4FE1-B23E-1514AEEEEEE8}
 		{967AE45A-1DE2-4E8B-B1F1-BC42B73F5E8D} = {265A5533-4AFA-4D1C-8A8B-5359ADD90E2F}
 		{F0D66F33-9418-49C7-B07D-BF853179BB96} = {265A5533-4AFA-4D1C-8A8B-5359ADD90E2F}
+		{B7BD2A84-D440-4B1A-849D-D55284997D55} = {288BB105-95F0-4FE1-B23E-1514AEEEEEE8}
 	EndGlobalSection
 EndGlobal

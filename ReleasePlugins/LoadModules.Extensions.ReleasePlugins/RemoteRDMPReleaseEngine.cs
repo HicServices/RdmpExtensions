@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using DataExportLibrary.Data.DataTables;
 using DataExportLibrary.DataRelease;
+using DataExportLibrary.DataRelease.Potential;
 using DataExportLibrary.DataRelease.ReleasePipeline;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using Ionic.Zip;
@@ -26,9 +27,9 @@ namespace LoadModules.Extensions.ReleasePlugins
                 RemoteRDMPSettings = new RemoteRDMPReleaseEngineSettings();
         }
 
-        public override void DoRelease(Dictionary<IExtractionConfiguration, List<ReleasePotential>> toRelease, ReleaseEnvironmentPotential environment, bool isPatch)
+        public override void DoRelease(Dictionary<IExtractionConfiguration, List<ReleasePotential>> toRelease, Dictionary<IExtractionConfiguration, ReleaseEnvironmentPotential> environments, bool isPatch)
         {
-            base.DoRelease(toRelease, environment, isPatch);
+            base.DoRelease(toRelease, environments, isPatch);
 
             if (!ReleaseSuccessful)
                 throw new Exception("Something horrible happened during Release... cannot progress!");

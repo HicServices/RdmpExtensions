@@ -65,7 +65,7 @@ namespace LoadModules.Extensions.ReleasePlugins
 
             _remoteRDMPReleaseEngineengine = new RemoteRDMPReleaseEngine(_project, RDMPReleaseSettings, listener, releaseAudit.ReleaseFolder);
 
-            _remoteRDMPReleaseEngineengine.DoRelease(_releaseData.ConfigurationsForRelease, _releaseData.EnvironmentPotential, isPatch: _releaseData.ReleaseState == ReleaseState.DoingPatch);
+            _remoteRDMPReleaseEngineengine.DoRelease(_releaseData.ConfigurationsForRelease, _releaseData.EnvironmentPotentials, isPatch: _releaseData.ReleaseState == ReleaseState.DoingPatch);
 
             _configurationReleased = _remoteRDMPReleaseEngineengine.ConfigurationsReleased;
             return null;
