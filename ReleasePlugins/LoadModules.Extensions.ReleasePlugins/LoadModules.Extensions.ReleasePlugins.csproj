@@ -38,32 +38,32 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ANOStore, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\ANOStore.dll</HintPath>
+    <Reference Include="ANOStore, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\ANOStore.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ANOStore.Database, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\ANOStore.Database.dll</HintPath>
+    <Reference Include="ANOStore.Database, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\ANOStore.Database.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="BundleUpSourceIntoZip, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\BundleUpSourceIntoZip.exe</HintPath>
+    <Reference Include="BundleUpSourceIntoZip, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\BundleUpSourceIntoZip.exe</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CachingEngine, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\CachingEngine.dll</HintPath>
+    <Reference Include="CachingEngine, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\CachingEngine.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CatalogueLibrary, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\CatalogueLibrary.dll</HintPath>
+    <Reference Include="CatalogueLibrary, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\CatalogueLibrary.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CatalogueLibrary.Database, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\CatalogueLibrary.Database.dll</HintPath>
+    <Reference Include="CatalogueLibrary.Database, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\CatalogueLibrary.Database.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="CohortManagerLibrary, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\CohortManagerLibrary.dll</HintPath>
+    <Reference Include="CohortManagerLibrary, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\CohortManagerLibrary.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CommandLine, Version=2.2.1.0, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
@@ -74,28 +74,28 @@
       <HintPath>..\..\packages\CsvHelper.2.11.0\lib\net40-client\CsvHelper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DataExportLibrary, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\DataExportLibrary.dll</HintPath>
+    <Reference Include="DataExportLibrary, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\DataExportLibrary.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DataExportLibrary.Database, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\DataExportLibrary.Database.dll</HintPath>
+    <Reference Include="DataExportLibrary.Database, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\DataExportLibrary.Database.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DataExportLibrary.Interfaces, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\DataExportLibrary.Interfaces.dll</HintPath>
+    <Reference Include="DataExportLibrary.Interfaces, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\DataExportLibrary.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DataLoadEngine, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\DataLoadEngine.dll</HintPath>
+    <Reference Include="DataLoadEngine, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\DataLoadEngine.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DataQualityEngine, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\DataQualityEngine.dll</HintPath>
+    <Reference Include="DataQualityEngine, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\DataQualityEngine.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DataQualityEngine.Database, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\DataQualityEngine.Database.dll</HintPath>
+    <Reference Include="DataQualityEngine.Database, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\DataQualityEngine.Database.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
@@ -106,44 +106,44 @@
       <HintPath>..\..\packages\Google.Protobuf.3.5.1\lib\net45\Google.Protobuf.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="HIC.Common.Validation, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\HIC.Common.Validation.dll</HintPath>
+    <Reference Include="HIC.Common.Validation, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\HIC.Common.Validation.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="HIC.Logging, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\HIC.Logging.dll</HintPath>
+    <Reference Include="HIC.Logging, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\HIC.Logging.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="HIC.Logging.Database, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\HIC.Logging.Database.dll</HintPath>
+    <Reference Include="HIC.Logging.Database, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\HIC.Logging.Database.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="HIC.RDMP.Plugin, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\HIC.RDMP.Plugin.dll</HintPath>
+    <Reference Include="HIC.RDMP.Plugin, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\HIC.RDMP.Plugin.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="IdentifierDump, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\IdentifierDump.dll</HintPath>
+    <Reference Include="IdentifierDump, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\IdentifierDump.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="IdentifierDump.Database, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\IdentifierDump.Database.dll</HintPath>
+    <Reference Include="IdentifierDump.Database, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\IdentifierDump.Database.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.4.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\..\packages\JetBrains.Annotations.10.4.0\lib\net\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="LoadModules.Generic, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\LoadModules.Generic.dll</HintPath>
+    <Reference Include="LoadModules.Generic, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\LoadModules.Generic.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MapsDirectlyToDatabaseTable, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\MapsDirectlyToDatabaseTable.dll</HintPath>
+    <Reference Include="MapsDirectlyToDatabaseTable, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\MapsDirectlyToDatabaseTable.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
@@ -183,8 +183,8 @@
       <HintPath>..\..\packages\Xam.Plugins.Settings.3.1.1\lib\net45\Plugin.Settings.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="PluginPackager, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\PluginPackager.exe</HintPath>
+    <Reference Include="PluginPackager, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\PluginPackager.exe</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore">
@@ -193,36 +193,36 @@
     <Reference Include="PresentationFramework">
       <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.1\PresentationFramework.dll</HintPath>
     </Reference>
-    <Reference Include="QueryCaching, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\QueryCaching.dll</HintPath>
+    <Reference Include="QueryCaching, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\QueryCaching.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="QueryCaching.Database, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\QueryCaching.Database.dll</HintPath>
+    <Reference Include="QueryCaching.Database, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\QueryCaching.Database.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="RDMPAutomationService, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\RDMPAutomationService.exe</HintPath>
+    <Reference Include="RDMPAutomationService, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\RDMPAutomationService.exe</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="RDMPStartup, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\RDMPStartup.dll</HintPath>
+    <Reference Include="RDMPStartup, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\RDMPStartup.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Renci.SshNet, Version=2013.4.7.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SSH.NET.2013.4.7\lib\net40\Renci.SshNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ReusableLibraryCode, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\ReusableLibraryCode.dll</HintPath>
+    <Reference Include="ReusableLibraryCode, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\ReusableLibraryCode.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Rhino.Mocks, Version=3.6.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <HintPath>..\..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Sharing, Version=2.9.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.3.1-rc\lib\net452\Sharing.dll</HintPath>
+    <Reference Include="Sharing, Version=2.9.5.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\HIC.RDMP.Plugin.2.9.5.3-rc\lib\net452\Sharing.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

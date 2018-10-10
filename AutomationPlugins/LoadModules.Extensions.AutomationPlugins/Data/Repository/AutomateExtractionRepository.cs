@@ -23,5 +23,13 @@ namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
         {
             return _constructor.ConstructIMapsDirectlyToDatabaseObject(t, this, reader);
         }
+
+        protected override bool IsCompatibleType(Type type)
+        {
+            return type == typeof(AutomateExtraction)
+                || type == typeof(AutomateExtractionSchedule)
+                || type == typeof(QueuedExtraction)
+                || type == typeof(SuccessfullyExtractedResults);
+        }
     }
 }
