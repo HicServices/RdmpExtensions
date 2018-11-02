@@ -18,32 +18,35 @@ namespace LoadModules.Extensions.Python.Tests.Unit
     {
 
         [Test]
-        [ExpectedException(ExpectedMessage = "Version of Python required for script has not been selected")]
         public void PythonVersionNotSetYet()
         {
             PythonDataProvider provider = new PythonDataProvider();
-            provider.Check(new ThrowImmediatelyCheckNotifier());
+            var ex = Assert.Throws<Exception>(()=>provider.Check(new ThrowImmediatelyCheckNotifier()));
+            Assert.AreEqual("Version of Python required for script has not been selected",ex.Message);
+            
         }
 
 
         [Test]
-        [ExpectedException(ExpectedMessage = @"The specified OverridePythonExecutablePath:C:\fishmongers\python does not exist", MatchType = MessageMatch.Contains)]
         public void PythonScript_OverrideExecutablePath_FileDoesntExist()
         {
             string MyPythonScript = @"s = raw_input ('==>')";
 
-            File.Delete("Myscript.py");
-            File.WriteAllText("Myscript.py", MyPythonScript);
+            var py = Path.Combine(TestContext.CurrentContext.WorkDirectory, "Myscript.py");
+
+            File.Delete(py);
+            File.WriteAllText(py, MyPythonScript);
 
             PythonDataProvider provider = new PythonDataProvider();
             provider.Version = PythonVersion.Version2;
-            provider.FullPathToPythonScriptToRun = "Myscript.py";
+            provider.FullPathToPythonScriptToRun = py;
             provider.MaximumNumberOfSecondsToLetScriptRunFor = 5;
             provider.OverridePythonExecutablePath = new FileInfo(@"C:\fishmongers\python");
             //call with accept all
-            provider.Check(new AcceptAllCheckNotifier());
+            var ex = Assert.Throws<Exception>(()=>provider.Check(new AcceptAllCheckNotifier()));
+            
+            StringAssert.Contains(@"The specified OverridePythonExecutablePath:C:\fishmongers\python does not exist",ex.Message);
 
-            provider.Fetch(MockRepository.GenerateStub<IDataLoadJob>(), new GracefulCancellationToken());
         }
 
     }

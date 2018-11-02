@@ -23,7 +23,6 @@ namespace LoadModules.Extensions.Python.Tests.Unit
             new Python3InstalledTests().IsPython3Installed();
         }
         [Test]
-        [ExpectedException(ExpectedMessage = @"which is incompatible with the desired version 2.7.1", MatchType = MessageMatch.Contains)]
         public void PythonScript_OverrideExecutablePath_VersionMismatch()
         {
             string MyPythonScript = @"s = print('==>')";
@@ -43,7 +42,8 @@ namespace LoadModules.Extensions.Python.Tests.Unit
 
             provider.Check(new ThrowImmediatelyCheckNotifier());
             //so we now know that version 3 is installed, and we have overriden the python path to the .exe explicitly and we are trying to launch with Version2 enum now
-            provider.Fetch(MockRepository.GenerateStub<IDataLoadJob>(), new GracefulCancellationToken());
+            var ex = Assert.Throws<Exception>(()=>provider.Fetch(MockRepository.GenerateStub<IDataLoadJob>(), new GracefulCancellationToken()));
+            StringAssert.Contains(@"which is incompatible with the desired version 2.7.1",ex.Message);
         }
     }
 }

@@ -46,12 +46,13 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         {
             string MyPythonScript = @"print 'Hello World'";
 
-            File.Delete("Myscript.py");
-            File.WriteAllText("Myscript.py", MyPythonScript);
+            var py = Path.Combine(TestContext.CurrentContext.WorkDirectory, "Myscript.py");
+            File.Delete(py);
+            File.WriteAllText(py, MyPythonScript);
 
             PythonDataProvider provider = new PythonDataProvider();
             provider.Version = PythonVersion.Version2;
-            provider.FullPathToPythonScriptToRun = (wrapFilename ? "\"" : "") + "Myscript.py" + (wrapFilename ? "\"" : "");
+            provider.FullPathToPythonScriptToRun = (wrapFilename ? "\"" : "") + py + (wrapFilename ? "\"" : "");
             provider.MaximumNumberOfSecondsToLetScriptRunFor = 0;
 
             //call with accept all
@@ -66,12 +67,13 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         {
             string MyPythonScript = @"s = raw_input ('==>')";
 
-            File.Delete("Myscript.py");
-            File.WriteAllText("Myscript.py", MyPythonScript);
+            var py = Path.Combine(TestContext.CurrentContext.WorkDirectory, "Myscript.py");
+            File.Delete(py);
+            File.WriteAllText(py, MyPythonScript);
 
             PythonDataProvider provider = new PythonDataProvider();
             provider.Version = PythonVersion.Version2;
-            provider.FullPathToPythonScriptToRun = "Myscript.py";
+            provider.FullPathToPythonScriptToRun = py;
             provider.MaximumNumberOfSecondsToLetScriptRunFor = 5;
 
             //call with accept all
@@ -85,23 +87,24 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         }
 
         [Test]
-        [ExpectedException(ExpectedMessage = @"The specified OverridePythonExecutablePath:Myscript.py file is not called python.exe... what is going on here?", MatchType = MessageMatch.Contains)]
         public void PythonScript_OverrideExecutablePath_DodgyFileType()
         {
             string MyPythonScript = @"s = raw_input ('==>')";
 
-            File.Delete("Myscript.py");
-            File.WriteAllText("Myscript.py", MyPythonScript);
+            var py = Path.Combine(TestContext.CurrentContext.WorkDirectory, "Myscript.py");
+
+            File.Delete(py);
+            File.WriteAllText(py, MyPythonScript);
 
             PythonDataProvider provider = new PythonDataProvider();
             provider.Version = PythonVersion.Version2;
-            provider.FullPathToPythonScriptToRun = "Myscript.py";
+            provider.FullPathToPythonScriptToRun = py;
             provider.MaximumNumberOfSecondsToLetScriptRunFor = 5;
-            provider.OverridePythonExecutablePath = new FileInfo(@"Myscript.py");
+            provider.OverridePythonExecutablePath = new FileInfo(py);
             //call with accept all
-            provider.Check(new AcceptAllCheckNotifier());
+            var ex = Assert.Throws<Exception>(()=>provider.Check(new AcceptAllCheckNotifier()));
 
-            provider.Fetch(new ThrowImmediatelyDataLoadJob(), new GracefulCancellationToken());
+            StringAssert.Contains(@"Myscript.py file is not called python.exe... what is going on here?",ex.Message);
         }
 
         [Test]

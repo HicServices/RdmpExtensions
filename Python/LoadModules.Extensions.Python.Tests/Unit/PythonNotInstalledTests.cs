@@ -1,24 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using CatalogueLibrary;
-using CatalogueLibrary.Data;
-using CatalogueLibrary.Data.DataLoad;
-using CatalogueLibrary.Data.EntityNaming;
-using CatalogueLibrary.DataFlowPipeline;
-using DataLoadEngine;
-using DataLoadEngine.DatabaseManagement;
-using DataLoadEngine.DatabaseManagement.EntityNaming;
-using DataLoadEngine.DatabaseManagement.Operations;
-using DataLoadEngine.Job;
-using HIC.Logging;
 using LoadModules.Extensions.Python.DataProvider;
 using NUnit.Framework;
 using ReusableLibraryCode.Checks;
-using ReusableLibraryCode.Progress;
-using Rhino.Mocks;
-using Tests.Common;
 
 namespace LoadModules.Extensions.Python.Tests.Unit
 {
