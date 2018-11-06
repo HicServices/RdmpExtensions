@@ -47,7 +47,7 @@
       <NUnitToolPath Include="$(MSBuildThisFileDirectory)packages\NUnit.ConsoleRunner.*\tools\nunit3-console.exe" />
     </ItemGroup>
 	
-	<Error Condition="'@(NUnitToolPath)'==''" Text="Could not find NUnit executable. Looked in $(MSBuildThisFileDirectory)packages\NUnit.ConsoleRunners.*\tools\nunit3-console.exe. If not installed, execute 'Install-Package NUnit.Console -Version 3.9.0' into Package Manager Console" />
+	<Error Condition="'@(NUnitToolPath)'==''" Text="Could not find NUnit executable. Looked in $(MSBuildThisFileDirectory)packages\NUnit.ConsoleRunner.*\tools\nunit3-console.exe. If not installed, execute 'Install-Package NUnit.Console -Version 3.9.0' into Package Manager Console" />
 	
     <Message Text="Test Assemblies: @(TestAssembly -> '%(Identity)', ' ')" />
   </Target>

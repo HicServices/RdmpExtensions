@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CatalogueLibrary.DataFlowPipeline.Requirements;
 using DataExportLibrary.ExtractionTime.ExtractionPipeline.Sources;
-using HIC.Logging;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using ReusableLibraryCode.Progress;
 

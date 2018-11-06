@@ -26,6 +26,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
 
         protected override bool IsCompatibleType(Type type)
         {
+            // return typeof(DatabaseEntity).IsAssignableFrom(type);
             return type == typeof(AutomateExtraction)
                 || type == typeof(AutomateExtractionSchedule)
                 || type == typeof(QueuedExtraction)
