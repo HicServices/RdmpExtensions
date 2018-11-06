@@ -61,7 +61,7 @@
   </Target>
   
   <Target Name="RunAllTests" DependsOnTargets="ConfigureTests">
-    <Exec Command="@(NUnitToolPath->'%(fullpath)') @(TestAssembly -> '%(Identity)', ' ') --result=$(NUnitResultsFile);format=nunit2" />
+    <Exec Command="@(NUnitToolPath->'%(fullpath)') @(TestAssembly -> '%(Identity)', ' ') --result=$(NUnitResultsFile);format=nunit2 --workers=1 --inprocess" />
   </Target>
   
   <Target Name="PackagePlugin">
