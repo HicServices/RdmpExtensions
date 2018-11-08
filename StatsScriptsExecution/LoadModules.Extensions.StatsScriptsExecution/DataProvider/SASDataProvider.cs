@@ -11,6 +11,7 @@ using CatalogueLibrary.DataFlowPipeline;
 using DataLoadEngine.DataProvider;
 using DataLoadEngine.Job;
 using ReusableLibraryCode.Checks;
+using ReusableLibraryCode.DataAccess;
 using ReusableLibraryCode.DatabaseHelpers.Discovery;
 using ReusableLibraryCode.Progress;
 
@@ -28,7 +29,10 @@ namespace LoadModules.Extensions.StatsScriptsExecution.DataProvider
         public int MaximumNumberOfSecondsToLetScriptRunFor { get; set; }
 
         [DemandsInitialization("Database connection string", mandatory: true)]
-        public string DatabaseConnectionString { get; set; }
+        public ExternalDatabaseServer InputDatabase { get; set; }
+
+        [DemandsInitialization("Database connection string", mandatory: true)]
+        public ExternalDatabaseServer OutputDatabase { get; set; }
 
         [DemandsInitialization("Output directory", mandatory: true)]
         public DirectoryInfo OutputDirectory { get; set; }
@@ -144,17 +148,29 @@ namespace LoadModules.Extensions.StatsScriptsExecution.DataProvider
             var fullPrintPath = Path.Combine(actualOutputDir, scriptFileName + ".out");
             var fullLogPath = Path.Combine(actualOutputDir, scriptFileName + ".log");
 
-            var command = "-set output \"" + actualOutputDir +
-                "\" -set connect \"" + DatabaseConnectionString +
-                "\" -sysin \"" + FullPathToSASScript.FullName +
-                "\" -nosplash -icon" +
-                " -print \"" + fullPrintPath + "\"" +
-                " -log \"" + fullLogPath + "\"";
+            var dataInConnection = GetSASConnectionString(InputDatabase);
+            var dataOutConnection = GetSASConnectionString(OutputDatabase);
+
+            var command = "-set output \"" + actualOutputDir + "\"" +
+                          " -set connect \"" + dataInConnection + "\"" + 
+                          " -set connectout \"" + dataOutConnection + "\"" +
+                          " -sysin \"" + FullPathToSASScript.FullName + "\"" +
+                          " -nosplash -noterminal -nostatuswin -noicon" +
+                          " -print \"" + fullPrintPath + "\"" +
+                          " -log \"" + fullLogPath + "\"";
 
             var info = new ProcessStartInfo(sasFullPath);
             info.Arguments = command;
 
             return info;
+        }
+
+        private string GetSASConnectionString(ExternalDatabaseServer db)
+        {
+            var connString = db.Discover(DataAccessContext.DataLoad).Server.Builder.ConnectionString;
+            connString = connString.TrimEnd(';');
+            connString += ";DRIVER={SQL Server}";
+            return connString;
         }
 
         private string CreateActualOutputDir(string scriptFileName)
