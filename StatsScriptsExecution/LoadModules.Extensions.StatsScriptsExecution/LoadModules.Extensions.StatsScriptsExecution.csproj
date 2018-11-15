@@ -241,7 +241,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataProvider\SASDataProvider.cs" />
+    <Compile Include="Attachers\SasAttacher.cs" />
     <Compile Include="Helpers\Settings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

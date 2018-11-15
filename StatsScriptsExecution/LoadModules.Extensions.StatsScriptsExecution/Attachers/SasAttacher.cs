@@ -1,24 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CatalogueLibrary;
 using CatalogueLibrary.Data;
 using CatalogueLibrary.DataFlowPipeline;
-using DataLoadEngine.DataProvider;
+using DataLoadEngine.Attachers;
 using DataLoadEngine.Job;
 using ReusableLibraryCode.Checks;
-using ReusableLibraryCode.DataAccess;
 using ReusableLibraryCode.DatabaseHelpers.Discovery;
 using ReusableLibraryCode.Progress;
 
-namespace LoadModules.Extensions.StatsScriptsExecution.DataProvider
+namespace LoadModules.Extensions.StatsScriptsExecution.Attachers
 {
-    public class SASDataProvider : IPluginDataProvider
+    public class SasAttacher : Attacher, IPluginAttacher
     {
+        public SasAttacher() : base(true)
+        {
+        }
+
         [DemandsInitialization("SAS root directory (contains sas.exe)", mandatory: true)]
         public DirectoryInfo SASRootDirectory { get; set; }
 
@@ -31,18 +30,10 @@ namespace LoadModules.Extensions.StatsScriptsExecution.DataProvider
         [DemandsInitialization("Database connection string", mandatory: true)]
         public ExternalDatabaseServer InputDatabase { get; set; }
 
-        [DemandsInitialization("Database connection string", mandatory: true)]
-        public ExternalDatabaseServer OutputDatabase { get; set; }
-
         [DemandsInitialization("Output directory", mandatory: true)]
         public DirectoryInfo OutputDirectory { get; set; }
 
-        public void LoadCompletedSoDispose(ExitCodeType exitCode, IDataLoadEventListener postLoadEventsListener)
-        {
-
-        }
-
-        public void Check(ICheckNotifier notifier)
+        public override void Check(ICheckNotifier notifier)
         {
             try
             {
@@ -65,19 +56,18 @@ namespace LoadModules.Extensions.StatsScriptsExecution.DataProvider
             }
         }
 
-        public void Initialize(IHICProjectDirectory hicProjectDirectory, DiscoveredDatabase dbInfo)
+        public override void LoadCompletedSoDispose(ExitCodeType exitCode, IDataLoadEventListener postLoadEventListener)
         {
-
         }
 
-        public ExitCodeType Fetch(IDataLoadJob job, GracefulCancellationToken cancellationToken)
+        public override ExitCodeType Attach(IDataLoadJob job, GracefulCancellationToken cancellationToken)
         {
             var processStartInfo = CreateCommand();
 
             int exitCode;
             try
             {
-                exitCode = ExecuteProcess(processStartInfo, MaximumNumberOfSecondsToLetScriptRunFor);
+                exitCode = ExecuteProcess(processStartInfo, MaximumNumberOfSecondsToLetScriptRunFor, job);
             }
             catch (TimeoutException e)
             {
@@ -90,16 +80,20 @@ namespace LoadModules.Extensions.StatsScriptsExecution.DataProvider
             return exitCode == 0 ? ExitCodeType.Success : ExitCodeType.Error;
         }
 
-        private int ExecuteProcess(ProcessStartInfo processStartInfo, int scriptTimeout)
+        private int ExecuteProcess(ProcessStartInfo processStartInfo, int scriptTimeout, IDataLoadJob job)
         {
             processStartInfo.UseShellExecute = false;
             processStartInfo.CreateNoWindow = true;
+
+            job.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Starting SAS."));
 
             Process p;
             try
             {
                 p = new Process();
                 p.StartInfo = processStartInfo;
+
+                job.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "commandline: " + processStartInfo.Arguments));
 
                 p.Start();
             }
@@ -149,7 +143,7 @@ namespace LoadModules.Extensions.StatsScriptsExecution.DataProvider
             var fullLogPath = Path.Combine(actualOutputDir, scriptFileName + ".log");
 
             var dataInConnection = GetSASConnectionString(InputDatabase);
-            var dataOutConnection = GetSASConnectionString(OutputDatabase);
+            var dataOutConnection = GetSASConnectionString(_dbInfo);
 
             var command = "-set output \"" + actualOutputDir + "\"" +
                           " -set connect \"" + dataInConnection + "\"" + 
@@ -165,12 +159,14 @@ namespace LoadModules.Extensions.StatsScriptsExecution.DataProvider
             return info;
         }
 
+        private string GetSASConnectionString(DiscoveredDatabase db)
+        {
+            return String.Format("Server={0};Database={1};IntegratedSecurity=true;DRIVER=SQL Server", db.Server.Name, db.GetRuntimeName());
+        }
+
         private string GetSASConnectionString(ExternalDatabaseServer db)
         {
-            var connString = db.Discover(DataAccessContext.DataLoad).Server.Builder.ConnectionString;
-            connString = connString.TrimEnd(';');
-            connString += ";DRIVER={SQL Server}";
-            return connString;
+            return String.Format("Server={0};Database={1};IntegratedSecurity=true;DRIVER=SQL Server", db.Server, db.Database);
         }
 
         private string CreateActualOutputDir(string scriptFileName)
