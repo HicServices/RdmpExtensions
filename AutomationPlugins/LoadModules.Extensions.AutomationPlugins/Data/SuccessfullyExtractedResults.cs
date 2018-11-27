@@ -1,17 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CatalogueLibrary.Data;
-using DataExportLibrary.Data.DataTables;
 using DataExportLibrary.Interfaces.Data.DataTables;
-using LoadModules.Extensions.AutomationPlugins.Data.Repository;
-using MapsDirectlyToDatabaseTable;
-using ReusableLibraryCode;
+using RDMPStartup;
 
 namespace LoadModules.Extensions.AutomationPlugins.Data
 {
@@ -40,7 +32,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
         }
         #endregion
 
-        public SuccessfullyExtractedResults(AutomateExtractionRepository repository,string sql, AutomateExtraction parent, IExtractableDataSet dataset)
+        public SuccessfullyExtractedResults(PluginRepository repository, string sql, AutomateExtraction parent, IExtractableDataSet dataset)
         {
             repository.InsertAndHydrate(this, new Dictionary<string, object>()
             {
@@ -52,7 +44,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             if (ID == 0 || Repository != repository)
                 throw new ArgumentException("Repository failed to properly hydrate this class");
         }
-        public SuccessfullyExtractedResults(AutomateExtractionRepository repository, DbDataReader r)
+        public SuccessfullyExtractedResults(PluginRepository repository, DbDataReader r)
             : base(repository, r)
         {
             SQL = r["SQL"].ToString();

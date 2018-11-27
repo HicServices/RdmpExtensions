@@ -12,6 +12,7 @@ using DataExportLibrary.ExtractionTime.Commands;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using MapsDirectlyToDatabaseTable;
+using RDMPStartup;
 
 namespace LoadModules.Extensions.AutomationPlugins.Data
 {
@@ -79,9 +80,9 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
 
         #endregion
 
-        public AutomateExtraction(AutomateExtractionRepository repository,AutomateExtractionSchedule schedule, IExtractionConfiguration config)
+        public AutomateExtraction(PluginRepository repository, AutomateExtractionSchedule schedule, IExtractionConfiguration config)
         {
-            _repository = repository;
+            _repository = (AutomateExtractionRepository) repository;
             repository.InsertAndHydrate(this, new Dictionary<string, object>()
             {
                 {"AutomateExtractionSchedule_ID",schedule.ID},
@@ -94,10 +95,10 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             if (ID == 0 || Repository != repository)
                 throw new ArgumentException("Repository failed to properly hydrate this class");
         }
-        public AutomateExtraction(AutomateExtractionRepository repository, DbDataReader r)
+        public AutomateExtraction(PluginRepository repository, DbDataReader r)
             : base(repository, r)
         {
-            _repository = repository;
+            _repository = (AutomateExtractionRepository) repository;
             ExtractionConfiguration_ID = Convert.ToInt32(r["ExtractionConfiguration_ID"]);
             AutomateExtractionSchedule_ID = Convert.ToInt32(r["AutomateExtractionSchedule_ID"]);
             Disabled = Convert.ToBoolean(r["Disabled"]);

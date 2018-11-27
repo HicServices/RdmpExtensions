@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CatalogueLibrary.Data;
 using CatalogueLibrary.Data.Pipelines;
 using DataExportLibrary.Data.DataTables;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using MapsDirectlyToDatabaseTable;
+using RDMPStartup;
 
 namespace LoadModules.Extensions.AutomationPlugins.Data
 {
@@ -71,7 +69,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
         }
         #endregion
 
-        public QueuedExtraction(AutomateExtractionRepository repository, ExtractionConfiguration configuration, IPipeline extractionPipeline, DateTime dueDate)
+        public QueuedExtraction(PluginRepository repository, ExtractionConfiguration configuration, IPipeline extractionPipeline, DateTime dueDate)
         {
             repository.InsertAndHydrate(this, new Dictionary<string, object>()
             {
@@ -84,7 +82,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             if (ID == 0 || Repository != repository)
                 throw new ArgumentException("Repository failed to properly hydrate this class");
         }
-        public QueuedExtraction(AutomateExtractionRepository repository, DbDataReader r)
+        public QueuedExtraction(PluginRepository repository, DbDataReader r)
             : base(repository, r)
         {
             ExtractionConfiguration_ID = Convert.ToInt32(r["ExtractionConfiguration_ID"]);

@@ -9,6 +9,7 @@ using DataExportLibrary.Data.DataTables;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using MapsDirectlyToDatabaseTable;
+using RDMPStartup;
 using ReusableLibraryCode.Checks;
 
 namespace LoadModules.Extensions.AutomationPlugins.Data
@@ -125,9 +126,9 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
 
         #endregion
 
-        public AutomateExtractionSchedule(AutomateExtractionRepository repository, Project project)
+        public AutomateExtractionSchedule(PluginRepository repository, Project project)
         {
-            _repository = repository;
+            _repository = (AutomateExtractionRepository) repository;
             repository.InsertAndHydrate(this, new Dictionary<string, object>()
             {
                 {"Project_ID",project.ID},
@@ -139,10 +140,10 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
             if (ID == 0 || Repository != repository)
                 throw new ArgumentException("Repository failed to properly hydrate this class");
         }
-        public AutomateExtractionSchedule(AutomateExtractionRepository repository, DbDataReader r)
+        public AutomateExtractionSchedule(PluginRepository repository, DbDataReader r)
             : base(repository, r)
         {
-            _repository = repository;
+            _repository = (AutomateExtractionRepository) repository;
 
             ExecutionTimescale = (AutomationTimeScale) Enum.Parse(typeof(AutomationTimeScale),r["ExecutionTimescale"].ToString());
             UserRequestingRefresh = r["UserRequestingRefresh"] as string;
