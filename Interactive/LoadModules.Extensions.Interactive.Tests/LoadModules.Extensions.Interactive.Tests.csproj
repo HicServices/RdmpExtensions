@@ -378,7 +378,9 @@
     <Content Include="NUnit3.TestAdapter.dll" />
     <Content Include="NUnit3.TestAdapter.pdb" />
     <Content Include="Pencil.cur" />
-    <Content Include="TestDatabases.txt" />
+    <Content Include="TestDatabases.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
