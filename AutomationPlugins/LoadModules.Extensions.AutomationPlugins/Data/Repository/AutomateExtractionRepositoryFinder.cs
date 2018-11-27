@@ -3,9 +3,7 @@ using System.Linq;
 using System.Reflection;
 using CatalogueLibrary.Data;
 using CatalogueLibrary.Repositories;
-using MapsDirectlyToDatabaseTable;
 using RDMPStartup;
-using ReusableLibraryCode.DataAccess;
 
 namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
 {
@@ -22,7 +20,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
             _databaseAssembly = typeof(Database.Class1).Assembly;
         }
 
-        public override IRepository GetRepositoryIfAny()
+        public override PluginRepository GetRepositoryIfAny()
         {
             if (_repositoryLocator.CatalogueRepository == null || _repositoryLocator.DataExportRepository == null)
                 return null;
@@ -38,13 +36,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
             if (compatibleServers.Length == 0)
                 return null;
 
-            var server = DataAccessPortal.GetInstance().ExpectServer(compatibleServers[0], DataAccessContext.InternalDataProcessing);
-
-            Exception ex;
-            if (!server.RespondsWithinTime(Timeout, out ex))
-                throw new Exception("Automate Extraction Server '" + server + "' could not be reached",ex);
-
-            return new AutomateExtractionRepository(_repositoryLocator,server.Builder);
+            return new AutomateExtractionRepository(_repositoryLocator, compatibleServers[0]);
         }
 
         public override Type GetRepositoryType()

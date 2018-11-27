@@ -38,7 +38,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
             server.Database = db.GetRuntimeName();
             server.SaveToDatabase();
 
-            return new AutomateExtractionRepository(repositoryLocator, db.Server.Builder);
+            return new AutomateExtractionRepository(repositoryLocator, server);
         }
 
         public Pipeline GetValidExtractionPipeline()
