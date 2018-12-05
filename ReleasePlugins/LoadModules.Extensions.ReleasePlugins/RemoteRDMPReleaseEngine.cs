@@ -105,7 +105,7 @@ namespace LoadModules.Extensions.ReleasePlugins
         
         private void ZipReleaseFolder(DirectoryInfo customExtractionDirectory, string zipPassword, string zipOutput)
         {
-            var zip = new ZipFile();
+            var zip = new ZipFile() { UseZip64WhenSaving = Zip64Option.AsNecessary };
             if (!String.IsNullOrWhiteSpace(zipPassword))
                 zip.Password = zipPassword;
                 
