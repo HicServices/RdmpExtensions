@@ -4,13 +4,10 @@ using System.Windows.Forms;
 using CatalogueLibrary.Repositories;
 using DataExportLibrary.Interfaces.Data.DataTables;
 using DataExportLibrary.Data.DataTables;
-using DataLoadEngine.Migration;
-using DataQualityEngine.Data;
+using Fansi.Implementations.MicrosoftSQL;
 using MapsDirectlyToDatabaseTableUI;
 using RDMPStartup;
-using ReusableLibraryCode;
 using ReusableLibraryCode.Checks;
-using ReusableLibraryCode.DatabaseHelpers.Discovery.Microsoft;
 
 namespace LoadModules.Extensions.Interactive.DeAnonymise
 {

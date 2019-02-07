@@ -16,7 +16,7 @@ using RDMPStartup;
 
 namespace LoadModules.Extensions.AutomationPlugins.Data
 {
-    public class AutomateExtraction : DatabaseEntity
+    public class AutomateExtraction : DatabaseEntity, IMapsDirectlyToDatabaseTable
     {
         private readonly AutomateExtractionRepository _repository;
 

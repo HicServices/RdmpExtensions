@@ -2,12 +2,12 @@ using CatalogueLibrary.Data;
 using CatalogueLibrary.Data.Pipelines;
 using CatalogueLibrary.Repositories;
 using DataExportLibrary.ExtractionTime.ExtractionPipeline.Destinations;
+using FAnsi.Discovery;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline;
 using MapsDirectlyToDatabaseTable.Versioning;
 using NUnit.Framework;
 using ReusableLibraryCode.Checks;
-using ReusableLibraryCode.DatabaseHelpers.Discovery;
 using Tests.Common;
 
 namespace LoadModules.Extensions.AutomationPlugins.Tests
@@ -26,7 +26,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
         {
             var db = discoveredServerICanCreateRandomDatabasesAndTablesOn.ExpectDatabase("TEST_AutomationPluginsTests");
             if (db.Exists())
-                db.ForceDrop();
+                db.Drop();
 
             var assembly = typeof(Database.Class1).Assembly;
 

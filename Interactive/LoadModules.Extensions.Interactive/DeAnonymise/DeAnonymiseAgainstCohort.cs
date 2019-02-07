@@ -2,11 +2,8 @@
 using System.Data;
 using System.Windows.Forms;
 using CatalogueLibrary.DataFlowPipeline;
-using DataExportLibrary.Repositories;
-using RDMPStartup;
-using ReusableLibraryCode;
+using Fansi.Implementations.MicrosoftSQL;
 using ReusableLibraryCode.Checks;
-using ReusableLibraryCode.DatabaseHelpers.Discovery.Microsoft;
 using ReusableLibraryCode.Progress;
 
 namespace LoadModules.Extensions.Interactive.DeAnonymise

@@ -10,7 +10,6 @@ using DataExportLibrary.ExtractionTime.Commands;
 using DataLoadEngine.Migration;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
-using ReusableLibraryCode.DatabaseHelpers.Discovery;
 using ReusableLibraryCode.Exceptions;
 using ReusableLibraryCode.Progress;
 
