@@ -153,7 +153,7 @@ namespace LoadModules.Extensions.Python.DataProvider
             return info;
         }
 
-        public void Initialize(IHICProjectDirectory hicProjectDirectory, DiscoveredDatabase dbInfo)
+        public void Initialize(ILoadDirectory hicProjectDirectory, DiscoveredDatabase dbInfo)
         {
             
         }
@@ -339,7 +339,7 @@ namespace LoadModules.Extensions.Python.DataProvider
             throw new NotImplementedException();
         }
 
-        public bool Validate(IHICProjectDirectory destination)
+        public bool Validate(ILoadDirectory destination)
         {
             return true;
         }
