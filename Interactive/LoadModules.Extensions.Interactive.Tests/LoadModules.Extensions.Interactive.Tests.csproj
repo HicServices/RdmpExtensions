@@ -393,7 +393,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="RDMPAutomationService.exe.config" />
     <None Include="Tests.Common.dll.config">
