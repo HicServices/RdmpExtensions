@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using CatalogueLibrary.Data;
-using DataExportLibrary.Interfaces.Data.DataTables;
 using RDMPStartup;
 
 namespace LoadModules.Extensions.AutomationPlugins.Data

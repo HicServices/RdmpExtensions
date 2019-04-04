@@ -11,7 +11,6 @@ using DataExportLibrary.Data.DataTables;
 using DataExportLibrary.DataRelease.Audit;
 using DataExportLibrary.DataRelease.ReleasePipeline;
 using DataExportLibrary.ExtractionTime;
-using DataExportLibrary.Interfaces.Data.DataTables;
 using ReusableLibraryCode.Checks;
 using ReusableLibraryCode.Progress;
 
@@ -80,7 +79,7 @@ namespace LoadModules.Extensions.ReleasePlugins
                     int remnantsDeleted = 0;
 
                     foreach (ExtractionConfiguration configuration in _releaseData.ConfigurationsForRelease.Keys)
-                        foreach (ReleaseLogEntry remnant in configuration.ReleaseLogEntries)
+                        foreach (IReleaseLog remnant in configuration.ReleaseLog)
                         {
                             remnant.DeleteInDatabase();
                             remnantsDeleted++;

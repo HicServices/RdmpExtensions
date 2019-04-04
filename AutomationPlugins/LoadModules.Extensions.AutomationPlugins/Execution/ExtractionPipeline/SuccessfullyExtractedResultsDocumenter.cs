@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using CatalogueLibrary.Data;
 using CatalogueLibrary.DataFlowPipeline;
 using CatalogueLibrary.DataFlowPipeline.Requirements;
+using CatalogueLibrary.ExtractionTime.Commands;
+using CatalogueLibrary.Repositories;
 using DataExportLibrary.ExtractionTime;
 using DataExportLibrary.ExtractionTime.Commands;
-using DataExportLibrary.Interfaces.Data.DataTables;
-using DataExportLibrary.Interfaces.ExtractionTime.Commands;
 using HIC.Logging;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
@@ -49,7 +50,8 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline
             {
                 _sql = ds.QueryBuilder.SQL;
                 _dataset = ds.DatasetBundle.DataSet;
-                var finder = new AutomateExtractionRepositoryFinder(ds.RepositoryLocator);
+                
+                var finder = new AutomateExtractionRepositoryFinder(new RepositoryProvider(ds.DataExportRepository));
                 _repo = finder.GetRepositoryIfAny() as AutomateExtractionRepository;
 
                 if(_repo == null)

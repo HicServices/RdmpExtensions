@@ -7,7 +7,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
 {
     public class AutomateExtractionRepository : PluginRepository
     {
-        public CatalogueRepository CatalogueRepository { get; private set; }
+        public ICatalogueRepository CatalogueRepository { get; private set; }
         public IDataExportRepository DataExportRepository { get; private set; }
 
         public AutomateExtractionRepository(IRDMPPlatformRepositoryServiceLocator repositoryLocator, ExternalDatabaseServer server):base(server,null)

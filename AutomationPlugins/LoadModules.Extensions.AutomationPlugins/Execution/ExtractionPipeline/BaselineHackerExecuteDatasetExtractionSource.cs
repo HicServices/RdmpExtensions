@@ -1,4 +1,5 @@
 ﻿using System;
+using CatalogueLibrary.Repositories;
 using DataExportLibrary.ExtractionTime.ExtractionPipeline.Sources;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using ReusableLibraryCode.Progress;
@@ -9,7 +10,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline
     {
         public override string HackExtractionSQL(string sql, IDataLoadEventListener listener)
         {
-            var finder = new AutomateExtractionRepositoryFinder(Request.RepositoryLocator);
+            var finder = new AutomateExtractionRepositoryFinder(new RepositoryProvider(Request.DataExportRepository));
             var repository = (AutomateExtractionRepository) finder.GetRepositoryIfAny();
 
             if(repository == null)
