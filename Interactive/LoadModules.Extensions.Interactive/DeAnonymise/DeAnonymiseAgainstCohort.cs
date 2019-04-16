@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows.Forms;
 using CatalogueLibrary.DataFlowPipeline;
-using Fansi.Implementations.MicrosoftSQL;
+using FAnsi.Implementations.MicrosoftSQL;
 using ReusableLibraryCode.Checks;
 using ReusableLibraryCode.Progress;
 
