@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using HIC.Logging;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
-using ReusableLibraryCode;
+using Rdmp.Core.Logging;
 
 namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline
 {
@@ -65,13 +64,11 @@ namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline
                     repository.DiscoveredServer.GetCommand(query, con).ExecuteNonQuery();
                 }
 
-                //bulk insert new history
-                var bulkCopy = new SqlBulkCopy(repository.DiscoveredServer.Builder.ConnectionString);
-                bulkCopy.ColumnMappings.Add("AutomateExtraction_ID", "AutomateExtraction_ID");
-                bulkCopy.ColumnMappings.Add("ReleaseID", "ReleaseID");
-                bulkCopy.DestinationTableName = tempTable.GetFullyQualifiedName();
-                UsefulStuff.BulkInsertWithBetterErrorMessages(bulkCopy, dt, repository.DiscoveredServer);
-                
+                using(var bulk = tempTable.BeginBulkInsert())
+                {
+                    bulk.Upload(dt);
+                }
+
                 //clear old history
                 using (SqlConnection con = new SqlConnection(repository.ConnectionString))
                 {

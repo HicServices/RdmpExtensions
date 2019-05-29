@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
-using CatalogueLibrary.Data;
-using CatalogueLibrary.DataFlowPipeline;
-using CatalogueLibrary.DataFlowPipeline.Requirements;
-using CatalogueLibrary.Ticketing;
-using DataExportLibrary.Data.DataTables;
-using DataExportLibrary.DataRelease.Audit;
-using DataExportLibrary.DataRelease.ReleasePipeline;
-using DataExportLibrary.ExtractionTime;
+using Rdmp.Core.Curation.Data;
+using Rdmp.Core.DataExport.Data;
+using Rdmp.Core.DataExport.DataExtraction;
+using Rdmp.Core.DataExport.DataRelease.Audit;
+using Rdmp.Core.DataExport.DataRelease.Pipeline;
+using Rdmp.Core.DataFlowPipeline;
+using Rdmp.Core.DataFlowPipeline.Requirements;
+using Rdmp.Core.Ticketing;
 using ReusableLibraryCode.Checks;
 using ReusableLibraryCode.Progress;
 
@@ -18,7 +17,7 @@ namespace LoadModules.Extensions.ReleasePlugins
 {
     public class RemoteRDMPDataReleaseDestination : IPluginDataFlowComponent<ReleaseAudit>, IDataFlowDestination<ReleaseAudit>, IPipelineRequirement<Project>, IPipelineRequirement<ReleaseData>
     {
-        [DemandsNestedInitialization()]
+       [DemandsNestedInitialization()]
         public RemoteRDMPReleaseEngineSettings RDMPReleaseSettings { get; set; }
 
         private RemoteRDMPReleaseEngine _remoteRDMPReleaseEngineengine;

@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CatalogueLibrary.Data;
-using CatalogueLibrary.Triggers;
-using DataExportLibrary.ExtractionTime.Commands;
-using DataLoadEngine.Migration;
 using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
+using Rdmp.Core.Curation.Data;
+using Rdmp.Core.DataExport.DataExtraction.Commands;
+using Rdmp.Core.DataLoad.Triggers;
 using ReusableLibraryCode.Exceptions;
 using ReusableLibraryCode.Progress;
 

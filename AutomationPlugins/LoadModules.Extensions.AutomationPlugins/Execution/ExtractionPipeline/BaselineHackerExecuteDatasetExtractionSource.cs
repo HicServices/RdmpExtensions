@@ -1,7 +1,7 @@
 ﻿using System;
-using CatalogueLibrary.Repositories;
-using DataExportLibrary.ExtractionTime.ExtractionPipeline.Sources;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
+using Rdmp.Core.DataExport.DataExtraction.Pipeline.Sources;
+using Rdmp.Core.Repositories;
 using ReusableLibraryCode.Progress;
 
 namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline

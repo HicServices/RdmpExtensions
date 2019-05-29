@@ -1,7 +1,7 @@
-﻿using System;
-using CatalogueLibrary.Data;
-using CatalogueLibrary.Repositories;
-using RDMPStartup;
+﻿using Rdmp.Core.Curation.Data;
+using Rdmp.Core.Repositories;
+using Rdmp.Core.Startup;
+using System;
 
 namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
 {

@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using CatalogueLibrary.Data;
-using DataExportLibrary.Data.DataTables;
-using DataExportLibrary.DataRelease;
-using DataExportLibrary.DataRelease.Potential;
-using DataExportLibrary.DataRelease.ReleasePipeline;
 using Ionic.Zip;
 using LoadModules.Extensions.ReleasePlugins.Data;
 using Newtonsoft.Json;
+using Rdmp.Core.DataExport.Data;
+using Rdmp.Core.DataExport.DataRelease;
+using Rdmp.Core.DataExport.DataRelease.Pipeline;
+using Rdmp.Core.DataExport.DataRelease.Potential;
+using Rdmp.Core.Ticketing;
 using ReusableLibraryCode.Progress;
-using CatalogueLibrary.Ticketing;
 
 namespace LoadModules.Extensions.ReleasePlugins
 {

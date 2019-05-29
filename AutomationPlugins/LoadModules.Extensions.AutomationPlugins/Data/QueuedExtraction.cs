@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using CatalogueLibrary.Data;
-using CatalogueLibrary.Data.Pipelines;
-using DataExportLibrary.Data.DataTables;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
 using MapsDirectlyToDatabaseTable;
-using RDMPStartup;
+using Rdmp.Core.Curation.Data;
+using Rdmp.Core.Curation.Data.Pipelines;
+using Rdmp.Core.DataExport.Data;
+using Rdmp.Core.Startup;
 
 namespace LoadModules.Extensions.AutomationPlugins.Data
 {

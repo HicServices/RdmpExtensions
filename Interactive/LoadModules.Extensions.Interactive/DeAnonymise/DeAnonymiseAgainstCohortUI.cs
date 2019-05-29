@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Data;
 using System.Windows.Forms;
-using CatalogueLibrary.Data;
-using CatalogueLibrary.Repositories;
-using DataExportLibrary.Data.DataTables;
 using FAnsi.Implementations.MicrosoftSQL;
-using MapsDirectlyToDatabaseTableUI;
-using RDMPStartup;
+using Rdmp.Core.DataExport.Data;
+using Rdmp.Core.Repositories;
+using Rdmp.Core.Startup;
+using Rdmp.UI.SimpleDialogs;
 using ReusableLibraryCode.Checks;
 
 namespace LoadModules.Extensions.Interactive.DeAnonymise

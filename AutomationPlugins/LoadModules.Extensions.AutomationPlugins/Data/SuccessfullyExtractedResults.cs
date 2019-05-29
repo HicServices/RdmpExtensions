@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using CatalogueLibrary.Data;
-using RDMPStartup;
+using MapsDirectlyToDatabaseTable;
+using Rdmp.Core.Curation.Data;
+using Rdmp.Core.DataExport.Data;
+using Rdmp.Core.Startup;
 
 namespace LoadModules.Extensions.AutomationPlugins.Data
 {

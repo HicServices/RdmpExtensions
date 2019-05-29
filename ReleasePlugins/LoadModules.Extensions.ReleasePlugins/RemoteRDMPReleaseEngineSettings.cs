@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
-using CatalogueLibrary.Data;
-using CatalogueLibrary.Data.Remoting;
+using Rdmp.Core.Curation.Data;
+using Rdmp.Core.Curation.Data.Remoting;
 using ReusableLibraryCode.Checks;
 
 namespace LoadModules.Extensions.ReleasePlugins
