@@ -4,7 +4,11 @@
     <AssemblyTitle>LoadModules.Extensions.StatsScriptsExecution</AssemblyTitle>
     <Product>LoadModules.Extensions.StatsScriptsExecution</Product>
     <Copyright>Copyright ©  2018</Copyright>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="HIC.RDMP.Plugin" Version="3.0.13-rc" />
   </ItemGroup>

@@ -10,8 +10,12 @@
     <AssemblyTitle>LoadModules.Extensions.Tests</AssemblyTitle>
     <Product>LoadModules.Extensions.Tests</Product>
     <Copyright>Copyright ©  2019</Copyright>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
+  <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="HIC.FAnsiSql" Version="0.9.1.10" />
     <PackageReference Include="HIC.RDMP.Plugin.Test" Version="3.0.13-rc" />

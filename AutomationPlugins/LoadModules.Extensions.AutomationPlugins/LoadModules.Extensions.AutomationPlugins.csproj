@@ -8,6 +8,7 @@
     <Copyright>Copyright ©  2017</Copyright>
     <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <FileVersion>1.1.0.0</FileVersion>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PostBuildEvent />
     <PostBuildEvent />
     <PostBuildEvent />
@@ -21,6 +22,9 @@
   <ItemGroup>
     <None Remove="db\runAfterCreateDatabase\CreateAutomationPluginDatabase.sql" />
     <None Remove="db\up\001_ReleaseAutomation.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="db\runAfterCreateDatabase\CreateAutomationPluginDatabase.sql" />

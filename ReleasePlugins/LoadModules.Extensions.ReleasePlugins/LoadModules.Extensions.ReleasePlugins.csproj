@@ -4,7 +4,8 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <AssemblyTitle>LoadModules.Extensions.ReleasePlugins</AssemblyTitle>
     <Product>LoadModules.Extensions.ReleasePlugins</Product>
-    <Copyright>Copyright ©  2017</Copyright>
+    <Copyright>Copyright ©  2017</Copyright> 
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -19,6 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="db\runAfterCreateDatabase\CreateWebdavPluginDatabase.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="db\runAfterCreateDatabase\CreateWebdavPluginDatabase.sql" />
