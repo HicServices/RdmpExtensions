@@ -97,7 +97,7 @@ task :deployplugins, [:config] do |t, args|
 end
 
 def getrdmpversion()
-	document = REXML::Document.new File.new("Python/LoadModules.Extensions.Python.csproj")
+	document = REXML::Document.new File.new("Python/LoadModules.Extensions.Python/LoadModules.Extensions.Python.csproj")
 	document.elements.each("*/ItemGroup/PackageReference") do |element|
 		if element.attributes.get_attribute("Include").value == "HIC.RDMP.Plugin"
 			return element.attributes.get_attribute("Version").value
