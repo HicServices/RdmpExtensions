@@ -1,6 +1,7 @@
 require "net/http"
 require 'uri'
 require 'json'
+require 'rexml/document'
 
 load 'rakeconfig.rb'
 $MSBUILD15CMD = MSBUILD15CMD.gsub(/\\/,"/")
@@ -11,7 +12,7 @@ task :ci_continuous, [:config] => [:setup_connection, :assemblyinfo, :build, :te
 
 task :ci_integration, [:config] => [:setup_connection, :assemblyinfo, :build, :all_tests]
 
-task :plugins, [:config] => [:assemblyinfo, :build, :deployplugins]
+task :plugins, [:config] => [:assemblyinfo, :build_release, :deployplugins]
 
 task :release => [:assemblyinfo, :build_release]
 
@@ -45,6 +46,10 @@ task :build_low_warning, [:config,:level] => :restorepackages do |msb, args|
 end
 
 task :createtestdb, [:config] do |t, args|
+	userProf = ENV['USERPROFILE'].gsub(/\\/,"/")	
+	rdmpversion = getrdmpversion()
+		
+	RDMP_TOOLS = "#{userProf}/.nuget/packages/hic.rdmp.plugin/#{rdmpversion}/tools/netcoreapp2.2/publish/"
 	Dir.chdir("#{RDMP_TOOLS}") do
         sh "dotnet ./rdmp.dll install #{DBSERVER} #{DBPREFIX} -D"
     end
@@ -84,11 +89,18 @@ task :deployplugins, [:config] do |t, args|
 	version = File.open('version') {|f| f.readline}
     puts "version: #{version}"
 	
-	Dir.chdir('Plugins/netcoreapp2.2/') do
-		sh "dotnet publish --runtime win-x64"
-	
+	Dir.chdir('Plugin/netcoreapp2.2/') do
+		sh "dotnet publish --runtime win-x64 -c #{args.config}"
+	end
 	#Packages the plugin which will be loaded into RDMP
 	sh "nuget pack HIC.Extensions.nuspec -Properties Configuration=#{args.config} -IncludeReferencedProjects -Symbols -Version #{version}"
-	
-    end
+end
+
+def getrdmpversion()
+	document = REXML::Document.new File.new("Python/LoadModules.Extensions.Python.csproj")
+	document.elements.each("*/ItemGroup/PackageReference") do |element|
+		if element.attributes.get_attribute("Include").value == "HIC.RDMP.Plugin"
+			return element.attributes.get_attribute("Version").value
+		end
+	end
 end
