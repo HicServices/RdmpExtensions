@@ -31,6 +31,6 @@
     <EmbeddedResource Include="db\up\001_ReleaseAutomation.sql" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="HIC.RDMP.Plugin" Version="3.1.0" />
+    <PackageReference Include="HIC.RDMP.Plugin" Version="3.2.0-rc1" />
   </ItemGroup>
 </Project>
