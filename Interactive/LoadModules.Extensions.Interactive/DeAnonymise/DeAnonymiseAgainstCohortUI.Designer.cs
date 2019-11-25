@@ -1,4 +1,6 @@
-﻿namespace LoadModules.Extensions.Interactive.DeAnonymise
+﻿using Rdmp.UI.ChecksUI;
+
+namespace LoadModules.Extensions.Interactive.DeAnonymise
 {
     partial class DeAnonymiseAgainstCohortUI
     {
@@ -29,7 +31,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DeAnonymiseAgainstCohortUI));
-            this.checksUI1 = new ReusableUIComponents.ChecksUI.ChecksUI();
+            this.checksUI1 = new Rdmp.UI.ChecksUI.ChecksUI();
             this.btnChooseCohort = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.btnOk = new System.Windows.Forms.Button();
@@ -159,7 +161,7 @@
 
         #endregion
 
-        private ReusableUIComponents.ChecksUI.ChecksUI checksUI1;
+        private Rdmp.UI.ChecksUI.ChecksUI checksUI1;
         private System.Windows.Forms.Button btnChooseCohort;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnOk;

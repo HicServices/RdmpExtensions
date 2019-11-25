@@ -30,8 +30,8 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
                 db.Drop();
 
             var patcher = new AutomateExtractionPluginPatcher();
-
-            MasterDatabaseScriptExecutor executor = new MasterDatabaseScriptExecutor(db.Server.Builder.ConnectionString);
+            
+            MasterDatabaseScriptExecutor executor = new MasterDatabaseScriptExecutor(db);
             executor.CreateAndPatchDatabase(patcher, new AcceptAllCheckNotifier());
 
             var server = new ExternalDatabaseServer(repositoryLocator.CatalogueRepository, "Automation Server", patcher);
