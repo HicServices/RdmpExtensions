@@ -53,7 +53,7 @@ namespace LoadModules.Extensions.Interactive.DeAnonymise
        
         private void btnChooseCohort_Click(object sender, EventArgs e)
         {
-            SelectIMapsDirectlyToDatabaseTableDialog dialog = new SelectIMapsDirectlyToDatabaseTableDialog(_dataExportRepository.GetAllObjects<ExtractableCohort>(), false, false);
+            SelectIMapsDirectlyToDatabaseTableDialog dialog = new SelectIMapsDirectlyToDatabaseTableDialog(null, _dataExportRepository.GetAllObjects<ExtractableCohort>(), false, false);
             if(dialog.ShowDialog() == DialogResult.OK)
                 if (dialog.Selected != null)
                 {

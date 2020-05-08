@@ -10,7 +10,6 @@ namespace LoadModules.Extensions.Interactive.DeAnonymise
 {
     public class DeAnonymiseAgainstCohort: IPluginDataFlowComponent<DataTable>
     {
-        
         /// <summary>
         /// When null (default) we launch a new DeAnonymiseAgainstCohortUI in order that the user selects which cohort he wants to deanonymise against. If you set this then you can 
         /// (for example in unit tests) specify an explicit implementation and dodge the gui.
