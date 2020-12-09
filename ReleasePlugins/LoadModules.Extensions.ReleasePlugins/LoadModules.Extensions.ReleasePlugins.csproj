@@ -29,7 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DotNetZip" Version="1.13.3" />
-    <PackageReference Include="HIC.RDMP.Plugin" Version="4.1.0" />
+    <PackageReference Include="HIC.RDMP.Plugin" Version="4.2.0" />
     <PackageReference Include="System.IO" Version="4.3.0" />
     <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
     
