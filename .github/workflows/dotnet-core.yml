@@ -34,9 +34,9 @@ jobs:
           dotnet test
       - name: Build
         run: |
-          cd Plugin/net5-windows
+          cd Plugin/windows
           dotnet publish --runtime win-x64 -c Release --self-contained false
-          cd ../net5
+          cd ../main
           dotnet publish -c Release --self-contained false
           cd ../..
           nuget pack ./HIC.Extensions.nuspec -Properties Configuration=Release -IncludeReferencedProjects -Symbols -Version ${{ steps.version.outputs.version }}
