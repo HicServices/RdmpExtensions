@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>false</RestorePackages>
+    <UseWindowsForms>true</UseWindowsForms>
     <AssemblyTitle>LoadModules.Extensions.Interactive</AssemblyTitle>
     <Company>Hewlett-Packard Company</Company>
     <Product>LoadModules.Extensions.Interactive</Product>
@@ -13,8 +14,8 @@
     <Compile Include="..\..\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="HIC.RDMP.Plugin" Version="4.2.1" />
-    <PackageReference Include="HIC.RDMP.Plugin.UI" Version="4.2.1" />
+    <PackageReference Include="HIC.RDMP.Plugin" Version="5.0.0" />
+    <PackageReference Include="HIC.RDMP.Plugin.UI" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="DeAnonymise\DeAnonymiseAgainstCohortUI.cs">
