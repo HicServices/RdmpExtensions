@@ -10,6 +10,6 @@
     <Compile Include="..\..\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="HIC.RDMP.Plugin" Version="5.0.0" />
+    <PackageReference Include="HIC.RDMP.Plugin" Version="5.0.1" />
   </ItemGroup>
 </Project>
