@@ -15,7 +15,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="HIC.RDMP.Plugin" Version="6.0.0" />
-    <PackageReference Include="HIC.RDMP.Plugin.UI" Version="6.0.0" />
+    <PackageReference Include="HIC.RDMP.Plugin.UI" Version="6.0.2" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="DeAnonymise\DeAnonymiseAgainstCohortUI.cs">
