@@ -19,7 +19,7 @@
   <ItemGroup>
     <PackageReference Include="HIC.RDMP.Plugin.Test" Version="7.0.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
-    <PackageReference Include="NunitXml.TestLogger" Version="2.1.36" />
+    <PackageReference Include="NunitXml.TestLogger" Version="3.0.117" />
     <PackageReference Include="RhinoMocks" Version="3.6.1" />
     <PackageReference Include="System.Security.Permissions" Version="5.0.0" />
   </ItemGroup>
