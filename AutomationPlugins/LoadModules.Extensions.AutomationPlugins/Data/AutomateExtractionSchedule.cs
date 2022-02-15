@@ -94,7 +94,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
         #region Database Relationships
 
         [NoMappingToDatabase]
-        public Pipeline Pipeline { get
+        public IPipeline Pipeline { get
         {
             return Pipeline_ID != null ? _repository.CatalogueRepository.GetObjectByID<Pipeline>(Pipeline_ID.Value) : null;
         } }
@@ -109,7 +109,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
         }
 
         [NoMappingToDatabase]
-        public Project Project
+        public IProject Project
         {
             get
         {
@@ -125,7 +125,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Data
 
         #endregion
 
-        public AutomateExtractionSchedule(PluginRepository repository, Project project)
+        public AutomateExtractionSchedule(PluginRepository repository, IProject project)
         {
             _repository = (AutomateExtractionRepository) repository;
             repository.InsertAndHydrate(this, new Dictionary<string, object>()
