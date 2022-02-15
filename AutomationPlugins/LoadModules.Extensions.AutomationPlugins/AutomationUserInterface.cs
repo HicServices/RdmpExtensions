@@ -6,6 +6,7 @@ using Rdmp.Core.CommandExecution.AtomicCommands;
 using Rdmp.Core.Curation.Data.Defaults;
 using Rdmp.Core.DataExport.Data;
 using Rdmp.Core.Icons.IconOverlays;
+using Rdmp.Core.Icons.IconProvision;
 using Rdmp.Core.Providers.Nodes;
 using ReusableLibraryCode.Icons.IconProvision;
 using System;
@@ -22,8 +23,17 @@ namespace LoadModules.Extensions.AutomationPlugins
         public AutomationUserInterface(IBasicActivateItems itemActivator) : base(itemActivator)
         {
             _overlayProvider = new IconOverlayProvider();
-            _scheduleIcon = AutomationImages.AutomateExtractionSchedule;
-            _automateExtractionIcon = AutomationImages.AutomateExtraction;
+            try
+            {
+                _scheduleIcon = AutomationImages.AutomateExtractionSchedule;
+                _automateExtractionIcon = AutomationImages.AutomateExtraction;
+            }
+            catch (Exception)
+            {
+                _scheduleIcon = CatalogueIcons.NoIconAvailable;
+                _automateExtractionIcon = CatalogueIcons.NoIconAvailable;
+            }
+
         }
 
         public override Bitmap GetImage(object concept, OverlayKind kind = OverlayKind.None)
