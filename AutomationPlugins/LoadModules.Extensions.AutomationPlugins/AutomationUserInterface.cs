@@ -5,9 +5,12 @@ using Rdmp.Core.CommandExecution;
 using Rdmp.Core.CommandExecution.AtomicCommands;
 using Rdmp.Core.Curation.Data.Defaults;
 using Rdmp.Core.DataExport.Data;
+using Rdmp.Core.Icons.IconOverlays;
 using Rdmp.Core.Providers.Nodes;
+using ReusableLibraryCode.Icons.IconProvision;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace LoadModules.Extensions.AutomationPlugins
@@ -18,6 +21,24 @@ namespace LoadModules.Extensions.AutomationPlugins
 
         public AutomationUserInterface(IBasicActivateItems itemActivator) : base(itemActivator)
         {
+            _overlayProvider = new IconOverlayProvider();
+            _scheduleIcon = AutomationImages.AutomateExtractionSchedule;
+            _automateExtractionIcon = AutomationImages.AutomateExtraction;
+        }
+
+        public override Bitmap GetImage(object concept, OverlayKind kind = OverlayKind.None)
+        {
+            if (concept is AutomateExtractionSchedule || concept as Type == typeof(AutomateExtractionSchedule))
+            {
+                return _overlayProvider.GetOverlay(_scheduleIcon,kind);
+            }
+
+            if (concept is AutomateExtraction || concept as Type == typeof(AutomateExtraction))
+            {
+                return _overlayProvider.GetOverlay(_automateExtractionIcon, kind);
+            }
+
+            return base.GetImage(concept, kind);
         }
 
         public override object[] GetChildren(object model)
@@ -65,6 +86,9 @@ namespace LoadModules.Extensions.AutomationPlugins
         }
 
         DateTime lastLook = DateTime.MinValue;
+        private IconOverlayProvider _overlayProvider;
+        private Bitmap _scheduleIcon;
+        private Bitmap _automateExtractionIcon;
 
         private void TryGettingAutomationRepository()
         {

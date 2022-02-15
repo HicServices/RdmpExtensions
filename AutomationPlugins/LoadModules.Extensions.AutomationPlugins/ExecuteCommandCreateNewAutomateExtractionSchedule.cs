@@ -1,6 +1,8 @@
 ﻿using LoadModules.Extensions.AutomationPlugins.Data;
 using Rdmp.Core.CommandExecution;
 using Rdmp.Core.DataExport.Data;
+using ReusableLibraryCode.Icons.IconProvision;
+using System.Drawing;
 using System.Linq;
 
 namespace LoadModules.Extensions.AutomationPlugins
@@ -28,6 +30,10 @@ namespace LoadModules.Extensions.AutomationPlugins
             Project = project;
         }
 
+        public override Image GetImage(IIconProvider iconProvider)
+        {
+            return iconProvider.GetImage(typeof(AutomateExtractionSchedule), OverlayKind.Add);
+        }
         public override void Execute()
         {
             base.Execute();

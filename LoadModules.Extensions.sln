@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31025.194
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoadModules.Extensions.Python", "Python\LoadModules.Extensions.Python\LoadModules.Extensions.Python.csproj", "{788BB60B-2FAD-4A26-B772-AEE27CEDAE47}"
 EndProject
@@ -36,6 +36,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		HIC.Extensions.nuspec = HIC.Extensions.nuspec
 		Packages.md = Packages.md
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "main", "Plugin\main\main.csproj", "{D1F1CEA4-E678-42C3-9F25-7684075DA3CC}"

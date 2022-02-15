@@ -2,6 +2,8 @@
 using Rdmp.Core.CommandExecution;
 using Rdmp.Core.CommandExecution.AtomicCommands;
 using Rdmp.Core.DataExport.Data;
+using ReusableLibraryCode.Icons.IconProvision;
+using System.Drawing;
 using System.Linq;
 
 namespace LoadModules.Extensions.AutomationPlugins
@@ -39,7 +41,11 @@ namespace LoadModules.Extensions.AutomationPlugins
                 SetImpossible($"Configuration already has a {nameof(AutomateExtraction)}");
                 return;
             }
+        }
 
+        public override Image GetImage(IIconProvider iconProvider)
+        {
+            return iconProvider.GetImage(typeof(AutomateExtraction), OverlayKind.Add);
         }
 
         public override void Execute()
