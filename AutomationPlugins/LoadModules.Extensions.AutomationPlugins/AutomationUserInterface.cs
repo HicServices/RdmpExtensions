@@ -19,6 +19,8 @@ namespace LoadModules.Extensions.AutomationPlugins
     public class AutomationUserInterface : PluginUserInterface
     {
         public AutomateExtractionRepository AutomationRepository { get; private set; }
+        public AutomateExtraction[] AllAutomateExtractions { get; private set; }
+        public AutomateExtractionSchedule[] AllSchedules { get; private set; }
 
         public AutomationUserInterface(IBasicActivateItems itemActivator) : base(itemActivator)
         {
@@ -80,7 +82,7 @@ namespace LoadModules.Extensions.AutomationPlugins
                 return null;    
             }
 
-            return AutomationRepository.GetAllObjects<AutomateExtractionSchedule>().FirstOrDefault(aes => aes.Project_ID == p.ID);
+            return AllSchedules.FirstOrDefault(aes => aes.Project_ID == p.ID);
         }
 
         private AutomateExtraction GetAutomateExtractionIfAny(IExtractionConfiguration ec)
@@ -92,7 +94,7 @@ namespace LoadModules.Extensions.AutomationPlugins
                 return null;
             }
 
-            return AutomationRepository.GetAllObjects<AutomateExtraction>().FirstOrDefault(ae => ae.ExtractionConfiguration_ID == ec.ID);
+            return AllAutomateExtractions.FirstOrDefault(ae => ae.ExtractionConfiguration_ID == ec.ID);
         }
 
         DateTime lastLook = DateTime.MinValue;
@@ -113,6 +115,10 @@ namespace LoadModules.Extensions.AutomationPlugins
             {
                 var repo = new AutomateExtractionRepositoryFinder(BasicActivator.RepositoryLocator);
                 AutomationRepository = (AutomateExtractionRepository)repo.GetRepositoryIfAny();
+
+                AllAutomateExtractions = AutomationRepository.GetAllObjects<AutomateExtraction>();
+                AllSchedules = AutomationRepository.GetAllObjects<AutomateExtractionSchedule>();
+
                 lastLook = DateTime.Now;
             }
             catch (Exception)
@@ -138,6 +144,14 @@ namespace LoadModules.Extensions.AutomationPlugins
             {
                 yield return new ExecuteCommandCreateNewAutomateExtraction(BasicActivator, ec);
             }    
+
+            if(o is AutomateExtraction ae)
+            {
+                yield return new ExecuteCommandSet(BasicActivator, ae, typeof(AutomateExtraction).GetProperty(nameof(AutomateExtraction.BaselineDate)))
+                {
+                    OverrideCommandName = "Set Baseline Date"
+                };
+            }
             
         }
     }
