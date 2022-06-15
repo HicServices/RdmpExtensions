@@ -47,7 +47,7 @@ namespace LoadModules.Extensions.AutomationPlugins.Tests
             return GetValidExtractionPipelineStatic(CatalogueRepository);
         }
 
-        public static Pipeline GetValidExtractionPipelineStatic(CatalogueRepository catalogueRepository)
+        public static Pipeline GetValidExtractionPipelineStatic(ICatalogueRepository catalogueRepository)
         {
             var validPipeline = new Pipeline(catalogueRepository);
 

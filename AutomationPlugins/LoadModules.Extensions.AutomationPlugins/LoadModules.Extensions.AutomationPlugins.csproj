@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>false</RestorePackages>
     <AssemblyTitle>LoadModules.Extensions.AutomationPlugins</AssemblyTitle>
@@ -31,7 +31,7 @@
     <EmbeddedResource Include="db\up\001_ReleaseAutomation.sql" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="HIC.RDMP.Plugin" Version="7.0.0" />
+    <PackageReference Include="HIC.RDMP.Plugin" Version="7.0.13" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="AutomationImages.Designer.cs">

@@ -49,6 +49,9 @@ namespace LoadModules.Extensions.Tests
 
         public object Payload { get; set; }
 
+        private List<NotifyEventArgs> _crashAtEndMessages { get; } = new List<NotifyEventArgs>();
+        public IReadOnlyCollection<NotifyEventArgs> CrashAtEndMessages => _crashAtEndMessages.AsReadOnly();
+
         public void CreateTablesInStage(DatabaseCloner cloner, LoadBubble stage)
         {
         }
@@ -64,6 +67,11 @@ namespace LoadModules.Extensions.Tests
         public ColumnInfo[] GetAllColumns()
         {
             return RegularTablesToLoad.SelectMany(t => t.ColumnInfos).Union(LookupTablesToLoad.SelectMany(t => t.ColumnInfos)).Distinct().ToArray();
+        }
+
+        public void CrashAtEnd(NotifyEventArgs because)
+        {
+            _crashAtEndMessages.Add(because);
         }
     }
 }

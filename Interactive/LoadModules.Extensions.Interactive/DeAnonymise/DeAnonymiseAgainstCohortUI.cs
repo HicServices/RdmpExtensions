@@ -3,6 +3,7 @@ using System.Data;
 using System.Windows.Forms;
 using FAnsi.Implementations.MicrosoftSQL;
 using MapsDirectlyToDatabaseTable;
+using Rdmp.Core.CommandExecution;
 using Rdmp.Core.DataExport.Data;
 using Rdmp.Core.Repositories;
 using Rdmp.Core.Startup;
@@ -54,7 +55,9 @@ namespace LoadModules.Extensions.Interactive.DeAnonymise
        
         private void btnChooseCohort_Click(object sender, EventArgs e)
         {
-            var dialog = new SelectDialog<IMapsDirectlyToDatabaseTable>(null, _dataExportRepository.GetAllObjects<ExtractableCohort>(), false, false);
+            var dialog = new SelectDialog<IMapsDirectlyToDatabaseTable>(
+                new DialogArgs() {WindowTitle = "Choose Cohort" },null, _dataExportRepository.GetAllObjects<ExtractableCohort>(), false);
+
             if(dialog.ShowDialog() == DialogResult.OK)
                 if (dialog.Selected != null)
                 {

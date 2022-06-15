@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AssemblyTitle>LoadModules.Extensions.StatsScriptsExecution</AssemblyTitle>
     <Product>LoadModules.Extensions.StatsScriptsExecution</Product>
     <Copyright>Copyright ©  2018</Copyright>
@@ -10,6 +10,6 @@
     <Compile Include="..\..\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="HIC.RDMP.Plugin" Version="7.0.0" />
+    <PackageReference Include="HIC.RDMP.Plugin" Version="7.0.13" />
   </ItemGroup>
 </Project>

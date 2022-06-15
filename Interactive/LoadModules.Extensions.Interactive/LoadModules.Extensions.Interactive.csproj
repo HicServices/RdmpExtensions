@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>false</RestorePackages>
     <UseWindowsForms>true</UseWindowsForms>
@@ -14,9 +14,9 @@
     <Compile Include="..\..\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="HIC.RDMP.Plugin" Version="7.0.0" />
-    <PackageReference Include="HIC.RDMP.Plugin.UI" Version="7.0.0" />
-    <PackageReference Include="System.Drawing.Common" Version="6.0.0-preview.7.21377.19" />
+    <PackageReference Include="HIC.RDMP.Plugin" Version="7.0.13" />
+    <PackageReference Include="HIC.RDMP.Plugin.UI" Version="7.0.13" />
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0-preview.5.22301.12" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="DeAnonymise\DeAnonymiseAgainstCohortUI.cs">
