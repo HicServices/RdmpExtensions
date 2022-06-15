@@ -10,7 +10,6 @@ namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
     public class AutomateExtractionRepositoryFinder : PluginRepositoryFinder
     {
         public static int Timeout = 5;
-        private Assembly _databaseAssembly;
         
         public AutomateExtractionRepositoryFinder(IRDMPPlatformRepositoryServiceLocator repositoryLocator) : base(repositoryLocator)
         {
@@ -21,12 +20,14 @@ namespace LoadModules.Extensions.AutomationPlugins.Data.Repository
         {
             if (RepositoryLocator.CatalogueRepository == null || RepositoryLocator.DataExportRepository == null)
                 return null;
+            
+            var patcher = new AutomateExtractionPluginPatcher();
 
             var compatibleServers = RepositoryLocator.CatalogueRepository.GetAllObjects<ExternalDatabaseServer>()
-                .Where(e => e.CreatedByAssembly == _databaseAssembly.GetName().Name).ToArray();
+                .Where(e => e.WasCreatedBy(patcher)).ToArray();
 
             if (compatibleServers.Length > 1)
-                throw new Exception("There are 2+ ExternalDatabaseServers of type '" + _databaseAssembly.GetName().Name + 
+                throw new Exception("There are 2+ ExternalDatabaseServers of type '" + patcher.Name + 
                                     "'.  This is not allowed, you must delete one.  The servers were called:" + 
                                     string.Join(",", compatibleServers.Select(s => s.ToString())));
 
