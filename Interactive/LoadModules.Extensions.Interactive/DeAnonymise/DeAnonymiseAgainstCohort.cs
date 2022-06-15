@@ -2,20 +2,23 @@
 using System.Data;
 using System.Windows.Forms;
 using FAnsi.Implementations.MicrosoftSQL;
+using Rdmp.Core.CommandExecution;
 using Rdmp.Core.DataFlowPipeline;
+using Rdmp.Core.DataFlowPipeline.Requirements;
 using ReusableLibraryCode.Checks;
 using ReusableLibraryCode.Progress;
 
 namespace LoadModules.Extensions.Interactive.DeAnonymise
 {
-    public class DeAnonymiseAgainstCohort: IPluginDataFlowComponent<DataTable>
+    public class DeAnonymiseAgainstCohort: IPluginDataFlowComponent<DataTable>, IPipelineRequirement<IBasicActivateItems>
     {
         /// <summary>
         /// When null (default) we launch a new DeAnonymiseAgainstCohortUI in order that the user selects which cohort he wants to deanonymise against. If you set this then you can 
         /// (for example in unit tests) specify an explicit implementation and dodge the gui.
         /// </summary>
         public IDeAnonymiseAgainstCohortConfigurationFulfiller ConfigurationGetter;
-        
+        private IBasicActivateItems _activator;
+
         public DataTable ProcessPipelineData(DataTable toProcess, IDataLoadEventListener listener, GracefulCancellationToken cancellationToken)
         {
             if (toProcess == null)
@@ -25,7 +28,7 @@ namespace LoadModules.Extensions.Interactive.DeAnonymise
 
             if (ConfigurationGetter == null)
             {
-                ConfigurationGetter = new DeAnonymiseAgainstCohortUI(toProcess);
+                ConfigurationGetter = new DeAnonymiseAgainstCohortUI(toProcess,_activator);
                 if(((Form)ConfigurationGetter).ShowDialog() != DialogResult.OK)
                     throw new Exception("User cancelled cohort picking dialog");
 
@@ -66,5 +69,9 @@ namespace LoadModules.Extensions.Interactive.DeAnonymise
            
         }
 
+        public void PreInitialize(IBasicActivateItems value, IDataLoadEventListener listener)
+        {
+            _activator = value;
+        }
     }
 }

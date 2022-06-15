@@ -7,6 +7,7 @@ using Rdmp.Core.CommandExecution;
 using Rdmp.Core.DataExport.Data;
 using Rdmp.Core.Repositories;
 using Rdmp.Core.Startup;
+using Rdmp.UI.ItemActivation;
 using Rdmp.UI.SimpleDialogs;
 using ReusableLibraryCode.Checks;
 
@@ -15,13 +16,15 @@ namespace LoadModules.Extensions.Interactive.DeAnonymise
     public partial class DeAnonymiseAgainstCohortUI : Form, IDeAnonymiseAgainstCohortConfigurationFulfiller
     {
         private readonly DataTable _toProcess;
+        private readonly IBasicActivateItems activator;
         private IDataExportRepository _dataExportRepository;
         public IExtractableCohort ChosenCohort { get; set; }
         public string OverrideReleaseIdentifier { get; set; }
         
-        public DeAnonymiseAgainstCohortUI(DataTable toProcess)
+        public DeAnonymiseAgainstCohortUI(DataTable toProcess, IBasicActivateItems activator)
         {
             _toProcess = toProcess;
+            this.activator = activator;
             InitializeComponent();
 
             try
@@ -56,7 +59,7 @@ namespace LoadModules.Extensions.Interactive.DeAnonymise
         private void btnChooseCohort_Click(object sender, EventArgs e)
         {
             var dialog = new SelectDialog<IMapsDirectlyToDatabaseTable>(
-                new DialogArgs() {WindowTitle = "Choose Cohort" },null, _dataExportRepository.GetAllObjects<ExtractableCohort>(), false);
+                new DialogArgs() {WindowTitle = "Choose Cohort" }, (IActivateItems)activator, _dataExportRepository.GetAllObjects<ExtractableCohort>(), false);
 
             if(dialog.ShowDialog() == DialogResult.OK)
                 if (dialog.Selected != null)
