@@ -61,22 +61,22 @@ namespace LoadModules.Extensions.AutomationPlugins {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized resource of type  Byte[] .
         /// </summary>
-        internal static System.Drawing.Bitmap AutomateExtraction {
+        internal static  Byte[]  AutomateExtraction {
             get {
                 object obj = ResourceManager.GetObject("AutomateExtraction", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return (( Byte[] )(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized resource of type  Byte[] .
         /// </summary>
-        internal static System.Drawing.Bitmap AutomateExtractionSchedule {
+        internal static  Byte[]  AutomateExtractionSchedule {
             get {
                 object obj = ResourceManager.GetObject("AutomateExtractionSchedule", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return (( Byte[] )(obj));
             }
         }
     }

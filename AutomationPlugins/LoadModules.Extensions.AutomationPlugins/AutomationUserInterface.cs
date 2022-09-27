@@ -9,9 +9,10 @@ using Rdmp.Core.Icons.IconOverlays;
 using Rdmp.Core.Icons.IconProvision;
 using Rdmp.Core.Providers.Nodes;
 using ReusableLibraryCode.Icons.IconProvision;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 
 namespace LoadModules.Extensions.AutomationPlugins
@@ -27,18 +28,18 @@ namespace LoadModules.Extensions.AutomationPlugins
             _overlayProvider = new IconOverlayProvider();
             try
             {
-                _scheduleIcon = AutomationImages.AutomateExtractionSchedule;
-                _automateExtractionIcon = AutomationImages.AutomateExtraction;
+                _scheduleIcon = Image.Load<Rgba32>(AutomationImages.AutomateExtractionSchedule);
+                _automateExtractionIcon = Image.Load<Rgba32>(AutomationImages.AutomateExtraction);
             }
             catch (Exception)
             {
-                _scheduleIcon = CatalogueIcons.NoIconAvailable;
-                _automateExtractionIcon = CatalogueIcons.NoIconAvailable;
+                _scheduleIcon = Image.Load<Rgba32>(CatalogueIcons.NoIconAvailable);
+                _automateExtractionIcon = Image.Load<Rgba32>(CatalogueIcons.NoIconAvailable);
             }
 
         }
 
-        public override Bitmap GetImage(object concept, OverlayKind kind = OverlayKind.None)
+        public override Image<Rgba32> GetImage(object concept, OverlayKind kind = OverlayKind.None)
         {
             if (concept is AutomateExtractionSchedule || concept as Type == typeof(AutomateExtractionSchedule))
             {
@@ -99,8 +100,8 @@ namespace LoadModules.Extensions.AutomationPlugins
 
         DateTime lastLook = DateTime.MinValue;
         private IconOverlayProvider _overlayProvider;
-        private Bitmap _scheduleIcon;
-        private Bitmap _automateExtractionIcon;
+        private Image<Rgba32> _scheduleIcon;
+        private Image<Rgba32> _automateExtractionIcon;
 
         private void TryGettingAutomationRepository()
         {

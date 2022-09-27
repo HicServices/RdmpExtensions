@@ -3,7 +3,8 @@ using Rdmp.Core.CommandExecution;
 using Rdmp.Core.CommandExecution.AtomicCommands;
 using Rdmp.Core.DataExport.Data;
 using ReusableLibraryCode.Icons.IconProvision;
-using System.Drawing;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System.Linq;
 
 namespace LoadModules.Extensions.AutomationPlugins
@@ -43,7 +44,7 @@ namespace LoadModules.Extensions.AutomationPlugins
             }
         }
 
-        public override Image GetImage(IIconProvider iconProvider)
+        public override Image<Rgba32> GetImage(IIconProvider iconProvider)
         {
             return iconProvider.GetImage(typeof(AutomateExtraction), OverlayKind.Add);
         }
