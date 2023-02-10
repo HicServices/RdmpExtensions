@@ -15,8 +15,10 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         [SetUp]
         public void IsPython2Installed()
         {
-            var p = new PythonDataProvider();
-            p.Version = PythonVersion.Version2;
+            var p = new PythonDataProvider
+            {
+                Version = PythonVersion.Version2
+            };
             try
             {
                 var version = p.GetPythonVersion();
@@ -43,10 +45,12 @@ namespace LoadModules.Extensions.Python.Tests.Unit
             File.Delete(py);
             File.WriteAllText(py, MyPythonScript);
 
-            var provider = new PythonDataProvider();
-            provider.Version = PythonVersion.Version2;
-            provider.FullPathToPythonScriptToRun = (wrapFilename ? "\"" : "") + py + (wrapFilename ? "\"" : "");
-            provider.MaximumNumberOfSecondsToLetScriptRunFor = 0;
+            var provider = new PythonDataProvider
+            {
+                Version = PythonVersion.Version2,
+                FullPathToPythonScriptToRun = (wrapFilename ? "\"" : "") + py + (wrapFilename ? "\"" : ""),
+                MaximumNumberOfSecondsToLetScriptRunFor = 0
+            };
 
             //call with accept all
             provider.Check(new AcceptAllCheckNotifier());
@@ -64,10 +68,12 @@ namespace LoadModules.Extensions.Python.Tests.Unit
             File.Delete(py);
             File.WriteAllText(py, MyPythonScript);
 
-            var provider = new PythonDataProvider();
-            provider.Version = PythonVersion.Version2;
-            provider.FullPathToPythonScriptToRun = py;
-            provider.MaximumNumberOfSecondsToLetScriptRunFor = 5;
+            var provider = new PythonDataProvider
+            {
+                Version = PythonVersion.Version2,
+                FullPathToPythonScriptToRun = py,
+                MaximumNumberOfSecondsToLetScriptRunFor = 5
+            };
 
             //call with accept all
             provider.Check(new AcceptAllCheckNotifier());
@@ -75,7 +81,7 @@ namespace LoadModules.Extensions.Python.Tests.Unit
             //new MockRepository().DynamicMock<IDataLoadJob>()
             var ex = Assert.Throws<Exception>(()=>provider.Fetch(new ThrowImmediatelyDataLoadJob(), new GracefulCancellationToken()));
 
-            Assert.IsTrue(ex.Message.Contains("Python command timed out"));
+            Assert.IsTrue(ex?.Message.Contains("Python command timed out"),$"Unexpected exception for timeout: {ex?.Message}");
 
         }
 
@@ -89,11 +95,13 @@ namespace LoadModules.Extensions.Python.Tests.Unit
             File.Delete(py);
             File.WriteAllText(py, MyPythonScript);
 
-            var provider = new PythonDataProvider();
-            provider.Version = PythonVersion.Version2;
-            provider.FullPathToPythonScriptToRun = py;
-            provider.MaximumNumberOfSecondsToLetScriptRunFor = 5;
-            provider.OverridePythonExecutablePath = new FileInfo(py);
+            var provider = new PythonDataProvider
+            {
+                Version = PythonVersion.Version2,
+                FullPathToPythonScriptToRun = py,
+                MaximumNumberOfSecondsToLetScriptRunFor = 5,
+                OverridePythonExecutablePath = new FileInfo(py)
+            };
             //call with accept all
             var ex = Assert.Throws<Exception>(()=>provider.Check(new AcceptAllCheckNotifier()));
 
@@ -103,10 +111,12 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         [Test]
         public void PythonScript_NonExistentFile()
         {
-            var provider = new PythonDataProvider();
-            provider.Version = PythonVersion.Version2;
-            provider.FullPathToPythonScriptToRun = "ImANonExistentFile.py";
-            provider.MaximumNumberOfSecondsToLetScriptRunFor = 50;
+            var provider = new PythonDataProvider
+            {
+                Version = PythonVersion.Version2,
+                FullPathToPythonScriptToRun = "ImANonExistentFile.py",
+                MaximumNumberOfSecondsToLetScriptRunFor = 50
+            };
             //call with accept all
             provider.Check(new AcceptAllCheckNotifier());
 
