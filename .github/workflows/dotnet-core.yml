@@ -23,22 +23,11 @@ jobs:
         run: |
           for /f tokens^=1^,2^ delims^=^" %%i in (SharedAssemblyInfo.cs) do @if "%%i"=="[assembly: AssemblyVersion(" echo ::set-output name=version::%%j
           for /f tokens^=2^,4^ delims^=^" %%i in (AutomationPlugins/LoadModules.Extensions.AutomationPlugins/LoadModules.Extensions.AutomationPlugins.csproj) do @if "%%i"=="HIC.RDMP.Plugin" echo ::set-output name=rdmpversion::%%j
-      - name: Install MS SQL 2019 Express LocalDB
-        run: |
-          Remove-Item -Path $env:ChocolateyInstall -Recurse -Force
-          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-          choco install -y -r sqllocaldb --no-progress
-      - name: Initialise LocalDB
-        shell: bash
-        run: |
-          SqlLocalDB.exe create MSSQLLocalDB -s
-          sqlcmd -l 180 -S '(localdb)\MSSQLLocalDB' -Q "SELECT @@VERSION;"
-          sed -i'' -e 's/localhost/\(localdb\)\\MSSQLLocalDB/' Tests.Common/TestDatabases.txt
       - name: Set up database
         run: |
           Invoke-WebRequest -Uri https://github.com/HicServices/RDMP/releases/download/v${{ steps.version.outputs.rdmpversion }}/rdmp-${{ steps.version.outputs.rdmpversion }}-cli-win-x64.zip -OutFile rdmp.zip
           Expand-Archive -Path rdmp.zip -DestinationPath .\rdmpcli
-          cmd.exe /c rdmpcli\rdmp.exe install --createdatabasetimeout 180 "(localdb)\MSSQLLocalDB" TEST_
+          cmd.exe /c rdmpcli\rdmp.exe install --createdatabasetimeout 180 localhost TEST_ -d
       - name: Test
         run: |
           nuget restore
