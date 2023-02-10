@@ -35,14 +35,14 @@ namespace LoadModules.Extensions.Interactive.Tests
             dt.Columns.Add("ReleaseID");
             dt.Columns.Add("Animal");
 
-            foreach (var kvp in _cohortKeysGenerated)
-                dt.Rows.Add(kvp.Value, "fish");
+            foreach (var (_, value) in _cohortKeysGenerated)
+                dt.Rows.Add(value, "fish");
 
             if (doRedundantOverride)
                 OverrideReleaseIdentifier = "ReleaseID";
 
+            using var clone = dt.Copy();  // Grab a copy of the pre-pipeline data to compare
             var result = _deAnonymiseAgainstCohort.ProcessPipelineData(dt, new ThrowImmediatelyDataLoadEventListener(), new GracefulCancellationToken());
-            using var clone = dt.Copy(); //Trigger re-fetch after pipeline run
 
             Assert.IsTrue(result.Columns.Contains("PrivateID"));
 
@@ -70,8 +70,8 @@ namespace LoadModules.Extensions.Interactive.Tests
             OverrideReleaseIdentifier = "HappyFunTimes";
             try
             {
+                using var clone = dt.Copy();  // Grab a copy of the pre-pipeline data to compare
                 using var result = _deAnonymiseAgainstCohort.ProcessPipelineData(dt, new ThrowImmediatelyDataLoadEventListener(), new GracefulCancellationToken());
-                using var clone = dt.Copy();  // Apparently triggers re-fetch
 
                 Assert.IsTrue(result.Columns.Contains("PrivateID"));
 
@@ -99,7 +99,7 @@ namespace LoadModules.Extensions.Interactive.Tests
 
             var ex = Assert.Throws<ArgumentException>(() => _deAnonymiseAgainstCohort.ProcessPipelineData(dt, new ThrowImmediatelyDataLoadEventListener(), new GracefulCancellationToken()));
 
-            Assert.IsTrue(ex.Message.StartsWith("Column 'ReleaseID' does not belong to table"));
+            Assert.IsTrue(ex?.Message.StartsWith("Column 'ReleaseID' does not belong to table"),$"Exception text was '{ex?.Message}'");
         }
 
         [Test]
