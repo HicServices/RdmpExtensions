@@ -25,6 +25,7 @@ jobs:
           for /f tokens^=2^,4^ delims^=^" %%i in (AutomationPlugins/LoadModules.Extensions.AutomationPlugins/LoadModules.Extensions.AutomationPlugins.csproj) do @if "%%i"=="HIC.RDMP.Plugin" echo ::set-output name=rdmpversion::%%j
       - name: Install MS SQL 2019 Express LocalDB
         run: |
+          Remove-Item -Path $env:ChocolateyInstall -Recurse -Force
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
           choco install -y -r sqllocaldb --no-progress
       - name: Initialise LocalDB
