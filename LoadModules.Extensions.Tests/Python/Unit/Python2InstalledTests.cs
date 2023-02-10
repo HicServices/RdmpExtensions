@@ -15,13 +15,13 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         [SetUp]
         public void IsPython2Installed()
         {
-            PythonDataProvider p = new PythonDataProvider();
+            var p = new PythonDataProvider();
             p.Version = PythonVersion.Version2;
             try
             {
-                string version = p.GetPythonVersion();
+                var version = p.GetPythonVersion();
 
-                Console.WriteLine("Found python version:" + version);
+                Console.WriteLine($"Found python version:{version}");
             }
             catch (Exception e)
             {
@@ -37,13 +37,13 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         [TestCase(true)]
         public void PythonScript_Version2_GoodSyntax(bool wrapFilename)
         {
-            string MyPythonScript = @"print 'Hello World'";
+            var MyPythonScript = @"print 'Hello World'";
 
             var py = Path.Combine(TestContext.CurrentContext.WorkDirectory, "Myscript.py");
             File.Delete(py);
             File.WriteAllText(py, MyPythonScript);
 
-            PythonDataProvider provider = new PythonDataProvider();
+            var provider = new PythonDataProvider();
             provider.Version = PythonVersion.Version2;
             provider.FullPathToPythonScriptToRun = (wrapFilename ? "\"" : "") + py + (wrapFilename ? "\"" : "");
             provider.MaximumNumberOfSecondsToLetScriptRunFor = 0;
@@ -58,13 +58,13 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         [Test]
         public void PythonScript_Timeout()
         {
-            string MyPythonScript = @"s = raw_input ('==>')";
+            var MyPythonScript = @"s = raw_input ('==>')";
 
             var py = Path.Combine(TestContext.CurrentContext.WorkDirectory, "Myscript.py");
             File.Delete(py);
             File.WriteAllText(py, MyPythonScript);
 
-            PythonDataProvider provider = new PythonDataProvider();
+            var provider = new PythonDataProvider();
             provider.Version = PythonVersion.Version2;
             provider.FullPathToPythonScriptToRun = py;
             provider.MaximumNumberOfSecondsToLetScriptRunFor = 5;
@@ -82,14 +82,14 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         [Test]
         public void PythonScript_OverrideExecutablePath_DodgyFileType()
         {
-            string MyPythonScript = @"s = raw_input ('==>')";
+            var MyPythonScript = @"s = raw_input ('==>')";
 
             var py = Path.Combine(TestContext.CurrentContext.WorkDirectory, "Myscript.py");
 
             File.Delete(py);
             File.WriteAllText(py, MyPythonScript);
 
-            PythonDataProvider provider = new PythonDataProvider();
+            var provider = new PythonDataProvider();
             provider.Version = PythonVersion.Version2;
             provider.FullPathToPythonScriptToRun = py;
             provider.MaximumNumberOfSecondsToLetScriptRunFor = 5;
@@ -103,7 +103,7 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         [Test]
         public void PythonScript_NonExistentFile()
         {
-            PythonDataProvider provider = new PythonDataProvider();
+            var provider = new PythonDataProvider();
             provider.Version = PythonVersion.Version2;
             provider.FullPathToPythonScriptToRun = "ImANonExistentFile.py";
             provider.MaximumNumberOfSecondsToLetScriptRunFor = 50;

@@ -20,14 +20,16 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         [Test]
         public void PythonScript_OverrideExecutablePath_VersionMismatch()
         {
-            string MyPythonScript = @"s = print('==>')";
+            var MyPythonScript = @"s = print('==>')";
             File.Delete("Myscript.py");
             File.WriteAllText("Myscript.py", MyPythonScript);
 
-            PythonDataProvider provider = new PythonDataProvider();
-            provider.Version = PythonVersion.Version3;
-            provider.FullPathToPythonScriptToRun = "Myscript.py";
-            provider.MaximumNumberOfSecondsToLetScriptRunFor = 500;
+            var provider = new PythonDataProvider
+            {
+                MaximumNumberOfSecondsToLetScriptRunFor = 500,
+                Version = PythonVersion.Version3,
+                FullPathToPythonScriptToRun = "Myscript.py"
+            };
             //call with accept all
             provider.Check(new AcceptAllCheckNotifier());// version 3 should now be installed
 
@@ -35,10 +37,13 @@ namespace LoadModules.Extensions.Python.Tests.Unit
             provider.OverridePythonExecutablePath = new FileInfo(Path.Combine(provider.GetFullPythonInstallDirectory(), "python.exe"));
             provider.Version = PythonVersion.Version2;
 
-            provider.Check(new ThrowImmediatelyCheckNotifier());
             //so we now know that version 3 is installed, and we have overriden the python path to the .exe explicitly and we are trying to launch with Version2 enum now
-            var ex = Assert.Throws<Exception>(()=>provider.Fetch(MockRepository.GenerateStub<IDataLoadJob>(), new GracefulCancellationToken()));
-            StringAssert.Contains(@"which is incompatible with the desired version 2.7.1",ex.Message);
+            var ex = Assert.Throws<Exception>(()=>
+                {
+                    provider.Check(new ThrowImmediatelyCheckNotifier());
+                    provider.Fetch(MockRepository.GenerateStub<IDataLoadJob>(), new GracefulCancellationToken());
+                });
+            StringAssert.Contains(@"which is incompatible with the desired version 2.7.1",ex?.Message);
         }
     }
 }
