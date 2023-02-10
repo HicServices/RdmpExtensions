@@ -62,7 +62,7 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         [Test]
         public void PythonScript_Timeout()
         {
-            var MyPythonScript = @"s = raw_input ('==>')";
+            var MyPythonScript = "import time\ntime.sleep(10)";
 
             var py = Path.Combine(TestContext.CurrentContext.WorkDirectory, "Myscript.py");
             File.Delete(py);
