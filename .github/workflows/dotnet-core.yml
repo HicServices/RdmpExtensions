@@ -24,7 +24,7 @@ jobs:
           for /f tokens^=1^,2^ delims^=^" %%i in (SharedAssemblyInfo.cs) do @if "%%i"=="[assembly: AssemblyVersion(" echo ::set-output name=version::%%j
           for /f tokens^=2^,4^ delims^=^" %%i in (AutomationPlugins/LoadModules.Extensions.AutomationPlugins/LoadModules.Extensions.AutomationPlugins.csproj) do @if "%%i"=="HIC.RDMP.Plugin" echo ::set-output name=rdmpversion::%%j
       - name: Install MS SQL 2019 Express LocalDB
-        uses: crazy-max/ghaction-chocolatey@v2
+        uses: crazy-max/ghaction-chocolatey@v2.1.0
         with:
           args: install -r sqllocaldb --no-progress -y
       - name: Initialise LocalDB
