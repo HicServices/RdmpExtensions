@@ -46,6 +46,7 @@ namespace LoadModules.Extensions.Tests
         }
 
         public HICDatabaseConfiguration Configuration { get; private set; }
+        public bool PersistentRaw { get; set; }
 
         public object Payload { get; set; }
 
