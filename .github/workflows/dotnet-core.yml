@@ -42,7 +42,7 @@ jobs:
           cmd /c rdmpcli\rdmp.exe pack --file HIC.Rdmp.Extensions.Plugin.${{ steps.version.outputs.version }}.nupkg --CatalogueConnectionString "Data Source=localhost;Database=TEST_Catalogue;Integrated Security=sspi;Encrypt=true;TrustServerCertificate=true" --DataExportConnectionString "Data Source=localhost;Database=TEST_DataExport;Integrated Security=sspi;Encrypt=true;TrustServerCertificate=true"
           cmd /c rdmpcli\rdmp.exe cmd listsupportedcommands --CatalogueConnectionString "Data Source=localhost;Database=TEST_Catalogue;Integrated Security=sspi;Encrypt=true;TrustServerCertificate=true" --DataExportConnectionString "Data Source=localhost;Database=TEST_DataExport;Integrated Security=sspi;Encrypt=true;TrustServerCertificate=true"
       - name: Store created nupkg files
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: ./*.nupkg
           retention-days: 1
