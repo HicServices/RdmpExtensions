@@ -15,13 +15,15 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         [SetUp]
         public void IsPython2Installed()
         {
-            PythonDataProvider p = new PythonDataProvider();
-            p.Version = PythonVersion.Version2;
+            var p = new PythonDataProvider
+            {
+                Version = PythonVersion.Version2
+            };
             try
             {
-                string version = p.GetPythonVersion();
+                var version = p.GetPythonVersion();
 
-                Console.WriteLine("Found python version:" + version);
+                Console.WriteLine($"Found python version:{version}");
             }
             catch (Exception e)
             {
@@ -37,16 +39,18 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         [TestCase(true)]
         public void PythonScript_Version2_GoodSyntax(bool wrapFilename)
         {
-            string MyPythonScript = @"print 'Hello World'";
+            var MyPythonScript = @"print 'Hello World'";
 
             var py = Path.Combine(TestContext.CurrentContext.WorkDirectory, "Myscript.py");
             File.Delete(py);
             File.WriteAllText(py, MyPythonScript);
 
-            PythonDataProvider provider = new PythonDataProvider();
-            provider.Version = PythonVersion.Version2;
-            provider.FullPathToPythonScriptToRun = (wrapFilename ? "\"" : "") + py + (wrapFilename ? "\"" : "");
-            provider.MaximumNumberOfSecondsToLetScriptRunFor = 0;
+            var provider = new PythonDataProvider
+            {
+                Version = PythonVersion.Version2,
+                FullPathToPythonScriptToRun = (wrapFilename ? "\"" : "") + py + (wrapFilename ? "\"" : ""),
+                MaximumNumberOfSecondsToLetScriptRunFor = 0
+            };
 
             //call with accept all
             provider.Check(new AcceptAllCheckNotifier());
@@ -58,16 +62,18 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         [Test]
         public void PythonScript_Timeout()
         {
-            string MyPythonScript = @"s = raw_input ('==>')";
+            var MyPythonScript = "import time\ntime.sleep(10)";
 
             var py = Path.Combine(TestContext.CurrentContext.WorkDirectory, "Myscript.py");
             File.Delete(py);
             File.WriteAllText(py, MyPythonScript);
 
-            PythonDataProvider provider = new PythonDataProvider();
-            provider.Version = PythonVersion.Version2;
-            provider.FullPathToPythonScriptToRun = py;
-            provider.MaximumNumberOfSecondsToLetScriptRunFor = 5;
+            var provider = new PythonDataProvider
+            {
+                Version = PythonVersion.Version2,
+                FullPathToPythonScriptToRun = py,
+                MaximumNumberOfSecondsToLetScriptRunFor = 5
+            };
 
             //call with accept all
             provider.Check(new AcceptAllCheckNotifier());
@@ -75,25 +81,27 @@ namespace LoadModules.Extensions.Python.Tests.Unit
             //new MockRepository().DynamicMock<IDataLoadJob>()
             var ex = Assert.Throws<Exception>(()=>provider.Fetch(new ThrowImmediatelyDataLoadJob(), new GracefulCancellationToken()));
 
-            Assert.IsTrue(ex.Message.Contains("Python command timed out"));
+            Assert.IsTrue(ex?.Message.Contains("Python command timed out"),$"Unexpected exception for timeout: {ex?.Message}");
 
         }
 
         [Test]
         public void PythonScript_OverrideExecutablePath_DodgyFileType()
         {
-            string MyPythonScript = @"s = raw_input ('==>')";
+            var MyPythonScript = @"s = raw_input ('==>')";
 
             var py = Path.Combine(TestContext.CurrentContext.WorkDirectory, "Myscript.py");
 
             File.Delete(py);
             File.WriteAllText(py, MyPythonScript);
 
-            PythonDataProvider provider = new PythonDataProvider();
-            provider.Version = PythonVersion.Version2;
-            provider.FullPathToPythonScriptToRun = py;
-            provider.MaximumNumberOfSecondsToLetScriptRunFor = 5;
-            provider.OverridePythonExecutablePath = new FileInfo(py);
+            var provider = new PythonDataProvider
+            {
+                Version = PythonVersion.Version2,
+                FullPathToPythonScriptToRun = py,
+                MaximumNumberOfSecondsToLetScriptRunFor = 5,
+                OverridePythonExecutablePath = new FileInfo(py)
+            };
             //call with accept all
             var ex = Assert.Throws<Exception>(()=>provider.Check(new AcceptAllCheckNotifier()));
 
@@ -103,10 +111,12 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         [Test]
         public void PythonScript_NonExistentFile()
         {
-            PythonDataProvider provider = new PythonDataProvider();
-            provider.Version = PythonVersion.Version2;
-            provider.FullPathToPythonScriptToRun = "ImANonExistentFile.py";
-            provider.MaximumNumberOfSecondsToLetScriptRunFor = 50;
+            var provider = new PythonDataProvider
+            {
+                Version = PythonVersion.Version2,
+                FullPathToPythonScriptToRun = "ImANonExistentFile.py",
+                MaximumNumberOfSecondsToLetScriptRunFor = 50
+            };
             //call with accept all
             provider.Check(new AcceptAllCheckNotifier());
 

@@ -58,24 +58,21 @@ namespace LoadModules.Extensions.Python.DataProvider
             //make sure Python is installed
             try
             {
-                string version = GetPythonVersion();
+                var version = GetPythonVersion();
 
                 if (version.StartsWith(GetExpectedPythonVersion()))
                     notifier.OnCheckPerformed(
                         new CheckEventArgs(
-                            "Found Expected Python version " + version + " on the host machine at directory " +
-                            GetFullPythonInstallDirectory(), CheckResult.Success));
+                            $"Found Expected Python version {version} on the host machine at directory {GetFullPythonInstallDirectory()}", CheckResult.Success));
                 else if (version.StartsWith(GetCompatiblePythonVersion()))
                     notifier.OnCheckPerformed(
                         new CheckEventArgs(
-                            "Found Compatible Python version " + version + " on the host machine at directory " +
-                            GetFullPythonInstallDirectory(), CheckResult.Success));
+                            $"Found Compatible Python version {version} on the host machine at directory {GetFullPythonInstallDirectory()}", CheckResult.Success));
                 else
                 {
                     notifier.OnCheckPerformed(
                             new CheckEventArgs(
-                                "Python version on the host machine is " + version +
-                                " which is incompatible with the desired version " + GetExpectedPythonVersion(),
+                                $"Python version on the host machine is {version} which is incompatible with the desired version {GetExpectedPythonVersion()}",
                                 CheckResult.Fail));
                 }
             }
@@ -86,21 +83,21 @@ namespace LoadModules.Extensions.Python.DataProvider
             catch (Exception e)
             {
                 //python is not installed
-                if (e.Message.Equals("The system cannot find the file specified"))
-                    notifier.OnCheckPerformed(new CheckEventArgs("Python is not installed on the host", CheckResult.Fail,e));
-                else
-                    notifier.OnCheckPerformed(new CheckEventArgs(e.Message, CheckResult.Fail, e));
+                notifier.OnCheckPerformed(e.Message.Equals("The system cannot find the file specified")
+                    ? new CheckEventArgs("Python is not installed on the host", CheckResult.Fail, e)
+                    : new CheckEventArgs(e.Message, CheckResult.Fail, e));
             }
 
-            if (FullPathToPythonScriptToRun.Contains(" ") && !FullPathToPythonScriptToRun.Contains("\""))
+            if (FullPathToPythonScriptToRun?.Contains(" ")==true && FullPathToPythonScriptToRun?.Contains("\"")==false)
                 notifier.OnCheckPerformed(
                     new CheckEventArgs(
                         "FullPathToPythonScriptToRun contains spaces but is not wrapped by quotes which will likely fail when we assemble the python execute command",
                         CheckResult.Fail));
 
-            if (!File.Exists(FullPathToPythonScriptToRun.Trim('\"', '\'')))
+            if (!File.Exists(FullPathToPythonScriptToRun?.Trim('\"', '\'')))
                 notifier.OnCheckPerformed(
-                    new CheckEventArgs("File " + FullPathToPythonScriptToRun + " does not exist (FullPathToPythonScriptToRun)",
+                    new CheckEventArgs(
+                        $"File {FullPathToPythonScriptToRun} does not exist (FullPathToPythonScriptToRun)",
                         CheckResult.Warning));
         }
 
@@ -110,7 +107,7 @@ namespace LoadModules.Extensions.Python.DataProvider
             
             var toMemory = new ToMemoryDataLoadEventListener(true);
 
-            int result = ExecuteProcess(toMemory, info, 600);
+            var result = ExecuteProcess(toMemory, info, 600);
             
             if (result != 0)
                 return null;
@@ -120,7 +117,7 @@ namespace LoadModules.Extensions.Python.DataProvider
             if (msg != null)
                 return msg.Message;
 
-            throw new Exception("Call to " + info.Arguments + " did not return any value but exited with code " + result);
+            throw new Exception($"Call to {info.Arguments} did not return any value but exited with code {result}");
         }
 
         private ProcessStartInfo GetPythonCommand(string command)
@@ -130,26 +127,26 @@ namespace LoadModules.Extensions.Python.DataProvider
             if (OverridePythonExecutablePath == null)
             {
                 //e.g. c:\python34
-                string instalDir = GetFullPythonInstallDirectory();
-                exeFullPath = Path.Combine(instalDir, "python");
+                var installDir = GetFullPythonInstallDirectory();
+                exeFullPath = Path.Combine(installDir, "python");
             }
             else
             {
                 if (!OverridePythonExecutablePath.Exists)
-                    throw new FileNotFoundException("The specified OverridePythonExecutablePath:" +
-                                                    OverridePythonExecutablePath +
-                                                    " does not exist");
+                    throw new FileNotFoundException(
+                        $"The specified OverridePythonExecutablePath:{OverridePythonExecutablePath} does not exist");
                 else
                     if(OverridePythonExecutablePath.Name != "python.exe")
-                        throw new FileNotFoundException("The specified OverridePythonExecutablePath:" +
-                                                    OverridePythonExecutablePath +
-                                                    " file is not called python.exe... what is going on here?");
+                        throw new FileNotFoundException(
+                            $"The specified OverridePythonExecutablePath:{OverridePythonExecutablePath} file is not called python.exe... what is going on here?");
 
                 exeFullPath = OverridePythonExecutablePath.FullName;
             }
 
-            ProcessStartInfo info = new ProcessStartInfo(exeFullPath);
-            info.Arguments = command;
+            var info = new ProcessStartInfo(exeFullPath)
+            {
+                Arguments = command
+            };
 
             return info;
         }
@@ -161,7 +158,7 @@ namespace LoadModules.Extensions.Python.DataProvider
 
         public ExitCodeType Fetch(IDataLoadJob job, GracefulCancellationToken cancellationToken)
         {
-            ProcessStartInfo processStartInfo = GetPythonCommand(FullPathToPythonScriptToRun);
+            var processStartInfo = GetPythonCommand(FullPathToPythonScriptToRun);
             
             int exitCode;
             try
@@ -174,7 +171,8 @@ namespace LoadModules.Extensions.Python.DataProvider
                 return ExitCodeType.Error;
             }
 
-            job.OnNotify(this, new NotifyEventArgs(exitCode == 0 ? ProgressEventType.Information : ProgressEventType.Error, "Python script terminated with exit code " + exitCode));
+            job.OnNotify(this, new NotifyEventArgs(exitCode == 0 ? ProgressEventType.Information : ProgressEventType.Error,
+                $"Python script terminated with exit code {exitCode}"));
 
             return exitCode == 0 ? ExitCodeType.Success : ExitCodeType.Error;
         }
@@ -189,8 +187,8 @@ namespace LoadModules.Extensions.Python.DataProvider
 
             Process p = null;
 
-            bool allErrorDataConsumed = false;
-            bool allOutputDataConsumed = false;
+            var allErrorDataConsumed = false;
+            var allOutputDataConsumed = false;
 
             try
             {
@@ -206,30 +204,31 @@ namespace LoadModules.Extensions.Python.DataProvider
             }
             catch (Exception e)
             {
-                throw new Exception("Failed to launch:" + Environment.NewLine + processStartInfo.FileName +Environment.NewLine +  " with Arguments:" + processStartInfo.Arguments,e);
+                throw new Exception(
+                    $"Failed to launch:{Environment.NewLine}{processStartInfo.FileName}{Environment.NewLine} with Arguments:{processStartInfo.Arguments}",e);
             }
             
             // To avoid deadlocks, always read the output stream first and then wait.
-            DateTime startTime = DateTime.Now;
+            var startTime = DateTime.Now;
 
             
             while (!p.WaitForExit(100))//while process has not exited
             {
-                if (TimeoutExpired(startTime))//if timeout expired
-                {
-                    bool killed = false;
-                    try
-                    {
-                        p.Kill();
-                        killed = true;
-                    }
-                    catch (Exception)
-                    {
-                        killed = false;
-                    }
+                if (!TimeoutExpired(startTime)) continue; //if timeout expired
 
-                    throw new TimeoutException("Process command " + processStartInfo.FileName + " with arguments " + processStartInfo.Arguments + " did not complete after  " + maximumNumberOfSecondsToLetScriptRunFor + " seconds " + (killed ? "(After timeout we killed the process successfully)" : "(We also failed to kill the process after the timeout expired)"));
+                var killed = false;
+                try
+                {
+                    p.Kill();
+                    killed = true;
                 }
+                catch (Exception)
+                {
+                    killed = false;
+                }
+
+                throw new TimeoutException(
+                    $"Process command {processStartInfo.FileName} with arguments {processStartInfo.Arguments} did not complete after  {maximumNumberOfSecondsToLetScriptRunFor} seconds {(killed ? "(After timeout we killed the process successfully)" : "(We also failed to kill the process after the timeout expired)")}");
             }
 
             while (!allErrorDataConsumed || !allOutputDataConsumed)

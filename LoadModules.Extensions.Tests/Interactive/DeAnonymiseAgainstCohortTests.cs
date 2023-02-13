@@ -31,28 +31,26 @@ namespace LoadModules.Extensions.Interactive.Tests
         [TestCase(false)]
         public void Normal_ReleaseDeAnonToPrivateKeys(bool doRedundantOverride)
         {
-            DataTable dt = new DataTable();
+            using var dt = new DataTable();
             dt.Columns.Add("ReleaseID");
             dt.Columns.Add("Animal");
 
-            foreach (KeyValuePair<string, string> kvp in _cohortKeysGenerated)
-                dt.Rows.Add(kvp.Value, "fish");
-
-            var clone = dt.Copy();
+            foreach (var (_, value) in _cohortKeysGenerated)
+                dt.Rows.Add(value, "fish");
 
             if (doRedundantOverride)
                 OverrideReleaseIdentifier = "ReleaseID";
 
-            DataTable result = _deAnonymiseAgainstCohort.ProcessPipelineData(dt, new ThrowImmediatelyDataLoadEventListener(), new GracefulCancellationToken());
-            dt = clone;//refetch the original because ProcessPipelineData is a destructive operation
+            using var clone = dt.Copy();  // Grab a copy of the pre-pipeline data to compare
+            var result = _deAnonymiseAgainstCohort.ProcessPipelineData(dt, new ThrowImmediatelyDataLoadEventListener(), new GracefulCancellationToken());
 
             Assert.IsTrue(result.Columns.Contains("PrivateID"));
 
-            for(int i=0;i<result.Rows.Count;i++)
+            for(var i=0;i<result.Rows.Count;i++)
             {
                 Assert.AreEqual(
                     _cohortKeysGenerated[(string)result.Rows[i]["PrivateID"]],
-                    dt.Rows[i]["ReleaseID"]);
+                    clone.Rows[i]["ReleaseID"]);
             }
 
             OverrideReleaseIdentifier = null;
@@ -61,28 +59,27 @@ namespace LoadModules.Extensions.Interactive.Tests
         [Test]
         public void Freaky_ColumnNameOverriding()
         {
-            DataTable dt = new DataTable();
+            using var dt = new DataTable();
             dt.Columns.Add("HappyFunTimes");
             dt.Columns.Add("Animal");
 
-            foreach (KeyValuePair<string, string> kvp in _cohortKeysGenerated)
-                dt.Rows.Add(kvp.Value, "fish");
+            foreach (var (_, value) in _cohortKeysGenerated)
+                dt.Rows.Add(value, "fish");
 
-            var clone = dt.Copy();
 
             OverrideReleaseIdentifier = "HappyFunTimes";
             try
             {
-                DataTable result = _deAnonymiseAgainstCohort.ProcessPipelineData(dt, new ThrowImmediatelyDataLoadEventListener(), new GracefulCancellationToken());
-                dt = clone;//refetch the original because ProcessPipelineData is a destructive operation
+                using var clone = dt.Copy();  // Grab a copy of the pre-pipeline data to compare
+                using var result = _deAnonymiseAgainstCohort.ProcessPipelineData(dt, new ThrowImmediatelyDataLoadEventListener(), new GracefulCancellationToken());
 
                 Assert.IsTrue(result.Columns.Contains("PrivateID"));
 
-                for (int i = 0; i < result.Rows.Count; i++)
+                for (var i = 0; i < result.Rows.Count; i++)
                 {
                     Assert.AreEqual(
                         _cohortKeysGenerated[(string)result.Rows[i]["PrivateID"]],
-                        dt.Rows[i]["HappyFunTimes"]);
+                        clone.Rows[i]["HappyFunTimes"]);
                 }
             }
             finally
@@ -94,24 +91,24 @@ namespace LoadModules.Extensions.Interactive.Tests
         [Test]
         public void Throws_ColumnMissing()
         {
-            DataTable dt = new DataTable();
+            using var dt = new DataTable();
             dt.Columns.Add("Animal");
 
-            foreach (KeyValuePair<string, string> kvp in _cohortKeysGenerated)
+            foreach (var (key, value) in _cohortKeysGenerated)
                 dt.Rows.Add("fish");
 
             var ex = Assert.Throws<ArgumentException>(() => _deAnonymiseAgainstCohort.ProcessPipelineData(dt, new ThrowImmediatelyDataLoadEventListener(), new GracefulCancellationToken()));
 
-            Assert.IsTrue(ex.Message.StartsWith("Column 'ReleaseID' does not belong to table"));
+            Assert.IsTrue(ex?.Message.StartsWith("Column 'ReleaseID' does not belong to table"),$"Exception text was '{ex?.Message}'");
         }
 
         [Test]
         public void Throws_ColumnMissingWithOverride()
         {
-            DataTable dt = new DataTable();
+            using var dt = new DataTable();
             dt.Columns.Add("Animal");
 
-            foreach (KeyValuePair<string, string> kvp in _cohortKeysGenerated)
+            foreach (var (key, value) in _cohortKeysGenerated)
                 dt.Rows.Add("fish");
 
             OverrideReleaseIdentifier = "HappyFace";

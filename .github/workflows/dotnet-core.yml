@@ -6,12 +6,14 @@ env:
   MSSQL_SA_PASSWORD: "YourStrong!Passw0rd"
   ACCEPT_EULA: "Y"
   MSSQL_PID: "developer"
+  DOTNET_NOLOGO: 1
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   
 jobs:
   package:
-    runs-on: windows-latest
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 5.0.200
@@ -23,13 +25,12 @@ jobs:
           for /f tokens^=2^,4^ delims^=^" %%i in (AutomationPlugins/LoadModules.Extensions.AutomationPlugins/LoadModules.Extensions.AutomationPlugins.csproj) do @if "%%i"=="HIC.RDMP.Plugin" echo ::set-output name=rdmpversion::%%j
       - name: Set up database
         run: |
-          Invoke-WebRequest -Uri https://github.com/HicServices/RDMP/releases/download/v${{ steps.version.outputs.rdmpversion }}/rdmp-cli-win-x64.zip -OutFile rdmp.zip
+          Invoke-WebRequest -Uri https://github.com/HicServices/RDMP/releases/download/v${{ steps.version.outputs.rdmpversion }}/rdmp-${{ steps.version.outputs.rdmpversion }}-cli-win-x64.zip -OutFile rdmp.zip
           Expand-Archive -Path rdmp.zip -DestinationPath .\rdmpcli
-          cmd.exe /c rdmpcli\rdmp.exe install localhost TEST_
+          cmd.exe /c rdmpcli\rdmp.exe install --createdatabasetimeout 180 localhost TEST_ -d
       - name: Test
         run: |
-          nuget restore
-          dotnet test
+          dotnet test -c Release
       - name: Build
         run: |
           cd Plugin/windows
@@ -37,10 +38,9 @@ jobs:
           cd ../main
           dotnet publish -c Release --self-contained false
           cd ../..
-          nuget pack ./HIC.Extensions.nuspec -Properties Configuration=Release -IncludeReferencedProjects -Symbols -Version ${{ steps.version.outputs.version }}
-          cmd /c rdmpcli\rdmp.exe pack --file HIC.Rdmp.Extensions.Plugin.${{ steps.version.outputs.version }}.nupkg --servername localhost --cataloguedatabasename TEST_Catalogue --dataexportdatabasename TEST_DataExport
-          cmd /c rdmpcli\rdmp.exe cmd listsupportedcommands --servername localhost --cataloguedatabasename TEST_Catalogue --dataexportdatabasename TEST_DataExport
-          cmd /c rdmpcli\rdmp.exe cmd describecommand CreateNewImagingDatasetSuite --servername localhost --cataloguedatabasename TEST_Catalogue --dataexportdatabasename TEST_DataExport
+          cmd /c nuget.exe pack ./HIC.Extensions.nuspec -Properties Configuration=Release -IncludeReferencedProjects -Symbols -Version ${{ steps.version.outputs.version }}
+          cmd /c rdmpcli\rdmp.exe pack --file HIC.Rdmp.Extensions.Plugin.${{ steps.version.outputs.version }}.nupkg --CatalogueConnectionString "Data Source=localhost;Database=TEST_Catalogue;Integrated Security=sspi;Encrypt=true;TrustServerCertificate=true" --DataExportConnectionString "Data Source=localhost;Database=TEST_DataExport;Integrated Security=sspi;Encrypt=true;TrustServerCertificate=true"
+          cmd /c rdmpcli\rdmp.exe cmd listsupportedcommands --CatalogueConnectionString "Data Source=localhost;Database=TEST_Catalogue;Integrated Security=sspi;Encrypt=true;TrustServerCertificate=true" --DataExportConnectionString "Data Source=localhost;Database=TEST_DataExport;Integrated Security=sspi;Encrypt=true;TrustServerCertificate=true"
       - name: Store created nupkg files
         uses: actions/upload-artifact@v2
         with:

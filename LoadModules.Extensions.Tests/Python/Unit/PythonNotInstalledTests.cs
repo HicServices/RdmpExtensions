@@ -14,32 +14,36 @@ namespace LoadModules.Extensions.Python.Tests.Unit
         [TestCase(PythonVersion.Version3)]
         public void PythonIsNotInstalled(PythonVersion version)
         {
-            InconclusiveIfPytonIsInstalled(version);
+            InconclusiveIfPythonIsInstalled(version);
 
-            PythonDataProvider provider = new PythonDataProvider();
-            provider.Version = version;
-            
+            var provider = new PythonDataProvider
+            {
+                Version = version
+            };
+
             var ex = Assert.Throws<Exception>(()=>provider.Check(new ThrowImmediatelyCheckNotifier()));
 
-            Assert.IsTrue(ex.Message.Contains("Failed to launch"));
+            Assert.IsTrue(ex?.Message.Contains("Failed to launch"));
         }
 
-        private void InconclusiveIfPytonIsInstalled(PythonVersion version)
+        private void InconclusiveIfPythonIsInstalled(PythonVersion version)
         {
-            PythonDataProvider provider = new PythonDataProvider();
-            provider.Version = version;
-            string result = "";
+            var provider = new PythonDataProvider
+            {
+                Version = version
+            };
+            string result;
             try
             {
                 //These tests run if python is not installed so we expect this to throw
-                Assert.Throws<Exception>(() => result = provider.GetPythonVersion());
+                result = provider.GetPythonVersion();
             }
-            catch (Exception e)
+            catch
             {
-                //if it didnt' throw then it means python IS installed and we cannot run these tests so Inconclusive
-                Console.WriteLine("Could not run tests because Python is already installed on the system, these unit tests only fire if there is no Python.  Python version string is:" + result);
-                Assert.Inconclusive();
+                return;
             }
+            //if it didn't throw then it means python IS installed and we cannot run these tests so Inconclusive
+            Assert.Inconclusive($"Could not run tests because Python is already installed on the system, these unit tests only fire if there is no Python.  Python version string is:{result}");
         }
     }
 }
