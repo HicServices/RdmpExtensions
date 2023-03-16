@@ -7,183 +7,182 @@ using Rdmp.Core.DataFlowPipeline;
 using Rdmp.Core.DataLoad;
 using Rdmp.Core.DataLoad.Engine.Attachers;
 using Rdmp.Core.DataLoad.Engine.Job;
-using ReusableLibraryCode.Checks;
-using ReusableLibraryCode.Progress;
+using Rdmp.Core.ReusableLibraryCode.Checks;
+using Rdmp.Core.ReusableLibraryCode.Progress;
 
-namespace LoadModules.Extensions.StatsScriptsExecution.Attachers
+namespace LoadModules.Extensions.StatsScriptsExecution.Attachers;
+
+public class SasAttacher : Attacher, IPluginAttacher
 {
-    public class SasAttacher : Attacher, IPluginAttacher
+    public SasAttacher() : base(true)
     {
-        public SasAttacher() : base(true)
+    }
+
+    [DemandsInitialization("SAS root directory (contains sas.exe)", mandatory: true)]
+    public DirectoryInfo SASRootDirectory { get; set; }
+
+    [DemandsInitialization("SAS script to run", mandatory: true)]
+    public FileInfo FullPathToSASScript { get; set; }
+
+    [DemandsInitialization("The maximum number of seconds to allow the SAS script to run for before declaring it a failure, 0 for indefinetly")]
+    public int MaximumNumberOfSecondsToLetScriptRunFor { get; set; }
+
+    [DemandsInitialization("Database connection string", mandatory: true)]
+    public ExternalDatabaseServer InputDatabase { get; set; }
+
+    [DemandsInitialization("Output directory", mandatory: true)]
+    public DirectoryInfo OutputDirectory { get; set; }
+
+    public override void Check(ICheckNotifier notifier)
+    {
+        try
         {
+            if (!SASRootDirectory.Exists)
+                throw new DirectoryNotFoundException("The specified SAS root directory: " + SASRootDirectory.FullName + " does not exist");
+
+            var fullPathToSasExe = Path.Combine(SASRootDirectory.FullName, "sas.exe");
+            if (!File.Exists(fullPathToSasExe))
+                throw new FileNotFoundException("The specified SAS root directory: " + SASRootDirectory.FullName + " does not contain sas.exe");
+
+            if (!FullPathToSASScript.Exists)
+                throw new FileNotFoundException("The specified SAS script to run: " + FullPathToSASScript.FullName + " does not exist");
+
+            if (!OutputDirectory.Exists)
+                throw new DirectoryNotFoundException("The specified output directory: " + OutputDirectory.FullName + " does not exist");
+        }
+        catch (Exception e)
+        {
+            notifier.OnCheckPerformed(new CheckEventArgs(e.Message, CheckResult.Fail, e));
+        }
+    }
+
+    public override void LoadCompletedSoDispose(ExitCodeType exitCode, IDataLoadEventListener postLoadEventListener)
+    {
+    }
+
+    public override ExitCodeType Attach(IDataLoadJob job, GracefulCancellationToken cancellationToken)
+    {
+        var processStartInfo = CreateCommand();
+
+        int exitCode;
+        try
+        {
+            exitCode = ExecuteProcess(processStartInfo, MaximumNumberOfSecondsToLetScriptRunFor, job);
+        }
+        catch (TimeoutException e)
+        {
+            job.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "SAS script timed out (See inner exception for details", e));
+            return ExitCodeType.Error;
         }
 
-        [DemandsInitialization("SAS root directory (contains sas.exe)", mandatory: true)]
-        public DirectoryInfo SASRootDirectory { get; set; }
+        job.OnNotify(this, new NotifyEventArgs(exitCode == 0 ? ProgressEventType.Information : ProgressEventType.Error, "SAS script terminated with exit code " + exitCode));
 
-        [DemandsInitialization("SAS script to run", mandatory: true)]
-        public FileInfo FullPathToSASScript { get; set; }
+        return exitCode == 0 ? ExitCodeType.Success : ExitCodeType.Error;
+    }
 
-        [DemandsInitialization("The maximum number of seconds to allow the SAS script to run for before declaring it a failure, 0 for indefinetly")]
-        public int MaximumNumberOfSecondsToLetScriptRunFor { get; set; }
+    private int ExecuteProcess(ProcessStartInfo processStartInfo, int scriptTimeout, IDataLoadJob job)
+    {
+        processStartInfo.UseShellExecute = false;
+        processStartInfo.CreateNoWindow = true;
 
-        [DemandsInitialization("Database connection string", mandatory: true)]
-        public ExternalDatabaseServer InputDatabase { get; set; }
+        job.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Starting SAS."));
 
-        [DemandsInitialization("Output directory", mandatory: true)]
-        public DirectoryInfo OutputDirectory { get; set; }
-
-        public override void Check(ICheckNotifier notifier)
+        Process p;
+        try
         {
-            try
-            {
-                if (!SASRootDirectory.Exists)
-                    throw new DirectoryNotFoundException("The specified SAS root directory: " + SASRootDirectory.FullName + " does not exist");
+            p = new Process();
+            p.StartInfo = processStartInfo;
 
-                var fullPathToSasExe = Path.Combine(SASRootDirectory.FullName, "sas.exe");
-                if (!File.Exists(fullPathToSasExe))
-                    throw new FileNotFoundException("The specified SAS root directory: " + SASRootDirectory.FullName + " does not contain sas.exe");
+            job.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "commandline: " + processStartInfo.Arguments));
 
-                if (!FullPathToSASScript.Exists)
-                    throw new FileNotFoundException("The specified SAS script to run: " + FullPathToSASScript.FullName + " does not exist");
-
-                if (!OutputDirectory.Exists)
-                    throw new DirectoryNotFoundException("The specified output directory: " + OutputDirectory.FullName + " does not exist");
-            }
-            catch (Exception e)
-            {
-                notifier.OnCheckPerformed(new CheckEventArgs(e.Message, CheckResult.Fail, e));
-            }
+            p.Start();
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Failed to launch:" + Environment.NewLine + processStartInfo.FileName + Environment.NewLine + " with Arguments:" + processStartInfo.Arguments, e);
         }
 
-        public override void LoadCompletedSoDispose(ExitCodeType exitCode, IDataLoadEventListener postLoadEventListener)
+        var startTime = DateTime.Now;
+        while (!p.WaitForExit(100))
         {
-        }
-
-        public override ExitCodeType Attach(IDataLoadJob job, GracefulCancellationToken cancellationToken)
-        {
-            var processStartInfo = CreateCommand();
-
-            int exitCode;
-            try
+            if (TimeoutExpired(startTime))//if timeout expired
             {
-                exitCode = ExecuteProcess(processStartInfo, MaximumNumberOfSecondsToLetScriptRunFor, job);
-            }
-            catch (TimeoutException e)
-            {
-                job.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "SAS script timed out (See inner exception for details", e));
-                return ExitCodeType.Error;
-            }
-
-            job.OnNotify(this, new NotifyEventArgs(exitCode == 0 ? ProgressEventType.Information : ProgressEventType.Error, "SAS script terminated with exit code " + exitCode));
-
-            return exitCode == 0 ? ExitCodeType.Success : ExitCodeType.Error;
-        }
-
-        private int ExecuteProcess(ProcessStartInfo processStartInfo, int scriptTimeout, IDataLoadJob job)
-        {
-            processStartInfo.UseShellExecute = false;
-            processStartInfo.CreateNoWindow = true;
-
-            job.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Starting SAS."));
-
-            Process p;
-            try
-            {
-                p = new Process();
-                p.StartInfo = processStartInfo;
-
-                job.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "commandline: " + processStartInfo.Arguments));
-
-                p.Start();
-            }
-            catch (Exception e)
-            {
-                throw new Exception("Failed to launch:" + Environment.NewLine + processStartInfo.FileName + Environment.NewLine + " with Arguments:" + processStartInfo.Arguments, e);
-            }
-
-            var startTime = DateTime.Now;
-            while (!p.WaitForExit(100))
-            {
-                if (TimeoutExpired(startTime))//if timeout expired
+                bool killed;
+                try
                 {
-                    bool killed;
-                    try
-                    {
-                        p.Kill();
-                        killed = true;
-                    }
-                    catch (Exception)
-                    {
-                        killed = false;
-                    }
-
-                    throw new TimeoutException("Process command " + processStartInfo.FileName + " with arguments " + processStartInfo.Arguments + " did not complete after  " + scriptTimeout + " seconds " + (killed ? "(After timeout we killed the process successfully)" : "(We also failed to kill the process after the timeout expired)"));
+                    p.Kill();
+                    killed = true;
                 }
+                catch (Exception)
+                {
+                    killed = false;
+                }
+
+                throw new TimeoutException("Process command " + processStartInfo.FileName + " with arguments " + processStartInfo.Arguments + " did not complete after  " + scriptTimeout + " seconds " + (killed ? "(After timeout we killed the process successfully)" : "(We also failed to kill the process after the timeout expired)"));
             }
-
-            return p.ExitCode;
         }
 
-        private bool TimeoutExpired(DateTime startTime)
+        return p.ExitCode;
+    }
+
+    private bool TimeoutExpired(DateTime startTime)
+    {
+        if (MaximumNumberOfSecondsToLetScriptRunFor == 0)
+            return false;
+
+        return DateTime.Now - startTime > new TimeSpan(0, 0, 0, MaximumNumberOfSecondsToLetScriptRunFor);
+    }
+
+    private ProcessStartInfo CreateCommand()
+    {
+        var scriptFileName = FullPathToSASScript.Name.Replace(FullPathToSASScript.Extension, "");
+        var actualOutputDir = CreateActualOutputDir(scriptFileName);
+        var sasFullPath = Path.Combine(SASRootDirectory.FullName, "sas.exe");
+
+        var fullPrintPath = Path.Combine(actualOutputDir, scriptFileName + ".out");
+        var fullLogPath = Path.Combine(actualOutputDir, scriptFileName + ".log");
+
+        var dataInConnection = GetSASConnectionString(InputDatabase);
+        var dataOutConnection = GetSASConnectionString(_dbInfo);
+
+        var command = "-set output \"" + actualOutputDir + "\"" +
+                      " -set connect \"" + dataInConnection + "\"" + 
+                      " -set connectout \"" + dataOutConnection + "\"" +
+                      " -sysin \"" + FullPathToSASScript.FullName + "\"" +
+                      " -nosplash -noterminal -nostatuswin -noicon" +
+                      " -print \"" + fullPrintPath + "\"" +
+                      " -log \"" + fullLogPath + "\"";
+
+        var info = new ProcessStartInfo(sasFullPath);
+        info.Arguments = command;
+
+        return info;
+    }
+
+    private string GetSASConnectionString(DiscoveredDatabase db)
+    {
+        return String.Format("Server={0};Database={1};IntegratedSecurity=true;DRIVER=SQL Server", db.Server.Name, db.GetRuntimeName());
+    }
+
+    private string GetSASConnectionString(ExternalDatabaseServer db)
+    {
+        return String.Format("Server={0};Database={1};IntegratedSecurity=true;DRIVER=SQL Server", db.Server, db.Database);
+    }
+
+    private string CreateActualOutputDir(string scriptFileName)
+    {
+        var timeStampString = DateTime.Now.ToString("yyyyMMddTHHmmss");
+        var dir = Path.Combine(OutputDirectory.FullName, timeStampString + "_" + scriptFileName);
+
+        try
         {
-            if (MaximumNumberOfSecondsToLetScriptRunFor == 0)
-                return false;
-
-            return DateTime.Now - startTime > new TimeSpan(0, 0, 0, MaximumNumberOfSecondsToLetScriptRunFor);
+            Directory.CreateDirectory(dir);
         }
-
-        private ProcessStartInfo CreateCommand()
+        catch (Exception)
         {
-            var scriptFileName = FullPathToSASScript.Name.Replace(FullPathToSASScript.Extension, "");
-            var actualOutputDir = CreateActualOutputDir(scriptFileName);
-            var sasFullPath = Path.Combine(SASRootDirectory.FullName, "sas.exe");
-
-            var fullPrintPath = Path.Combine(actualOutputDir, scriptFileName + ".out");
-            var fullLogPath = Path.Combine(actualOutputDir, scriptFileName + ".log");
-
-            var dataInConnection = GetSASConnectionString(InputDatabase);
-            var dataOutConnection = GetSASConnectionString(_dbInfo);
-
-            var command = "-set output \"" + actualOutputDir + "\"" +
-                          " -set connect \"" + dataInConnection + "\"" + 
-                          " -set connectout \"" + dataOutConnection + "\"" +
-                          " -sysin \"" + FullPathToSASScript.FullName + "\"" +
-                          " -nosplash -noterminal -nostatuswin -noicon" +
-                          " -print \"" + fullPrintPath + "\"" +
-                          " -log \"" + fullLogPath + "\"";
-
-            var info = new ProcessStartInfo(sasFullPath);
-            info.Arguments = command;
-
-            return info;
+            return OutputDirectory.FullName;
         }
 
-        private string GetSASConnectionString(DiscoveredDatabase db)
-        {
-            return String.Format("Server={0};Database={1};IntegratedSecurity=true;DRIVER=SQL Server", db.Server.Name, db.GetRuntimeName());
-        }
-
-        private string GetSASConnectionString(ExternalDatabaseServer db)
-        {
-            return String.Format("Server={0};Database={1};IntegratedSecurity=true;DRIVER=SQL Server", db.Server, db.Database);
-        }
-
-        private string CreateActualOutputDir(string scriptFileName)
-        {
-            var timeStampString = DateTime.Now.ToString("yyyyMMddTHHmmss");
-            var dir = Path.Combine(OutputDirectory.FullName, timeStampString + "_" + scriptFileName);
-
-            try
-            {
-                Directory.CreateDirectory(dir);
-            }
-            catch (Exception)
-            {
-                return OutputDirectory.FullName;
-            }
-
-            return dir;
-        }
+        return dir;
     }
 }

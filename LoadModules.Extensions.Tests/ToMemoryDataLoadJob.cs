@@ -16,63 +16,62 @@ using Rdmp.Core.DataLoad.Engine.DatabaseManagement.Operations;
 using Rdmp.Core.DataLoad.Engine.Job;
 using Rdmp.Core.Logging;
 using Rdmp.Core.Repositories;
-using ReusableLibraryCode.Progress;
+using Rdmp.Core.ReusableLibraryCode.Progress;
 
-namespace LoadModules.Extensions.Tests
+namespace LoadModules.Extensions.Tests;
+
+public class ToMemoryDataLoadJob : ToMemoryDataLoadEventListener, IDataLoadJob
 {
-    public class ToMemoryDataLoadJob : ToMemoryDataLoadEventListener, IDataLoadJob
+    public ToMemoryDataLoadJob(bool throwOnErrorEvents = true) : base(throwOnErrorEvents)
     {
-        public ToMemoryDataLoadJob(bool throwOnErrorEvents = true) : base(throwOnErrorEvents)
-        {
-        }
+    }
 
-        public string Description { get; private set; }
-        public IDataLoadInfo DataLoadInfo { get; private set; }
-        public ILoadDirectory LoadDirectory { get; set; }
-        public int JobID { get; set; }
-        public ILoadMetadata LoadMetadata { get; private set; }
-        public bool DisposeImmediately { get; private set; }
-        public string ArchiveFilepath { get; private set; }
-        public List<ITableInfo> RegularTablesToLoad { get; private set; }
-        public List<ITableInfo> LookupTablesToLoad { get; private set; }
-        public IRDMPPlatformRepositoryServiceLocator RepositoryLocator { get { return null; } }
+    public string Description { get; private set; }
+    public IDataLoadInfo DataLoadInfo { get; private set; }
+    public ILoadDirectory LoadDirectory { get; set; }
+    public int JobID { get; set; }
+    public ILoadMetadata LoadMetadata { get; private set; }
+    public bool DisposeImmediately { get; private set; }
+    public string ArchiveFilepath { get; private set; }
+    public List<ITableInfo> RegularTablesToLoad { get; private set; }
+    public List<ITableInfo> LookupTablesToLoad { get; private set; }
+    public IRDMPPlatformRepositoryServiceLocator RepositoryLocator { get { return null; } }
 
-        public void StartLogging()
-        {
-        }
+    public void StartLogging()
+    {
+    }
 
-        public void CloseLogging()
-        {
-        }
+    public void CloseLogging()
+    {
+    }
 
-        public HICDatabaseConfiguration Configuration { get; private set; }
-        public bool PersistentRaw { get; set; }
+    public HICDatabaseConfiguration Configuration { get; private set; }
+    public bool PersistentRaw { get; set; }
 
-        public object Payload { get; set; }
+    public object Payload { get; set; }
 
-        private List<NotifyEventArgs> _crashAtEndMessages { get; } = new List<NotifyEventArgs>();
-        public IReadOnlyCollection<NotifyEventArgs> CrashAtEndMessages => _crashAtEndMessages.AsReadOnly();
+    private List<NotifyEventArgs> _crashAtEndMessages { get; } = new List<NotifyEventArgs>();
+    public IReadOnlyCollection<NotifyEventArgs> CrashAtEndMessages => _crashAtEndMessages.AsReadOnly();
 
-        public void CreateTablesInStage(DatabaseCloner cloner, LoadBubble stage)
-        {
-        }
+    public void CreateTablesInStage(DatabaseCloner cloner, LoadBubble stage)
+    {
+    }
 
-        public void PushForDisposal(IDisposeAfterDataLoad disposeable)
-        {
-        }
+    public void PushForDisposal(IDisposeAfterDataLoad disposeable)
+    {
+    }
 
-        public void LoadCompletedSoDispose(ExitCodeType exitCode, IDataLoadEventListener postLoadEventsListener)
-        {
-        }
+    public void LoadCompletedSoDispose(ExitCodeType exitCode, IDataLoadEventListener postLoadEventsListener)
+    {
+    }
 
-        public ColumnInfo[] GetAllColumns()
-        {
-            return RegularTablesToLoad.SelectMany(t => t.ColumnInfos).Union(LookupTablesToLoad.SelectMany(t => t.ColumnInfos)).Distinct().ToArray();
-        }
+    public ColumnInfo[] GetAllColumns()
+    {
+        return RegularTablesToLoad.SelectMany(t => t.ColumnInfos).Union(LookupTablesToLoad.SelectMany(t => t.ColumnInfos)).Distinct().ToArray();
+    }
 
-        public void CrashAtEnd(NotifyEventArgs because)
-        {
-            _crashAtEndMessages.Add(because);
-        }
+    public void CrashAtEnd(NotifyEventArgs because)
+    {
+        _crashAtEndMessages.Add(because);
     }
 }

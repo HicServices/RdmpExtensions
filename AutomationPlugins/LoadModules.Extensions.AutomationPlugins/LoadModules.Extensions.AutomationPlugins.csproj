@@ -31,7 +31,7 @@
     <EmbeddedResource Include="db\up\001_ReleaseAutomation.sql" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="HIC.RDMP.Plugin" Version="8.0.7" />
+    <PackageReference Include="HIC.RDMP.Plugin" Version="8.1.0-rc1" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="AutomationImages.Designer.cs">

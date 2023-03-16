@@ -4,156 +4,155 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
-using MapsDirectlyToDatabaseTable;
+using Rdmp.Core.MapsDirectlyToDatabaseTable;
 using Rdmp.Core.Curation.Data;
 using Rdmp.Core.DataExport.Data;
 using Rdmp.Core.Startup;
 using Microsoft.Data.SqlClient;
 
-namespace LoadModules.Extensions.AutomationPlugins.Data
+namespace LoadModules.Extensions.AutomationPlugins.Data;
+
+public class AutomateExtraction : DatabaseEntity, IMapsDirectlyToDatabaseTable
 {
-    public class AutomateExtraction : DatabaseEntity, IMapsDirectlyToDatabaseTable
+    private readonly AutomateExtractionRepository _repository;
+
+    #region Database Properties
+
+    private int _extractionConfiguration_ID;
+    private int _automateExtractionSchedule_ID;
+    private bool _disabled;
+    private DateTime? _baselineDate;
+    private bool _refreshCohort;
+    private bool _release;
+
+    public int ExtractionConfiguration_ID
     {
-        private readonly AutomateExtractionRepository _repository;
+        get { return _extractionConfiguration_ID; }
+        set { SetField(ref _extractionConfiguration_ID, value); }
+    }
+    public int AutomateExtractionSchedule_ID
+    {
+        get { return _automateExtractionSchedule_ID; }
+        set { SetField(ref _automateExtractionSchedule_ID, value); }
+    }
+    public bool Disabled
+    {
+        get { return _disabled; }
+        set { SetField(ref _disabled, value); }
+    }
+    public DateTime? BaselineDate
+    {
+        get { return _baselineDate; }
+        set { SetField(ref _baselineDate, value); }
+    }
 
-        #region Database Properties
+    public bool RefreshCohort
+    {
+        get { return _refreshCohort; }
+        set {SetField(ref _refreshCohort , value); }
+    }
 
-        private int _extractionConfiguration_ID;
-        private int _automateExtractionSchedule_ID;
-        private bool _disabled;
-        private DateTime? _baselineDate;
-        private bool _refreshCohort;
-        private bool _release;
+    public bool Release
+    {
+        get { return _release; }
+        set { SetField(ref _release , value);}
+    }
 
-        public int ExtractionConfiguration_ID
-        {
-            get { return _extractionConfiguration_ID; }
-            set { SetField(ref _extractionConfiguration_ID, value); }
-        }
-        public int AutomateExtractionSchedule_ID
-        {
-            get { return _automateExtractionSchedule_ID; }
-            set { SetField(ref _automateExtractionSchedule_ID, value); }
-        }
-        public bool Disabled
-        {
-            get { return _disabled; }
-            set { SetField(ref _disabled, value); }
-        }
-        public DateTime? BaselineDate
-        {
-            get { return _baselineDate; }
-            set { SetField(ref _baselineDate, value); }
-        }
+    #endregion
 
-        public bool RefreshCohort
-        {
-            get { return _refreshCohort; }
-            set {SetField(ref _refreshCohort , value); }
-        }
-
-        public bool Release
-        {
-            get { return _release; }
-            set { SetField(ref _release , value);}
-        }
-
-        #endregion
-
-        #region Relationships
+    #region Relationships
         
-        [NoMappingToDatabase]
-        public IExtractionConfiguration ExtractionConfiguration { get
+    [NoMappingToDatabase]
+    public IExtractionConfiguration ExtractionConfiguration { get
+    {
+        return _repository.DataExportRepository.GetObjectByID<ExtractionConfiguration>(ExtractionConfiguration_ID);
+    } }
+
+    [NoMappingToDatabase]
+    public AutomateExtractionSchedule AutomateExtractionSchedule { get
+    {
+        return _repository.GetObjectByID<AutomateExtractionSchedule>(AutomateExtractionSchedule_ID);
+    }}
+
+    #endregion
+
+    public AutomateExtraction(PluginRepository repository, AutomateExtractionSchedule schedule, IExtractionConfiguration config)
+    {
+        _repository = (AutomateExtractionRepository) repository;
+        repository.InsertAndHydrate(this, new Dictionary<string, object>()
         {
-            return _repository.DataExportRepository.GetObjectByID<ExtractionConfiguration>(ExtractionConfiguration_ID);
-        } }
+            {"AutomateExtractionSchedule_ID",schedule.ID},
+            {"ExtractionConfiguration_ID",config.ID},
+            {"RefreshCohort",false},
+            {"Release",false},
 
-        [NoMappingToDatabase]
-        public AutomateExtractionSchedule AutomateExtractionSchedule { get
-        {
-            return _repository.GetObjectByID<AutomateExtractionSchedule>(AutomateExtractionSchedule_ID);
-        }}
+        });
 
-        #endregion
+        if (ID == 0 || Repository != repository)
+            throw new ArgumentException("Repository failed to properly hydrate this class");
+    }
+    public AutomateExtraction(PluginRepository repository, DbDataReader r)
+        : base(repository, r)
+    {
+        _repository = (AutomateExtractionRepository) repository;
+        ExtractionConfiguration_ID = Convert.ToInt32(r["ExtractionConfiguration_ID"]);
+        AutomateExtractionSchedule_ID = Convert.ToInt32(r["AutomateExtractionSchedule_ID"]);
+        Disabled = Convert.ToBoolean(r["Disabled"]);
+        BaselineDate = ObjectToNullableDateTime(r["BaselineDate"]);
 
-        public AutomateExtraction(PluginRepository repository, AutomateExtractionSchedule schedule, IExtractionConfiguration config)
-        {
-            _repository = (AutomateExtractionRepository) repository;
-            repository.InsertAndHydrate(this, new Dictionary<string, object>()
-            {
-                {"AutomateExtractionSchedule_ID",schedule.ID},
-                {"ExtractionConfiguration_ID",config.ID},
-                {"RefreshCohort",false},
-                {"Release",false},
+        RefreshCohort = Convert.ToBoolean(r["RefreshCohort"]);
+        Release = Convert.ToBoolean(r["Release"]);
+    }
 
-            });
-
-            if (ID == 0 || Repository != repository)
-                throw new ArgumentException("Repository failed to properly hydrate this class");
-        }
-        public AutomateExtraction(PluginRepository repository, DbDataReader r)
-            : base(repository, r)
-        {
-            _repository = (AutomateExtractionRepository) repository;
-            ExtractionConfiguration_ID = Convert.ToInt32(r["ExtractionConfiguration_ID"]);
-            AutomateExtractionSchedule_ID = Convert.ToInt32(r["AutomateExtractionSchedule_ID"]);
-            Disabled = Convert.ToBoolean(r["Disabled"]);
-            BaselineDate = ObjectToNullableDateTime(r["BaselineDate"]);
-
-            RefreshCohort = Convert.ToBoolean(r["RefreshCohort"]);
-            Release = Convert.ToBoolean(r["Release"]);
-        }
-
-        private ExtractionConfiguration _cachedExtractionConfiguration;
+    private ExtractionConfiguration _cachedExtractionConfiguration;
         
 
-        public override string ToString()
-        {
-            if (_cachedExtractionConfiguration == null)
-                _cachedExtractionConfiguration = _repository.DataExportRepository.GetObjectByID<ExtractionConfiguration>(ExtractionConfiguration_ID);
+    public override string ToString()
+    {
+        _cachedExtractionConfiguration ??=
+            _repository.DataExportRepository.GetObjectByID<ExtractionConfiguration>(ExtractionConfiguration_ID);
 
-            return _cachedExtractionConfiguration.Name;
+        return _cachedExtractionConfiguration.Name;
+    }
+
+    public DataTable GetIdentifiersTable()
+    {
+        var dt = new DataTable();
+
+        var repo = (TableRepository)Repository;
+        var server = repo.DiscoveredServer;
+
+        using (var con = server.GetConnection())
+        {
+            con.Open();
+            var cmd = server.GetCommand("Select ReleaseID from ReleaseIdentifiersSeen", con);
+            var da = server.GetDataAdapter(cmd);
+            da.Fill(dt);
         }
 
-        public DataTable GetIdentifiersTable()
+        return dt;
+    }
+
+    public SuccessfullyExtractedResults GetSuccessIfAnyFor(IExtractableDataSet ds)
+    {
+        return _repository.GetAllObjects<SuccessfullyExtractedResults>(@"WHERE ExtractableDataSet_ID  = " + ds.ID + " AND AutomateExtraction_ID = " + ID).SingleOrDefault();
+    }
+
+    public void ClearBaselines()
+    {
+        using (var con = _repository.DiscoveredServer.GetConnection())
         {
-            var dt = new DataTable();
-
-            var repo = (TableRepository)Repository;
-            var server = repo.DiscoveredServer;
-
-            using (var con = server.GetConnection())
-            {
-                con.Open();
-                var cmd = server.GetCommand("Select ReleaseID from ReleaseIdentifiersSeen", con);
-                var da = server.GetDataAdapter(cmd);
-                da.Fill(dt);
-            }
-
-            return dt;
-        }
-
-        public SuccessfullyExtractedResults GetSuccessIfAnyFor(IExtractableDataSet ds)
-        {
-            return _repository.GetAllObjects<SuccessfullyExtractedResults>(@"WHERE ExtractableDataSet_ID  = " + ds.ID + " AND AutomateExtraction_ID = " + ID).SingleOrDefault();
-        }
-
-        public void ClearBaselines()
-        {
-            using (var con = _repository.DiscoveredServer.GetConnection())
-            {
-                con.Open();
-                new SqlCommand(@"Delete From 
+            con.Open();
+            new SqlCommand(@"Delete From 
   [ReleaseIdentifiersSeen]
   where
   AutomateExtraction_ID = " + ID, (SqlConnection) con).ExecuteNonQuery();
-            }
-
-            foreach (SuccessfullyExtractedResults r in _repository.GetAllObjectsWithParent<SuccessfullyExtractedResults>(this))
-                r.DeleteInDatabase();
-            
-            BaselineDate = null;
-            SaveToDatabase();
         }
+
+        foreach (SuccessfullyExtractedResults r in _repository.GetAllObjectsWithParent<SuccessfullyExtractedResults>(this))
+            r.DeleteInDatabase();
+            
+        BaselineDate = null;
+        SaveToDatabase();
     }
 }

@@ -2,32 +2,31 @@
 using Rdmp.Core.CommandExecution;
 using Rdmp.Core.Startup;
 
-namespace LoadModules.Extensions.AutomationPlugins
+namespace LoadModules.Extensions.AutomationPlugins;
+
+public class BasicAutomationCommandExecution : BasicCommandExecution
 {
-    public class BasicAutomationCommandExecution : BasicCommandExecution
+    protected PluginRepository AutomationRepository { get; }
+
+    public BasicAutomationCommandExecution(IBasicActivateItems activator):base(activator)
     {
-        protected PluginRepository AutomationRepository { get; }
-
-        public BasicAutomationCommandExecution(IBasicActivateItems activator):base(activator)
+        var repoFinder = new AutomateExtractionRepositoryFinder(BasicActivator.RepositoryLocator);
+        try
         {
-            var repoFinder = new AutomateExtractionRepositoryFinder(BasicActivator.RepositoryLocator);
-            try
-            {
-                AutomationRepository = repoFinder.GetRepositoryIfAny();
-            }
-            catch (System.Exception e)
-            {
-                SetImpossible("No Automation Repository Found:" + e.Message);
-                return;
-            }
-
-            if (AutomationRepository == null)
-            {
-                SetImpossible("There is no Automation Repository configured");
-                return;
-            }
-                
+            AutomationRepository = repoFinder.GetRepositoryIfAny();
+        }
+        catch (System.Exception e)
+        {
+            SetImpossible("No Automation Repository Found:" + e.Message);
+            return;
         }
 
+        if (AutomationRepository == null)
+        {
+            SetImpossible("There is no Automation Repository configured");
+            return;
+        }
+                
     }
+
 }

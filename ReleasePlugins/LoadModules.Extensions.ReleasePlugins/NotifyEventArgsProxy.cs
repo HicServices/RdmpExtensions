@@ -1,12 +1,11 @@
 ﻿using System;
-using ReusableLibraryCode.Progress;
+using Rdmp.Core.ReusableLibraryCode.Progress;
 
-namespace LoadModules.Extensions.ReleasePlugins.Data
+namespace LoadModules.Extensions.ReleasePlugins.Data;
+
+public class NotifyEventArgsProxy : NotifyEventArgs
 {
-    public class NotifyEventArgsProxy : NotifyEventArgs
-    {
-        public NotifyEventArgsProxy() : base(ProgressEventType.Information, String.Empty, null)
-        {   
-        }
+    public NotifyEventArgsProxy() : base(ProgressEventType.Information, String.Empty, null)
+    {   
     }
 }
