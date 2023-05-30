@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{A6987FAF-E280-48C8-B50D-17FF34924E1D}</ProjectGuid>
     <TargetFramework>net6.0-windows</TargetFramework>
@@ -18,7 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="HIC.RDMP.Plugin.Test" Version="8.0.7" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.4.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="NunitXml.TestLogger" Version="3.0.131" />
     <PackageReference Include="RhinoMocks" Version="3.6.1" />
     <PackageReference Include="System.Security.Permissions" Version="7.0.0" />
