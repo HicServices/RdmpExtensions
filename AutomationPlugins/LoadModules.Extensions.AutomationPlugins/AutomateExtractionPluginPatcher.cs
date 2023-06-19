@@ -1,17 +1,11 @@
-﻿using MapsDirectlyToDatabaseTable.Versioning;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Rdmp.Core.MapsDirectlyToDatabaseTable.Versioning;
 
-namespace LoadModules.Extensions.AutomationPlugins
+namespace LoadModules.Extensions.AutomationPlugins;
+
+public class AutomateExtractionPluginPatcher:PluginPatcher
 {
-    public class AutomateExtractionPluginPatcher:PluginPatcher
+    public AutomateExtractionPluginPatcher():base("db")
     {
-        public AutomateExtractionPluginPatcher():base("db")
-        {
 
-        }
     }
 }
