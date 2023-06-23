@@ -24,7 +24,8 @@ public class BaselineHackerExecuteDatasetExtractionSource : ExecuteDatasetExtrac
         if (hacker.ExecuteHackIfAllowed(listener, out hackSql) == BaselineHackEvaluation.Allowed)
         {
             var newSql = sql + hackSql;
-            listener.OnNotify(this,new NotifyEventArgs(ProgressEventType.Information, "Full Hacked Query is now:" + Environment.NewLine + newSql));
+            listener.OnNotify(this,new NotifyEventArgs(ProgressEventType.Information,
+                $"Full Hacked Query is now:{Environment.NewLine}{newSql}"));
 
             return newSql;
         }

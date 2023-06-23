@@ -29,9 +29,11 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DotNetZip" Version="1.16.0" />
-    <PackageReference Include="HIC.RDMP.Plugin" Version="8.1.0-rc1" />
     <PackageReference Include="System.IO" Version="4.3.0" />
     <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
     
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\RDMP\Rdmp.Core\Rdmp.Core.csproj" />
   </ItemGroup>
 </Project>

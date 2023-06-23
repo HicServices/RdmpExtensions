@@ -35,7 +35,7 @@ public class RemoteRDMPReleaseEngine : ReleaseEngine
 
         ReleaseSuccessful = false;
 
-        var releaseFileName = GetArchiveNameForProject() + ".zip";
+        var releaseFileName = $"{GetArchiveNameForProject()}.zip";
         var projectSafeHavenFolder = GetSafeHavenFolder(Project.MasterTicket);
         if (projectSafeHavenFolder.Equals(string.Empty))
             throw new Exception("No Safe Haven folder specified in the Project Master Ticket");
@@ -105,7 +105,7 @@ public class RemoteRDMPReleaseEngine : ReleaseEngine
     private void ZipReleaseFolder(DirectoryInfo customExtractionDirectory, string zipPassword, string zipOutput)
     {
         var zip = new ZipFile() { UseZip64WhenSaving = Zip64Option.AsNecessary };
-        if (!String.IsNullOrWhiteSpace(zipPassword))
+        if (!string.IsNullOrWhiteSpace(zipPassword))
             zip.Password = zipPassword;
                 
         zip.AddDirectory(customExtractionDirectory.FullName);
@@ -114,23 +114,18 @@ public class RemoteRDMPReleaseEngine : ReleaseEngine
 
     private string GetArchiveNameForProject()
     {
-        var prefix = DateTime.UtcNow.ToString("yyyy-MM-dd_");
-        var nameToUse = "Proj-" + Project.ProjectNumber;
-        return prefix + "Release-" + nameToUse;
+        return $"{DateTime.UtcNow:yyyy-MM-dd_}Release-Proj-{Project.ProjectNumber}";
     }
 
     private string GetSafeHavenFolder(string masterTicket)
     {
-        if (String.IsNullOrWhiteSpace(masterTicket))
-            return "Proj-" + Project.ProjectNumber;
+        if (string.IsNullOrWhiteSpace(masterTicket))
+            return $"Proj-{Project.ProjectNumber}";
             
         var catalogueRepository = Project.DataExportRepository.CatalogueRepository;
         var factory = new TicketingSystemFactory(catalogueRepository);
         var system = factory.CreateIfExists(catalogueRepository.GetTicketingSystem());
 
-        if (system == null)
-            return String.Empty;
-
-        return system.GetProjectFolderName(masterTicket).Replace("/", "");
+        return system == null ? string.Empty : system.GetProjectFolderName(masterTicket).Replace("/", "");
     }
 }

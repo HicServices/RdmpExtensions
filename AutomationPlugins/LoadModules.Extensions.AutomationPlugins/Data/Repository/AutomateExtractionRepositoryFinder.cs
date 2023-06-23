@@ -26,9 +26,8 @@ public class AutomateExtractionRepositoryFinder : PluginRepositoryFinder
             .Where(e => e.WasCreatedBy(patcher)).ToArray();
 
         if (compatibleServers.Length > 1)
-            throw new Exception("There are 2+ ExternalDatabaseServers of type '" + patcher.Name + 
-                                "'.  This is not allowed, you must delete one.  The servers were called:" + 
-                                string.Join(",", compatibleServers.Select(s => s.ToString())));
+            throw new Exception(
+                $"There are 2+ ExternalDatabaseServers of type '{patcher.Name}'.  This is not allowed, you must delete one.  The servers were called:{string.Join(",", compatibleServers.Select(s => s.ToString()))}");
 
         if (compatibleServers.Length == 0)
             return null;

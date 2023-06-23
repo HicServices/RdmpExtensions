@@ -55,10 +55,12 @@ public class SuccessfullyExtractedResultsDocumenter : IPluginDataFlowComponent<D
             if(_repo == null)
                 throw new Exception("Could not create AutomateExtractionRepository, are you missing an AutomationPluginsDatabase?");
 
-            var matches = _repo.GetAllObjects<AutomateExtraction>("WHERE ExtractionConfiguration_ID = " + ds.Configuration.ID);
+            var matches = _repo.GetAllObjects<AutomateExtraction>(
+                $"WHERE ExtractionConfiguration_ID = {ds.Configuration.ID}");
 
             if(matches.Length == 0)
-                throw new Exception("ExtractionConfiguration '" + ds.Configuration + "' does not have an entry in the AutomateExtractionRepository");
+                throw new Exception(
+                    $"ExtractionConfiguration '{ds.Configuration}' does not have an entry in the AutomateExtractionRepository");
 
             //index ensure you can't have multiple so this shouldn't blow up
             _automateExtraction = matches.Single();
@@ -90,7 +92,8 @@ public class SuccessfullyExtractedResultsDocumenter : IPluginDataFlowComponent<D
         
     private DataTable ProcessPipelineData(ExtractGlobalsCommand globalData, DataTable toProcess, IDataLoadEventListener listener, GracefulCancellationToken cancellationToken)
     {
-        listener.OnNotify(this,new NotifyEventArgs(ProgressEventType.Warning, "Global Data is not audited and supported by " + GetType().Name));
+        listener.OnNotify(this,new NotifyEventArgs(ProgressEventType.Warning,
+            $"Global Data is not audited and supported by {GetType().Name}"));
 
         //we don't do these yet
         return toProcess;

@@ -23,12 +23,14 @@ public class ObjectCreationTests : TestsRequiringAnAutomationPluginRepository
         Assert.AreEqual(schedule.Project_ID , proj.ID);
 
         //Configurations
-        var config = new ExtractionConfiguration(Repo.DataExportRepository, proj);
-        config.Name = "Configuration1";
+        var config = new ExtractionConfiguration(Repo.DataExportRepository, proj)
+        {
+            Name = "Configuration1"
+        };
         config.SaveToDatabase();
             
         //Permission to use a given configuration
-        AutomateExtraction automate = new AutomateExtraction(Repo,schedule,config);
+        var automate = new AutomateExtraction(Repo,schedule,config);
         Assert.AreEqual(automate.ExtractionConfiguration_ID,config.ID);
         Assert.AreEqual(automate.Disabled ,false);
         Assert.IsNull(automate.BaselineDate);
@@ -49,10 +51,10 @@ public class ObjectCreationTests : TestsRequiringAnAutomationPluginRepository
     [Test]
     public void CreateQueuedExecution()
     {
-        Project project = new Project(Repo.DataExportRepository,"proj");
-        ExtractionConfiguration configuration= new ExtractionConfiguration(Repo.DataExportRepository,project);
+        var project = new Project(Repo.DataExportRepository,"proj");
+        var configuration= new ExtractionConfiguration(Repo.DataExportRepository,project);
             
-        Pipeline p = new Pipeline(Repo.CatalogueRepository);
+        var p = new Pipeline(Repo.CatalogueRepository);
 
         var que = new QueuedExtraction(Repo, configuration, p, DateTime.Now.AddHours(1));
         Assert.IsTrue(que.Exists());

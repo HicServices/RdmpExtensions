@@ -33,60 +33,60 @@ public class AutomateExtractionSchedule : DatabaseEntity, INamed
 
     public AutomationTimeScale ExecutionTimescale
     {
-        get { return _executionTimescale; }
-        set { SetField(ref _executionTimescale, value); }
+        get => _executionTimescale;
+        set => SetField(ref _executionTimescale, value);
     }
     public string UserRequestingRefresh
     {
-        get { return _userRequestingRefresh; }
-        set { SetField(ref _userRequestingRefresh, value); }
+        get => _userRequestingRefresh;
+        set => SetField(ref _userRequestingRefresh, value);
     }
     public DateTime? UserRequestingRefreshDate
     {
-        get { return _userRequestingRefreshDate; }
-        set { SetField(ref _userRequestingRefreshDate, value); }
+        get => _userRequestingRefreshDate;
+        set => SetField(ref _userRequestingRefreshDate, value);
     }
     public string Ticket
     {
-        get { return _ticket; }
-        set { SetField(ref _ticket, value); }
+        get => _ticket;
+        set => SetField(ref _ticket, value);
     }
     public string Name
     {
-        get { return _name; }
-        set { SetField(ref _name, value); }
+        get => _name;
+        set => SetField(ref _name, value);
     }
     public string Comment
     {
-        get { return _comment; }
-        set { SetField(ref _comment, value); }
+        get => _comment;
+        set => SetField(ref _comment, value);
     }
     public bool Disabled
     {
-        get { return _disabled; }
-        set { SetField(ref _disabled, value); }
+        get => _disabled;
+        set => SetField(ref _disabled, value);
     }
     public int Project_ID
     {
-        get { return _project_ID; }
-        set { SetField(ref _project_ID, value); }
+        get => _project_ID;
+        set => SetField(ref _project_ID, value);
     }
     public int? Pipeline_ID
     {
-        get { return _pipeline_ID; }
-        set { SetField(ref _pipeline_ID, value); }
+        get => _pipeline_ID;
+        set => SetField(ref _pipeline_ID, value);
     }
 
     public TimeSpan ExecutionTimeOfDay
     {
-        get { return _executionTimeOfDay; }
-        set { SetField(ref _executionTimeOfDay , value); }
+        get => _executionTimeOfDay;
+        set => SetField(ref _executionTimeOfDay , value);
     }
 
     public int? ReleasePipeline_ID
     {
-        get { return _releasePipelineId; }
-        set { SetField(ref _releasePipelineId , value); }
+        get => _releasePipelineId;
+        set => SetField(ref _releasePipelineId , value);
     }
 
     #endregion
@@ -94,34 +94,16 @@ public class AutomateExtractionSchedule : DatabaseEntity, INamed
     #region Database Relationships
 
     [NoMappingToDatabase]
-    public IPipeline Pipeline { get
-    {
-        return Pipeline_ID != null ? _repository.CatalogueRepository.GetObjectByID<Pipeline>(Pipeline_ID.Value) : null;
-    } }
+    public IPipeline Pipeline => Pipeline_ID != null ? _repository.CatalogueRepository.GetObjectByID<Pipeline>(Pipeline_ID.Value) : null;
 
     [NoMappingToDatabase]
-    public IPipeline ReleasePipeline
-    {
-        get
-        {
-            return ReleasePipeline_ID != null ? _repository.CatalogueRepository.GetObjectByID<Pipeline>(ReleasePipeline_ID.Value) : null;
-        }
-    }
+    public IPipeline ReleasePipeline => ReleasePipeline_ID != null ? _repository.CatalogueRepository.GetObjectByID<Pipeline>(ReleasePipeline_ID.Value) : null;
 
     [NoMappingToDatabase]
-    public IProject Project
-    {
-        get
-        {
-            return  _repository.DataExportRepository.GetObjectByID<Project>(Project_ID);
-        } }
+    public IProject Project => _repository.DataExportRepository.GetObjectByID<Project>(Project_ID);
 
     [NoMappingToDatabase]
-    public AutomateExtraction[] AutomateExtractions { get
-    {
-        return _repository.GetAllObjectsWithParent<AutomateExtraction>(this);
-    } }
-
+    public AutomateExtraction[] AutomateExtractions => _repository.GetAllObjectsWithParent<AutomateExtraction>(this);
 
     #endregion
 
@@ -131,7 +113,7 @@ public class AutomateExtractionSchedule : DatabaseEntity, INamed
         repository.InsertAndHydrate(this, new Dictionary<string, object>()
         {
             {"Project_ID",project.ID},
-            {"Name","New Schedule"+Guid.NewGuid()},
+            {"Name", $"New Schedule{Guid.NewGuid()}" },
             {"ExecutionTimescale",AutomationTimeScale.Never},
             {"ExecutionTimeOfDay","12:00:00"}
         });
@@ -201,7 +183,7 @@ public class AutomateExtractionSchedule : DatabaseEntity, INamed
 
         notifier.OnCheckPerformed(
             new CheckEventArgs(
-                "Ticket '" + Ticket + "' is " + evaluation + ".  Reason given was:" + Environment.NewLine + reason,
+                $"Ticket '{Ticket}' is {evaluation}.  Reason given was:{Environment.NewLine}{reason}",
                 CheckResult.Fail, exc));
     }
 

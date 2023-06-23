@@ -41,7 +41,7 @@ public class RemoteRDMPReleaseEngineSettings : ICheckable
             var message = new HttpRequestMessage(HttpMethod.Head, baseUri.ToString());
             var check = client.SendAsync(message).Result;
             check.EnsureSuccessStatusCode();
-            notifier.OnCheckPerformed(new CheckEventArgs("Checks passed " + check.Content.ReadAsStringAsync().Result, CheckResult.Success));
+            notifier.OnCheckPerformed(new CheckEventArgs($"Checks passed {check.Content.ReadAsStringAsync().Result}", CheckResult.Success));
         }
         catch (Exception e)
         {

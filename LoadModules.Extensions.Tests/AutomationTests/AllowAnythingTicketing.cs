@@ -1,11 +1,9 @@
 ﻿using System;
-using System.ComponentModel.Composition;
 using Rdmp.Core.Ticketing;
 using Rdmp.Core.ReusableLibraryCode.Checks;
 
 namespace LoadModules.Extensions.AutomationPlugins.Tests;
 
-[Export(typeof(ITicketingSystem))]
 public class AllowAnythingTicketing:ITicketingSystem
 {
     public void Check(ICheckNotifier notifier)
@@ -31,8 +29,5 @@ public class AllowAnythingTicketing:ITicketingSystem
         return TicketingReleaseabilityEvaluation.Releaseable;
     }
 
-    public string GetProjectFolderName(string masterTicket)
-    {
-        return "Project " + masterTicket;
-    }
+    public string GetProjectFolderName(string masterTicket) => $"Project {masterTicket}";
 }

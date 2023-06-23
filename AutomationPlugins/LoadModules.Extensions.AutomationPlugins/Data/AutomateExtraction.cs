@@ -135,7 +135,8 @@ public class AutomateExtraction : DatabaseEntity, IMapsDirectlyToDatabaseTable
 
     public SuccessfullyExtractedResults GetSuccessIfAnyFor(IExtractableDataSet ds)
     {
-        return _repository.GetAllObjects<SuccessfullyExtractedResults>(@"WHERE ExtractableDataSet_ID  = " + ds.ID + " AND AutomateExtraction_ID = " + ID).SingleOrDefault();
+        return _repository.GetAllObjects<SuccessfullyExtractedResults>(
+            $@"WHERE ExtractableDataSet_ID  = {ds.ID} AND AutomateExtraction_ID = {ID}").SingleOrDefault();
     }
 
     public void ClearBaselines()
@@ -143,10 +144,10 @@ public class AutomateExtraction : DatabaseEntity, IMapsDirectlyToDatabaseTable
         using (var con = _repository.DiscoveredServer.GetConnection())
         {
             con.Open();
-            new SqlCommand(@"Delete From 
+            new SqlCommand($@"Delete From 
   [ReleaseIdentifiersSeen]
   where
-  AutomateExtraction_ID = " + ID, (SqlConnection) con).ExecuteNonQuery();
+  AutomateExtraction_ID = {ID}", (SqlConnection) con).ExecuteNonQuery();
         }
 
         foreach (SuccessfullyExtractedResults r in _repository.GetAllObjectsWithParent<SuccessfullyExtractedResults>(this))

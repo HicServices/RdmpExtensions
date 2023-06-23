@@ -35,8 +35,8 @@ public class RemoteRDMPDataReleaseDestination : IPluginDataFlowComponent<Release
             releaseAudit.ReleaseFolder = new DirectoryInfo(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N")));
             if (!releaseAudit.ReleaseFolder.Exists)
                 releaseAudit.ReleaseFolder.Create();
-            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Warning, "No destination folder specified! Did you forget to introduce and initialize the ReleaseFolderProvider in the pipeline? " +
-                "The release output will be located in " + releaseAudit.ReleaseFolder.FullName));
+            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Warning,
+                $"No destination folder specified! Did you forget to introduce and initialize the ReleaseFolderProvider in the pipeline? The release output will be located in {releaseAudit.ReleaseFolder.FullName}"));
         }
 
         if (_releaseData.ReleaseState == ReleaseState.DoingPatch)
@@ -58,7 +58,8 @@ public class RemoteRDMPDataReleaseDestination : IPluginDataFlowComponent<Release
                 }
             }
 
-            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Deleted " + recordsDeleted + " old CumulativeExtractionResults (That were not included in the final Patch you are preparing)"));
+            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information,
+                $"Deleted {recordsDeleted} old CumulativeExtractionResults (That were not included in the final Patch you are preparing)"));
         }
 
         _remoteRDMPReleaseEngineengine = new RemoteRDMPReleaseEngine(_project, RDMPReleaseSettings, listener, releaseAudit.ReleaseFolder);
@@ -85,7 +86,8 @@ public class RemoteRDMPDataReleaseDestination : IPluginDataFlowComponent<Release
                 }
 
                 if (remnantsDeleted > 0)
-                    listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Because release failed we are deleting ReleaseLogEntries, this resulted in " + remnantsDeleted + " deleted records, you will likely need to re-extract these datasets"));
+                    listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information,
+                        $"Because release failed we are deleting ReleaseLogEntries, this resulted in {remnantsDeleted} deleted records, you will likely need to re-extract these datasets"));
             }
             catch (Exception e1)
             {
@@ -96,7 +98,8 @@ public class RemoteRDMPDataReleaseDestination : IPluginDataFlowComponent<Release
 
         if (pipelineFailureExceptionIfAny == null)
         {
-            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Data release succeded into: " + RDMPReleaseSettings.RemoteRDMP.Name));
+            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information,
+                $"Data release succeded into: {RDMPReleaseSettings.RemoteRDMP.Name}"));
                 
             // we can freeze the configuration now:
             foreach (var config in _configurationReleased)
@@ -132,15 +135,15 @@ public class RemoteRDMPDataReleaseDestination : IPluginDataFlowComponent<Release
 
     private string GetSafeHavenFolder(string masterTicket)
     {
-        if (String.IsNullOrWhiteSpace(masterTicket))
-            return "Proj-" + _project.ProjectNumber;
+        if (string.IsNullOrWhiteSpace(masterTicket))
+            return $"Proj-{_project.ProjectNumber}";
 
         var catalogueRepository = _project.DataExportRepository.CatalogueRepository;
         var factory = new TicketingSystemFactory(catalogueRepository);
         var system = factory.CreateIfExists(catalogueRepository.GetTicketingSystem());
 
         if (system == null)
-            return String.Empty;
+            return string.Empty;
 
         return system.GetProjectFolderName(masterTicket).Replace("/", "");
     }

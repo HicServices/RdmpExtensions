@@ -28,7 +28,7 @@ public class IdentifierAccumulator
 
     private IdentifierAccumulator()
     {
-        _commitTblName = "Temp"+Guid.NewGuid().ToString().Replace("-", "");
+        _commitTblName = $"Temp{Guid.NewGuid().ToString().Replace("-", "")}";
     }
 
     HashSet<string>  identifiers = new HashSet<string>();
@@ -60,7 +60,7 @@ public class IdentifierAccumulator
             using (var con = repository.DiscoveredServer.GetConnection())
             {
                 con.Open();
-                var query = "SELECT TOP 0 * INTO " + tempTable.GetFullyQualifiedName()+" FROM ReleaseIdentifiersSeen";
+                var query = $"SELECT TOP 0 * INTO {tempTable.GetFullyQualifiedName()} FROM ReleaseIdentifiersSeen";
                 repository.DiscoveredServer.GetCommand(query, con).ExecuteNonQuery();
             }
 
@@ -73,13 +73,13 @@ public class IdentifierAccumulator
             using (SqlConnection con = new SqlConnection(repository.ConnectionString))
             {
                 con.Open();
-                string sql = @"INSERT ReleaseIdentifiersSeen (AutomateExtraction_ID, ReleaseID)  
+                string sql = $@"INSERT ReleaseIdentifiersSeen (AutomateExtraction_ID, ReleaseID)  
 SELECT AutomateExtraction_ID, ReleaseID   
-FROM "+_commitTblName+@"
+FROM {_commitTblName}
 WHERE NOT EXISTS (SELECT 1 FROM ReleaseIdentifiersSeen A2 WHERE
-A2.AutomateExtraction_ID = " + _commitTblName + @".AutomateExtraction_ID 
+A2.AutomateExtraction_ID = {_commitTblName}.AutomateExtraction_ID 
 AND
-A2.ReleaseID = " + _commitTblName + @".ReleaseID )";
+A2.ReleaseID = {_commitTblName}.ReleaseID )";
                 SqlCommand cmd = new SqlCommand(sql, con);
                 cmd.ExecuteNonQuery();
             }

@@ -14,9 +14,10 @@
     <Compile Include="..\..\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="HIC.RDMP.Plugin" Version="8.1.0-rc1" />
-    <PackageReference Include="HIC.RDMP.Plugin.UI" Version="8.1.0-rc1" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\RDMP\Rdmp.UI\Rdmp.UI.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="DeAnonymise\DeAnonymiseAgainstCohortUI.cs">

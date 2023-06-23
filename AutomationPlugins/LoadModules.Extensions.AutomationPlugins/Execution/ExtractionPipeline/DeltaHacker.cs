@@ -39,11 +39,13 @@ public class DeltaHacker
         var configId = _extractDatasetCommand.Configuration.ID;
 
         //find the automation record
-        var automateExtraction = _repository.GetAllObjects<AutomateExtraction>("WHERE ExtractionConfiguration_ID = " + configId );
+        var automateExtraction = _repository.GetAllObjects<AutomateExtraction>(
+            $"WHERE ExtractionConfiguration_ID = {configId}");
 
         //there should be one! and only 1
         if(automateExtraction.Length != 1)
-            throw new Exception("No AutomateExtraction was found for ExtractionConfiguration '" + _extractDatasetCommand.Configuration +"'");
+            throw new Exception(
+                $"No AutomateExtraction was found for ExtractionConfiguration '{_extractDatasetCommand.Configuration}'");
 
         if(automateExtraction[0].BaselineDate == null)
             return BaselineHackEvaluation.NoCompatibleBaselineAvailable;
@@ -62,7 +64,8 @@ public class DeltaHacker
         //nope, the SQL is different, maybe the user has snuck in an extra column or some other thing
         if(!string.Equals(currentSQL.Trim(),oldSQL.Trim(),StringComparison.CurrentCultureIgnoreCase))
         {
-            listener.OnNotify(this,new NotifyEventArgs(ProgressEventType.Warning, "SQL is out of date for baseline of " + _extractDatasetCommand + ".  The old success will be deleted now and a new baseline will be executed",
+            listener.OnNotify(this,new NotifyEventArgs(ProgressEventType.Warning,
+                $"SQL is out of date for baseline of {_extractDatasetCommand}.  The old success will be deleted now and a new baseline will be executed",
                 new ExpectedIdenticalStringsException("SQL strings did not match",currentSQL.Trim().ToLower(),oldSQL.Trim().ToLower())));
 
             //either way the SQL is screwey so lets nuke the baseline and make them do a full baseline
@@ -81,27 +84,28 @@ public class DeltaHacker
         var tblForJoin = _repository.DiscoveredServer.GetCurrentDatabase().ExpectTable("ReleaseIdentifiersSeen");
             
         if(!tblForJoin.Exists())
-            throw new Exception("Table '" + tblForJoin + " did not exist!");
+            throw new Exception($"Table '{tblForJoin} did not exist!");
 
         var tableForJoinName = tblForJoin.GetFullyQualifiedName();
             
-        hackSql = @"
+        hackSql = $@"
 AND
 (
 	(
         --new cohorts
-		" + cohortReleaseIdentifier + @" 
-			not in (Select ReleaseId from " + tableForJoinName + @" where AutomateExtraction_ID = "+ automateExtraction[0].ID+ @")
+		{cohortReleaseIdentifier} 
+			not in (Select ReleaseId from {tableForJoinName} where AutomateExtraction_ID = {automateExtraction[0].ID})
 	)
 	OR
 	(
         --new records
-		" + validFromField.Name + " > '" + automateExtraction[0].BaselineDate.Value + @"'
+		{validFromField.Name} > '{automateExtraction[0].BaselineDate.Value}'
 	)
 )
 ";
 
-        listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Generated the following Delta Hack SQL:" + Environment.NewLine + hackSql));
+        listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information,
+            $"Generated the following Delta Hack SQL:{Environment.NewLine}{hackSql}"));
 
         return BaselineHackEvaluation.Allowed;
     }
@@ -119,7 +123,8 @@ AND
             //table doesn't have a 
             if(col == null)
             {
-                listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "TableInfo " + tableInfo + " did not have a ColumnInfo called '" + validFromFieldName + "'"));
+                listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information,
+                    $"TableInfo {tableInfo} did not have a ColumnInfo called '{validFromFieldName}'"));
                 continue;
             }
 
@@ -136,8 +141,8 @@ AND
                     if (tableInfo.IsPrimaryExtractionTable)
                     {
                         //should never happen to be honest I'm pretty sure QueryBuilder will be super angry if you have 2+ TableInfos both with IsPrimary and ColumnNames should be unique anyway but who knows
-                        listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, 
-                            "There were multiple ColumnInfos called " + validFromFieldName + " both from IsPrimaryExtractionTable TableInfos (" + validFromField + "," + col + ")" 
+                        listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error,
+                            $"There were multiple ColumnInfos called {validFromFieldName} both from IsPrimaryExtractionTable TableInfos ({validFromField},{col})"
                         ));
                         return null;
                     }
@@ -155,9 +160,8 @@ AND
                     else
                     {
                         //neither the previous or ourselves are primary
-                        listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error,  "There were multiple ColumnInfos called " + validFromFieldName +
-                            " (" + validFromField +
-                            "," + col + ") try setting one of your TableInfos to IsPrimaryExtractionTable"));
+                        listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error,
+                            $"There were multiple ColumnInfos called {validFromFieldName} ({validFromField},{col}) try setting one of your TableInfos to IsPrimaryExtractionTable"));
                         return null;
                     }
                 }
@@ -167,11 +171,13 @@ AND
 
         if (validFromField == null)
         {
-            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Warning, "No ColumnInfos were found called '" + validFromFieldName + "'"));
+            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Warning,
+                $"No ColumnInfos were found called '{validFromFieldName}'"));
             return null;
         }
             
-        listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Found valid from field '" + validFromField + "'"));
+        listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information,
+            $"Found valid from field '{validFromField}'"));
         return validFromField;
     }
 }

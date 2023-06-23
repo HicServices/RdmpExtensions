@@ -192,8 +192,10 @@ public class PythonDataProvider:IPluginDataProvider
 
         try
         {
-            p =  new Process();
-            p.StartInfo = processStartInfo;
+            p = new Process
+            {
+                StartInfo = processStartInfo
+            };
             p.OutputDataReceived += (s, e) => allOutputDataConsumed = OutputDataReceived(s, e, listener,false);
             p.ErrorDataReceived += (s, e) => allErrorDataConsumed = OutputDataReceived(s, e, listener,true);
                 

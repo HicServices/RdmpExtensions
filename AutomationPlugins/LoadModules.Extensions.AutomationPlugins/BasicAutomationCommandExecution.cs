@@ -17,7 +17,7 @@ public class BasicAutomationCommandExecution : BasicCommandExecution
         }
         catch (System.Exception e)
         {
-            SetImpossible("No Automation Repository Found:" + e.Message);
+            SetImpossible($"No Automation Repository Found:{e.Message}");
             return;
         }
 
