@@ -6,7 +6,6 @@ env:
   MSSQL_SA_PASSWORD: "YourStrong!Passw0rd"
   ACCEPT_EULA: "Y"
   MSSQL_PID: "developer"
-  DOTNET_NOLOGO: 1
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   
 jobs:
@@ -14,33 +13,47 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+        with:
+          repository: HicServices/RDMP
+          ref: feature/rc4
+          path: RDMP
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 5.0.200
+          dotnet-version: 6.0.x
       - name: Get version
         id: version
         shell: cmd
         run: |
-          for /f tokens^=1^,2^ delims^=^" %%i in (SharedAssemblyInfo.cs) do @if "%%i"=="[assembly: AssemblyVersion(" echo ::set-output name=version::%%j
-          for /f tokens^=2^,4^ delims^=^" %%i in (AutomationPlugins/LoadModules.Extensions.AutomationPlugins/LoadModules.Extensions.AutomationPlugins.csproj) do @if "%%i"=="HIC.RDMP.Plugin" echo ::set-output name=rdmpversion::%%j
+          getversions >> %GITHUB_OUTPUT%
       - name: Set up database
         run: |
-          Invoke-WebRequest -Uri https://github.com/HicServices/RDMP/releases/download/v${{ steps.version.outputs.rdmpversion }}/rdmp-${{ steps.version.outputs.rdmpversion }}-cli-win-x64.zip -OutFile rdmp.zip
-          Expand-Archive -Path rdmp.zip -DestinationPath .\rdmpcli
-          cmd.exe /c rdmpcli\rdmp.exe install --createdatabasetimeout 180 localhost TEST_ -d
+          dotnet run --project RDMP/Tools/rdmp/rdmp.csproj -c Release -- install localhost TEST_ -d
       - name: Test
         run: |
-          dotnet test -c Release
+          dotnet test
       - name: Build
         run: |
-          cd Plugin/windows
-          dotnet publish --runtime win-x64 -c Release --self-contained false
-          cd ../main
-          dotnet publish -c Release --self-contained false
-          cd ../..
-          cmd /c nuget.exe pack ./HIC.Extensions.nuspec -Properties Configuration=Release -IncludeReferencedProjects -Symbols -Version ${{ steps.version.outputs.version }}
-          cmd /c rdmpcli\rdmp.exe pack --file HIC.Rdmp.Extensions.Plugin.${{ steps.version.outputs.version }}.nupkg --CatalogueConnectionString "Data Source=localhost;Database=TEST_Catalogue;Integrated Security=sspi;Encrypt=true;TrustServerCertificate=true" --DataExportConnectionString "Data Source=localhost;Database=TEST_DataExport;Integrated Security=sspi;Encrypt=true;TrustServerCertificate=true"
-          cmd /c rdmpcli\rdmp.exe cmd listsupportedcommands --CatalogueConnectionString "Data Source=localhost;Database=TEST_Catalogue;Integrated Security=sspi;Encrypt=true;TrustServerCertificate=true" --DataExportConnectionString "Data Source=localhost;Database=TEST_DataExport;Integrated Security=sspi;Encrypt=true;TrustServerCertificate=true"
+          @"
+          <?xml version="1.0" encoding="utf-8"?>
+          <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+              <metadata>
+                  <id>HIC.Extensions</id>
+                  <version>${{ steps.version.outputs.version }}</version>
+                  <authors>Health Informatics Service, University of Dundee</authors>
+                  <description>Imaging plugin for Research Data Management Platform </description>
+                  <dependencies>
+                      <dependency id="HIC.RDMP.Plugin" version="${{ steps.version.outputs.rdmpversion }}" />
+                  </dependencies>
+              </metadata>
+          </package>
+          "@ | Out-File plugin.nuspec
+
+          dotnet publish Plugin/windows/windows.csproj -c Release -o p/windows
+          dotnet publish Plugin/main/main.csproj -c Release -o p/main
+          cmd /c 7z a -tzip HIC.Extensions.nupkg plugin.nuspec p
+          dotnet run --project RDMP/Tools/rdmp/rdmp.csproj -c Release -- pack -p --file HIC.Extensions.nupkg --dir yaml
+          dotnet run --project RDMP/Tools/rdmp/rdmp.csproj -c Release -- cmd listsupportedcommands --dir yaml
       - name: Store created nupkg files
         uses: actions/upload-artifact@v3
         with:
@@ -52,4 +65,4 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref }}
-          file: Rdmp.Extensions.Plugin.${{ steps.version.outputs.version }}.nupkg
+          file: '["HIC.Rdmp.Extensions.Plugin.${{ steps.version.outputs.version }}.nupkg"]'
