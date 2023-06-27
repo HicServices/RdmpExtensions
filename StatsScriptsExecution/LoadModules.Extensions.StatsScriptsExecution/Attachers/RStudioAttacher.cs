@@ -178,12 +178,12 @@ public class RStudioAttacher : Attacher, IPluginAttacher
 
     private string GetConnectionString(DiscoveredDatabase db)
     {
-        return string.Format("Server={0};Database={1};IntegratedSecurity=true;DRIVER=SQL Server", db.Server.Name, db.GetRuntimeName());
+        return $"Server={db.Server.Name};Database={db.GetRuntimeName()};IntegratedSecurity=true;DRIVER=SQL Server";
     }
 
     private string GetConnectionString(ExternalDatabaseServer db)
     {
-        return string.Format("Server={0};Database={1};IntegratedSecurity=true;DRIVER=SQL Server", db.Server, db.Database);
+        return $"Server={db.Server};Database={db.Database};IntegratedSecurity=true;DRIVER=SQL Server";
     }
 
     private string CreateActualOutputDir(string scriptFileName)

@@ -61,7 +61,7 @@ public partial class DeAnonymiseAgainstCohortUI : Form, IDeAnonymiseAgainstCohor
     private void btnChooseCohort_Click(object sender, EventArgs e)
     {
         var dialog = new SelectDialog<IMapsDirectlyToDatabaseTable>(
-            new DialogArgs() {WindowTitle = "Choose Cohort" }, (IActivateItems)_activator, _dataExportRepository.GetAllObjects<ExtractableCohort>(), false);
+            new DialogArgs {WindowTitle = "Choose Cohort" }, (IActivateItems)_activator, _dataExportRepository.GetAllObjects<ExtractableCohort>(), false);
 
         if (dialog.ShowDialog() != DialogResult.OK) return;
         if (dialog.Selected == null) return;

@@ -168,12 +168,12 @@ public class SasAttacher : Attacher, IPluginAttacher
 
     private string GetSASConnectionString(DiscoveredDatabase db)
     {
-        return String.Format("Server={0};Database={1};IntegratedSecurity=true;DRIVER=SQL Server", db.Server.Name, db.GetRuntimeName());
+        return $"Server={db.Server.Name};Database={db.GetRuntimeName()};IntegratedSecurity=true;DRIVER=SQL Server";
     }
 
     private string GetSASConnectionString(ExternalDatabaseServer db)
     {
-        return String.Format("Server={0};Database={1};IntegratedSecurity=true;DRIVER=SQL Server", db.Server, db.Database);
+        return $"Server={db.Server};Database={db.Database};IntegratedSecurity=true;DRIVER=SQL Server";
     }
 
     private string CreateActualOutputDir(string scriptFileName)

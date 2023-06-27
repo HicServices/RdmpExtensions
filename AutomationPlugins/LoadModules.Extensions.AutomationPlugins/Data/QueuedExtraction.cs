@@ -23,54 +23,43 @@ public class QueuedExtraction : DatabaseEntity
 
     public int ExtractionConfiguration_ID
     {
-        get { return _extractionConfiguration_ID; }
-        set { SetField(ref _extractionConfiguration_ID, value); }
+        get => _extractionConfiguration_ID;
+        set => SetField(ref _extractionConfiguration_ID, value);
     }
     public int Pipeline_ID
     {
-        get { return _pipeline_ID; }
-        set { SetField(ref _pipeline_ID, value); }
+        get => _pipeline_ID;
+        set => SetField(ref _pipeline_ID, value);
     }
     public DateTime DueDate
     {
-        get { return _dueDate; }
-        set { SetField(ref _dueDate, value); }
+        get => _dueDate;
+        set => SetField(ref _dueDate, value);
     }
     public string Requester
     {
-        get { return _requester; }
-        set { SetField(ref _requester, value); }
+        get => _requester;
+        set => SetField(ref _requester, value);
     }
     public DateTime RequestDate
     {
-        get { return _requestDate; }
-        set { SetField(ref _requestDate, value); }
+        get => _requestDate;
+        set => SetField(ref _requestDate, value);
     }
     #endregion
 
     #region Relationships
     [NoMappingToDatabase]
-    public IExtractionConfiguration ExtractionConfiguration
-    {
-        get
-        {
-            return ((AutomateExtractionRepository)Repository).DataExportRepository.GetObjectByID<ExtractionConfiguration>(ExtractionConfiguration_ID);
-        }
-    }
+    public IExtractionConfiguration ExtractionConfiguration => ((AutomateExtractionRepository)Repository).DataExportRepository.GetObjectByID<ExtractionConfiguration>(ExtractionConfiguration_ID);
 
     [NoMappingToDatabase]
-    public Pipeline Pipeline
-    {
-        get
-        {
-            return ((AutomateExtractionRepository)Repository).CatalogueRepository.GetObjectByID<Pipeline>(Pipeline_ID);
-        }
-    }
+    public Pipeline Pipeline => ((AutomateExtractionRepository)Repository).CatalogueRepository.GetObjectByID<Pipeline>(Pipeline_ID);
+
     #endregion
 
     public QueuedExtraction(PluginRepository repository, ExtractionConfiguration configuration, IPipeline extractionPipeline, DateTime dueDate)
     {
-        repository.InsertAndHydrate(this, new Dictionary<string, object>()
+        repository.InsertAndHydrate(this, new Dictionary<string, object>
         {
             {"ExtractionConfiguration_ID",configuration.ID},
             {"Pipeline_ID",extractionPipeline.ID},

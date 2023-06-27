@@ -31,7 +31,7 @@ public class ObjectCreationTests : TestsRequiringAnAutomationPluginRepository
             
         //Permission to use a given configuration
         var automate = new AutomateExtraction(Repo,schedule,config);
-        Assert.AreEqual(automate.ExtractionConfiguration_ID,config.ID);
+        Assert.AreEqual(automate.ExtractionConfigurationId,config.ID);
         Assert.AreEqual(automate.Disabled ,false);
         Assert.IsNull(automate.BaselineDate);
 

@@ -27,7 +27,7 @@ public class DeltaHacker
 
 
         //dataset must have a single hic_validFrom field
-        ColumnInfo validFromField = GetValidFromField(listener);
+        var validFromField = GetValidFromField(listener);
         hackSql = null;
 
         if(validFromField == null)
@@ -113,7 +113,7 @@ AND
     public ColumnInfo GetValidFromField(IDataLoadEventListener listener)
     {
         ColumnInfo validFromField = null;
-        bool wasPrimaryExtractionTable = false;
+        var wasPrimaryExtractionTable = false;
         const string validFromFieldName = SpecialFieldNames.ValidFrom;
 
         foreach (TableInfo tableInfo in _extractDatasetCommand.QueryBuilder.TablesUsedInQuery)

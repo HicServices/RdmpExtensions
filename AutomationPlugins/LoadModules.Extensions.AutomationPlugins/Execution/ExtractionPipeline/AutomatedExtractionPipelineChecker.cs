@@ -28,7 +28,7 @@ public class AutomatedExtractionPipelineChecker:ICheckable
                 notifier.OnCheckPerformed(new CheckEventArgs("Found SuccessfullyExtractedResultsDocumenter plugin component",CheckResult.Success));
             else
                 notifier.OnCheckPerformed(new CheckEventArgs(
-                    $"Automated Extraction can only take place through Pipelines that include a {typeof(SuccessfullyExtractedResultsDocumenter).Name} plugin component", CheckResult.Fail));
+                    $"Automated Extraction can only take place through Pipelines that include a {nameof(SuccessfullyExtractedResultsDocumenter)} plugin component", CheckResult.Fail));
             
             var source = _automateExtractionPipeline.Source;
 

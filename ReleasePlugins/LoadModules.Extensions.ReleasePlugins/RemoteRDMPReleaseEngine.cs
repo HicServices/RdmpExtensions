@@ -17,13 +17,12 @@ namespace LoadModules.Extensions.ReleasePlugins;
 
 public class RemoteRDMPReleaseEngine : ReleaseEngine
 {
-    public RemoteRDMPReleaseEngineSettings RemoteRDMPSettings { get; set; }
+    public RemoteRDMPReleaseEngineSettings RemoteRDMPSettings { get; }
 
-    public RemoteRDMPReleaseEngine(Project project, RemoteRDMPReleaseEngineSettings releaseSettings, IDataLoadEventListener listener, DirectoryInfo releaseFolder) : base(project, new ReleaseEngineSettings(), listener, new ReleaseAudit() { ReleaseFolder = releaseFolder })
+    public RemoteRDMPReleaseEngine(Project project, RemoteRDMPReleaseEngineSettings releaseSettings, IDataLoadEventListener listener, DirectoryInfo releaseFolder) : base(project, new ReleaseEngineSettings(), listener, new ReleaseAudit { ReleaseFolder = releaseFolder })
     {
         RemoteRDMPSettings = releaseSettings;
-        if (RemoteRDMPSettings == null)
-            RemoteRDMPSettings = new RemoteRDMPReleaseEngineSettings();
+        RemoteRDMPSettings ??= new RemoteRDMPReleaseEngineSettings();
     }
 
     public override void DoRelease(Dictionary<IExtractionConfiguration, List<ReleasePotential>> toRelease, Dictionary<IExtractionConfiguration, ReleaseEnvironmentPotential> environments, bool isPatch)
@@ -50,55 +49,53 @@ public class RemoteRDMPReleaseEngine : ReleaseEngine
 
     private void UploadToRemote(string zipOutput, string releaseFileName, string projectSafeHavenFolder)
     {
-        using (var handler = new HttpClientHandler())
-        using (var client = new HttpClient(handler))
-        using (var content = new MultipartFormDataContent())
+        using var handler = new HttpClientHandler();
+        using var client = new HttpClient(handler);
+        using var content = new MultipartFormDataContent();
+        handler.Credentials = new NetworkCredential
         {
-            handler.Credentials = new NetworkCredential
-            {
-                UserName = RemoteRDMPSettings.RemoteRDMP.Username,
-                Password = RemoteRDMPSettings.RemoteRDMP.GetDecryptedPassword()
-            };
+            UserName = RemoteRDMPSettings.RemoteRDMP.Username,
+            Password = RemoteRDMPSettings.RemoteRDMP.GetDecryptedPassword()
+        };
 
-            content.Add(new StreamContent(File.OpenRead(zipOutput)), "file", Path.GetFileName(releaseFileName));
-            var settings = new
-            {
-                ProjectFolder = projectSafeHavenFolder,
-                ZipPassword = RemoteRDMPSettings.ZipPassword.GetDecryptedValue()
-            };
-            content.Add(new StringContent(JsonConvert.SerializeObject(settings)), "settings");
+        content.Add(new StreamContent(File.OpenRead(zipOutput)), "file", Path.GetFileName(releaseFileName));
+        var settings = new
+        {
+            ProjectFolder = projectSafeHavenFolder,
+            ZipPassword = RemoteRDMPSettings.ZipPassword.GetDecryptedValue()
+        };
+        content.Add(new StringContent(JsonConvert.SerializeObject(settings)), "settings");
                 
-            try
+        try
+        {
+            var result = client.PostAsync(RemoteRDMPSettings.RemoteRDMP.GetUrlForRelease(), content).Result;
+            string resultStream;
+            List<NotifyEventArgsProxy> messages;
+            if (!result.IsSuccessStatusCode)
             {
-                var result = client.PostAsync(RemoteRDMPSettings.RemoteRDMP.GetUrlForRelease(), content).Result;
-                string resultStream;
-                List<NotifyEventArgsProxy> messages;
-                if (!result.IsSuccessStatusCode)
+                resultStream = result.Content.ReadAsStringAsync().Result;
+                messages = JsonConvert.DeserializeObject<List<NotifyEventArgsProxy>>(resultStream);
+                foreach (var eventArg in messages)
                 {
-                    resultStream = result.Content.ReadAsStringAsync().Result;
-                    messages = JsonConvert.DeserializeObject<List<NotifyEventArgsProxy>>(resultStream);
-                    foreach (var eventArg in messages)
-                    {
-                        _listener.OnNotify(this, eventArg);
-                    }
-                    throw new Exception("Upload failed");
+                    _listener.OnNotify(this, eventArg);
                 }
-                else
-                {
-                    resultStream = result.Content.ReadAsStringAsync().Result;
-                    messages = JsonConvert.DeserializeObject<List<NotifyEventArgsProxy>>(resultStream);
-                    foreach (var eventArg in messages)
-                    {
-                        _listener.OnNotify(this, eventArg);
-                    }
-                    _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Upload succeeded"));
-                }
+                throw new Exception("Upload failed");
             }
-            catch (Exception ex)
+            else
             {
-                _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Failed to upload data", ex));
-                throw;
+                resultStream = result.Content.ReadAsStringAsync().Result;
+                messages = JsonConvert.DeserializeObject<List<NotifyEventArgsProxy>>(resultStream);
+                foreach (var eventArg in messages)
+                {
+                    _listener.OnNotify(this, eventArg);
+                }
+                _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Upload succeeded"));
             }
+        }
+        catch (Exception ex)
+        {
+            _listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Failed to upload data", ex));
+            throw;
         }
     }
         

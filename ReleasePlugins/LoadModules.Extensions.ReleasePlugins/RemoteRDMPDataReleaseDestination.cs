@@ -17,7 +17,7 @@ namespace LoadModules.Extensions.ReleasePlugins;
 
 public class RemoteRDMPDataReleaseDestination : IPluginDataFlowComponent<ReleaseAudit>, IDataFlowDestination<ReleaseAudit>, IPipelineRequirement<Project>, IPipelineRequirement<ReleaseData>
 {
-    [DemandsNestedInitialization()]
+    [DemandsNestedInitialization]
     public RemoteRDMPReleaseEngineSettings RDMPReleaseSettings { get; set; }
 
     private RemoteRDMPReleaseEngine _remoteRDMPReleaseEngineengine;
@@ -43,19 +43,17 @@ public class RemoteRDMPDataReleaseDestination : IPluginDataFlowComponent<Release
         {
             listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "CumulativeExtractionResults for datasets not included in the Patch will now be erased."));
 
-            int recordsDeleted = 0;
+            var recordsDeleted = 0;
 
-            foreach (var configuration in _releaseData.ConfigurationsForRelease.Keys)
+            foreach (var redundantResult in _releaseData.ConfigurationsForRelease.Keys
+                         .Select(configuration => new { configuration, current = configuration })
+                         .Select(t => new { t, currentResults = t.configuration.CumulativeExtractionResults })
+                         .SelectMany(t => t.currentResults.Where(r =>
+                             _releaseData.ConfigurationsForRelease[t.t.current]
+                                 .All(rp => rp.DataSet.ID != r.ExtractableDataSet_ID))))
             {
-                IExtractionConfiguration current = configuration;
-                var currentResults = configuration.CumulativeExtractionResults;
-
-                //foreach existing CumulativeExtractionResults if it is not included in the patch then it should be deleted
-                foreach (var redundantResult in currentResults.Where(r => _releaseData.ConfigurationsForRelease[current].All(rp => rp.DataSet.ID != r.ExtractableDataSet_ID)))
-                {
-                    redundantResult.DeleteInDatabase();
-                    recordsDeleted++;
-                }
+                redundantResult.DeleteInDatabase();
+                recordsDeleted++;
             }
 
             listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information,
@@ -76,10 +74,10 @@ public class RemoteRDMPDataReleaseDestination : IPluginDataFlowComponent<Release
         {
             try
             {
-                int remnantsDeleted = 0;
+                var remnantsDeleted = 0;
 
-                foreach (ExtractionConfiguration configuration in _releaseData.ConfigurationsForRelease.Keys)
-                foreach (IReleaseLog remnant in configuration.ReleaseLog)
+                foreach (var remnant in _releaseData.ConfigurationsForRelease.Keys.Cast<ExtractionConfiguration>()
+                             .SelectMany(configuration => configuration.ReleaseLog))
                 {
                     remnant.DeleteInDatabase();
                     remnantsDeleted++;
@@ -99,7 +97,7 @@ public class RemoteRDMPDataReleaseDestination : IPluginDataFlowComponent<Release
         if (pipelineFailureExceptionIfAny == null)
         {
             listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information,
-                $"Data release succeded into: {RDMPReleaseSettings.RemoteRDMP.Name}"));
+                $"Data release succeeded into: {RDMPReleaseSettings.RemoteRDMP.Name}"));
                 
             // we can freeze the configuration now:
             foreach (var config in _configurationReleased)
@@ -125,11 +123,10 @@ public class RemoteRDMPDataReleaseDestination : IPluginDataFlowComponent<Release
     public void Check(ICheckNotifier notifier)
     {
         var projectSafeHavenFolder = GetSafeHavenFolder(_project.MasterTicket);
-        if (string.IsNullOrWhiteSpace(projectSafeHavenFolder))
-            notifier.OnCheckPerformed(new CheckEventArgs("No Safe Haven folder specified in the Project Master Ticket", CheckResult.Fail));
-        else
-            notifier.OnCheckPerformed(new CheckEventArgs("Project Master Ticket contains Safe Haven folder", CheckResult.Success));
-            
+        notifier.OnCheckPerformed(string.IsNullOrWhiteSpace(projectSafeHavenFolder)
+            ? new CheckEventArgs("No Safe Haven folder specified in the Project Master Ticket", CheckResult.Fail)
+            : new CheckEventArgs("Project Master Ticket contains Safe Haven folder", CheckResult.Success));
+
         ((ICheckable)RDMPReleaseSettings).Check(notifier);
     }
 
@@ -142,10 +139,7 @@ public class RemoteRDMPDataReleaseDestination : IPluginDataFlowComponent<Release
         var factory = new TicketingSystemFactory(catalogueRepository);
         var system = factory.CreateIfExists(catalogueRepository.GetTicketingSystem());
 
-        if (system == null)
-            return string.Empty;
-
-        return system.GetProjectFolderName(masterTicket).Replace("/", "");
+        return system?.GetProjectFolderName(masterTicket).Replace("/", "") ?? string.Empty;
     }
 
     public void PreInitialize(Project value, IDataLoadEventListener listener)

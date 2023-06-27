@@ -110,7 +110,7 @@ public class AutomateExtractionSchedule : DatabaseEntity, INamed
     public AutomateExtractionSchedule(PluginRepository repository, IProject project)
     {
         _repository = (AutomateExtractionRepository) repository;
-        repository.InsertAndHydrate(this, new Dictionary<string, object>()
+        repository.InsertAndHydrate(this, new Dictionary<string, object>
         {
             {"Project_ID",project.ID},
             {"Name", $"New Schedule{Guid.NewGuid()}" },
@@ -173,10 +173,7 @@ public class AutomateExtractionSchedule : DatabaseEntity, INamed
             return;
         }
 
-        Exception exc;
-        string reason;
-
-        var evaluation = config.GetDataReleaseabilityOfTicket(Ticket, null, null, out reason, out exc);
+        var evaluation = config.GetDataReleaseabilityOfTicket(Ticket, null, null, out var reason, out var exc);
 
         if(evaluation == TicketingReleaseabilityEvaluation.Releaseable)
             return;
@@ -189,7 +186,7 @@ public class AutomateExtractionSchedule : DatabaseEntity, INamed
 
     public IExtractionConfiguration[] GetImportableExtractionConfigurations()
     {
-        var idsAlreadyPartOfSchedule = AutomateExtractions.Select(e => e.ExtractionConfiguration_ID);
+        var idsAlreadyPartOfSchedule = AutomateExtractions.Select(e => e.ExtractionConfigurationId);
 
         var available = Project.ExtractionConfigurations;
 

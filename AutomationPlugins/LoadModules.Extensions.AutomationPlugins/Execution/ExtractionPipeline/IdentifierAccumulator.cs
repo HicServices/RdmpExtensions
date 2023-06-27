@@ -49,9 +49,9 @@ public class IdentifierAccumulator
             dt.Columns.Add("AutomateExtraction_ID", typeof(int));
             dt.Columns.Add("ReleaseID", typeof(string));
 
-            int id = automateExtraction.ID;
+            var id = automateExtraction.ID;
 
-            foreach (string s in identifiers)
+            foreach (var s in identifiers)
                 dt.Rows.Add(id, s);
 
             //clear old history
@@ -70,17 +70,17 @@ public class IdentifierAccumulator
             }
 
             //clear old history
-            using (SqlConnection con = new SqlConnection(repository.ConnectionString))
+            using (var con = new SqlConnection(repository.ConnectionString))
             {
                 con.Open();
-                string sql = $@"INSERT ReleaseIdentifiersSeen (AutomateExtraction_ID, ReleaseID)  
+                var sql = $@"INSERT ReleaseIdentifiersSeen (AutomateExtraction_ID, ReleaseID)  
 SELECT AutomateExtraction_ID, ReleaseID   
 FROM {_commitTblName}
 WHERE NOT EXISTS (SELECT 1 FROM ReleaseIdentifiersSeen A2 WHERE
 A2.AutomateExtraction_ID = {_commitTblName}.AutomateExtraction_ID 
 AND
 A2.ReleaseID = {_commitTblName}.ReleaseID )";
-                SqlCommand cmd = new SqlCommand(sql, con);
+                var cmd = new SqlCommand(sql, con);
                 cmd.ExecuteNonQuery();
             }
             

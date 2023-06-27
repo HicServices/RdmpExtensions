@@ -29,17 +29,13 @@ public class SuccessfullyExtractedResultsDocumenter : IPluginDataFlowComponent<D
 
     public DataTable ProcessPipelineData(DataTable toProcess, IDataLoadEventListener listener,GracefulCancellationToken cancellationToken)
     {
-        //it is a request for custom data
-        var ds = _extractDatasetCommand as ExtractDatasetCommand;
-        var global = _extractDatasetCommand as ExtractGlobalsCommand;
-
-        if (ds != null)
-            return ProcessPipelineData(ds, toProcess, listener, cancellationToken);
-
-        if(global != null)
-            return ProcessPipelineData(global, toProcess, listener, cancellationToken);
-
-        throw new NotSupportedException("Expected IExtractCommand to be ExtractDatasetCommand or ExtractGlobalsCommand");
+        return _extractDatasetCommand switch
+        {
+            ExtractDatasetCommand ds => ProcessPipelineData(ds, toProcess, listener, cancellationToken),
+            ExtractGlobalsCommand global => ProcessPipelineData(global, toProcess, listener, cancellationToken),
+            _ => throw new NotSupportedException(
+                "Expected IExtractCommand to be ExtractDatasetCommand or ExtractGlobalsCommand")
+        };
     }
 
     private DataTable ProcessPipelineData(ExtractDatasetCommand ds, DataTable toProcess, IDataLoadEventListener listener, GracefulCancellationToken cancellationToken)
@@ -67,24 +63,18 @@ public class SuccessfullyExtractedResultsDocumenter : IPluginDataFlowComponent<D
                
             //delete any old baseline records 
             var success = _automateExtraction.GetSuccessIfAnyFor(ds.DatasetBundle.DataSet);
-            if (success != null)
-                success.DeleteInDatabase();
+            success?.DeleteInDatabase();
 
             _accumulator = IdentifierAccumulator.GetInstance(_dataLoadInfo);
 
         }
             
-        foreach (ReleaseIdentifierSubstitution substitution in ds.ReleaseIdentifierSubstitutions)
+        foreach (var value in ds.ReleaseIdentifierSubstitutions
+                     .SelectMany(substitution => toProcess.Rows.Cast<DataRow>(),
+                         (substitution, dr) => dr[substitution.GetRuntimeName()])
+                     .Where(value => value != null && value != DBNull.Value))
         {
-            foreach (DataRow dr in toProcess.Rows)
-            {
-                var value = dr[substitution.GetRuntimeName()];
-
-                if(value == null || value == DBNull.Value)
-                    continue;
-
-                _accumulator.AddIdentifierIfNotSee(value.ToString());
-            }
+            _accumulator.AddIdentifierIfNotSee(value.ToString());
         }
 
         return toProcess;
@@ -102,10 +92,10 @@ public class SuccessfullyExtractedResultsDocumenter : IPluginDataFlowComponent<D
 
     public void Dispose(IDataLoadEventListener listener, Exception pipelineFailureExceptionIfAny)
     {
-        //it completed succesfully right?
+        //it completed successfully right?
         if (pipelineFailureExceptionIfAny == null && _dataset != null)
         {
-            var successRecord = new SuccessfullyExtractedResults(_repo, _sql, _automateExtraction, _dataset);
+            _ = new SuccessfullyExtractedResults(_repo, _sql, _automateExtraction, _dataset);
             _accumulator.CommitCurrentState(_repo, _automateExtraction);
         }
     }

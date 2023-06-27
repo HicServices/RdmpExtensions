@@ -36,10 +36,9 @@ internal class ExecuteCommandCreateNewAutomateExtraction : BasicAutomationComman
         ExtractionConfiguration = extractionConfiguration;
         var existingAutomateExtractions = AutomationRepository.GetAllObjects<AutomateExtraction>();
 
-        if (existingAutomateExtractions.Any(s => s.ExtractionConfiguration_ID == extractionConfiguration.ID))
+        if (existingAutomateExtractions.Any(s => s.ExtractionConfigurationId == extractionConfiguration.ID))
         {
             SetImpossible($"Configuration already has a {nameof(AutomateExtraction)}");
-            return;
         }
     }
 

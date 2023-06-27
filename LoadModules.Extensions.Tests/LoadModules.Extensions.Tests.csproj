@@ -26,7 +26,6 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.2" />
     <PackageReference Include="NunitXml.TestLogger" Version="3.0.131" />
-    <PackageReference Include="System.Security.Permissions" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutomationPlugins\LoadModules.Extensions.AutomationPlugins\LoadModules.Extensions.AutomationPlugins.csproj" />

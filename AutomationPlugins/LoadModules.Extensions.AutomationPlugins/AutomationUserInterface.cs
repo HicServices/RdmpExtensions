@@ -56,19 +56,23 @@ public class AutomationUserInterface : PluginUserInterface
 
     public override object[] GetChildren(object model)
     {
-        if (model is IProject p)
+        switch (model)
         {
-            var schedule = GetScheduleIfAny(p);
+            case IProject p:
+            {
+                var schedule = GetScheduleIfAny(p);
                 
-            if(schedule != null)
-                return new[] { schedule };
-        }
-
-        if(model is IExtractionConfiguration ec)
-        {
-            var automate = GetAutomateExtractionIfAny(ec);
-            if (automate != null)
-                return new[] { automate };
+                if(schedule != null)
+                    return new[] { schedule };
+                break;
+            }
+            case IExtractionConfiguration ec:
+            {
+                var automate = GetAutomateExtractionIfAny(ec);
+                if (automate != null)
+                    return new[] { automate };
+                break;
+            }
         }
 
         return base.GetChildren(model);
@@ -78,35 +82,25 @@ public class AutomationUserInterface : PluginUserInterface
     {
         TryGettingAutomationRepository();
 
-        if (AutomationRepository == null)
-        {
-            return null;    
-        }
-
-        return AllSchedules.FirstOrDefault(aes => aes.Project_ID == p.ID);
+        return AutomationRepository == null ? null : AllSchedules.FirstOrDefault(aes => aes.Project_ID == p.ID);
     }
 
     private AutomateExtraction GetAutomateExtractionIfAny(IExtractionConfiguration ec)
     {
         TryGettingAutomationRepository();
 
-        if (AutomationRepository == null)
-        {
-            return null;
-        }
-
-        return AllAutomateExtractions.FirstOrDefault(ae => ae.ExtractionConfiguration_ID == ec.ID);
+        return AutomationRepository == null ? null : AllAutomateExtractions.FirstOrDefault(ae => ae.ExtractionConfigurationId == ec.ID);
     }
 
-    DateTime lastLook = DateTime.MinValue;
-    private IconOverlayProvider _overlayProvider;
-    private Image<Rgba32> _scheduleIcon;
-    private Image<Rgba32> _automateExtractionIcon;
+    DateTime _lastLook = DateTime.MinValue;
+    private readonly IconOverlayProvider _overlayProvider;
+    private readonly Image<Rgba32> _scheduleIcon;
+    private readonly Image<Rgba32> _automateExtractionIcon;
 
     private void TryGettingAutomationRepository()
     {
-        // we looked recently already dont spam that thing
-        if (DateTime.Now - lastLook < TimeSpan.FromSeconds(5))
+        // we looked recently already don't spam that thing
+        if (DateTime.Now - _lastLook < TimeSpan.FromSeconds(5))
             return;
 
         if (AutomationRepository != null)
@@ -120,39 +114,34 @@ public class AutomationUserInterface : PluginUserInterface
             AllAutomateExtractions = AutomationRepository.GetAllObjects<AutomateExtraction>();
             AllSchedules = AutomationRepository.GetAllObjects<AutomateExtractionSchedule>();
 
-            lastLook = DateTime.Now;
+            _lastLook = DateTime.Now;
         }
         catch (Exception)
         {
             AutomationRepository = null;
-            lastLook = DateTime.Now;
+            _lastLook = DateTime.Now;
         }
     }
 
     public override IEnumerable<IAtomicCommand> GetAdditionalRightClickMenuItems(object o)
     {
-        if (o is AllExternalServersNode)
+        switch (o)
         {
-            yield return new ExecuteCommandCreateNewExternalDatabaseServer(BasicActivator, new AutomateExtractionPluginPatcher(), PermissableDefaults.None);
+            case AllExternalServersNode:
+                yield return new ExecuteCommandCreateNewExternalDatabaseServer(BasicActivator, new AutomateExtractionPluginPatcher(), PermissableDefaults.None);
+                break;
+            case IProject p:
+                yield return new ExecuteCommandCreateNewAutomateExtractionSchedule(BasicActivator, p);
+                break;
+            case IExtractionConfiguration ec:
+                yield return new ExecuteCommandCreateNewAutomateExtraction(BasicActivator, ec);
+                break;
+            case AutomateExtraction ae:
+                yield return new ExecuteCommandSet(BasicActivator, ae, typeof(AutomateExtraction).GetProperty(nameof(AutomateExtraction.BaselineDate)))
+                {
+                    OverrideCommandName = "Set Baseline Date"
+                };
+                break;
         }
-
-
-        if(o is IProject p)
-        {
-            yield return new ExecuteCommandCreateNewAutomateExtractionSchedule(BasicActivator, p);
-        }
-        if(o is IExtractionConfiguration ec)
-        {
-            yield return new ExecuteCommandCreateNewAutomateExtraction(BasicActivator, ec);
-        }    
-
-        if(o is AutomateExtraction ae)
-        {
-            yield return new ExecuteCommandSet(BasicActivator, ae, typeof(AutomateExtraction).GetProperty(nameof(AutomateExtraction.BaselineDate)))
-            {
-                OverrideCommandName = "Set Baseline Date"
-            };
-        }
-            
     }
 }

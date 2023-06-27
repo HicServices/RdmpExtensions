@@ -7,9 +7,6 @@
     <Copyright>Copyright ©  2019</Copyright>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.Security.Permissions" Version="7.0.0" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\AutomationPlugins\LoadModules.Extensions.AutomationPlugins\LoadModules.Extensions.AutomationPlugins.csproj" />
     <ProjectReference Include="..\..\Interactive\LoadModules.Extensions.Interactive\LoadModules.Extensions.Interactive.csproj" />
     <ProjectReference Include="..\..\Python\LoadModules.Extensions.Python\LoadModules.Extensions.Python.csproj" />

@@ -24,7 +24,6 @@ public class BasicAutomationCommandExecution : BasicCommandExecution
         if (AutomationRepository == null)
         {
             SetImpossible("There is no Automation Repository configured");
-            return;
         }
                 
     }
