@@ -49,8 +49,8 @@ jobs:
           </package>
           "@ | Out-File -Encoding ASCII plugin.nuspec
 
-          dotnet publish Plugin/windows/windows.csproj -c Release -o p/windows
-          dotnet publish Plugin/main/main.csproj -c Release -o p/main
+          dotnet publish -p:DebugType=embedded -p:GenerateDocumentation=false Plugin/windows/windows.csproj -c Release -o p/windows
+          dotnet publish -p:DebugType=embedded -p:GenerateDocumentation=false Plugin/main/main.csproj -c Release -o p/main
           cmd /c 7z a -tzip HIC.Extensions.nupkg plugin.nuspec p
           dotnet run --project RDMP/Tools/rdmp/rdmp.csproj -c Release -- pack -p --file HIC.Extensions.nupkg --dir yaml
           dotnet run --project RDMP/Tools/rdmp/rdmp.csproj -c Release -- cmd listsupportedcommands --dir yaml
