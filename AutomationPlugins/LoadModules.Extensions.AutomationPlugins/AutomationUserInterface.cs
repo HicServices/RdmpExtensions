@@ -25,7 +25,6 @@ public class AutomationUserInterface : PluginUserInterface
 
     public AutomationUserInterface(IBasicActivateItems itemActivator) : base(itemActivator)
     {
-        _overlayProvider = new IconOverlayProvider();
         try
         {
             _scheduleIcon = Image.Load<Rgba32>(AutomationImages.AutomateExtractionSchedule);
@@ -43,12 +42,12 @@ public class AutomationUserInterface : PluginUserInterface
     {
         if (concept is AutomateExtractionSchedule || concept as Type == typeof(AutomateExtractionSchedule))
         {
-            return _overlayProvider.GetOverlay(_scheduleIcon,kind);
+            return IconOverlayProvider.GetOverlay(_scheduleIcon,kind);
         }
 
         if (concept is AutomateExtraction || concept as Type == typeof(AutomateExtraction))
         {
-            return _overlayProvider.GetOverlay(_automateExtractionIcon, kind);
+            return IconOverlayProvider.GetOverlay(_automateExtractionIcon, kind);
         }
 
         return base.GetImage(concept, kind);
@@ -93,7 +92,6 @@ public class AutomationUserInterface : PluginUserInterface
     }
 
     DateTime _lastLook = DateTime.MinValue;
-    private readonly IconOverlayProvider _overlayProvider;
     private readonly Image<Rgba32> _scheduleIcon;
     private readonly Image<Rgba32> _automateExtractionIcon;
 
