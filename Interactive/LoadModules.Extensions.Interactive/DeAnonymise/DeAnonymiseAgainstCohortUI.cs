@@ -16,15 +16,15 @@ namespace LoadModules.Extensions.Interactive.DeAnonymise;
 public partial class DeAnonymiseAgainstCohortUI : Form, IDeAnonymiseAgainstCohortConfigurationFulfiller
 {
     private readonly DataTable _toProcess;
-    private readonly IBasicActivateItems activator;
-    private IDataExportRepository _dataExportRepository;
+    private readonly IBasicActivateItems _activator;
+    private readonly IDataExportRepository _dataExportRepository;
     public IExtractableCohort ChosenCohort { get; set; }
     public string OverrideReleaseIdentifier { get; set; }
         
     public DeAnonymiseAgainstCohortUI(DataTable toProcess, IBasicActivateItems activator)
     {
         _toProcess = toProcess;
-        this.activator = activator;
+        _activator = activator;
         InitializeComponent();
 
         try
@@ -42,8 +42,10 @@ public partial class DeAnonymiseAgainstCohortUI : Form, IDeAnonymiseAgainstCohor
          
         foreach (DataColumn column in toProcess.Columns)
         {
-            Button b = new Button();
-            b.Text = column.ColumnName;
+            var b = new Button
+            {
+                Text = column.ColumnName
+            };
             flowLayoutPanel1.Controls.Add(b);
             b.Click += b_Click;
         }
@@ -59,28 +61,25 @@ public partial class DeAnonymiseAgainstCohortUI : Form, IDeAnonymiseAgainstCohor
     private void btnChooseCohort_Click(object sender, EventArgs e)
     {
         var dialog = new SelectDialog<IMapsDirectlyToDatabaseTable>(
-            new DialogArgs() {WindowTitle = "Choose Cohort" }, (IActivateItems)activator, _dataExportRepository.GetAllObjects<ExtractableCohort>(), false);
+            new DialogArgs {WindowTitle = "Choose Cohort" }, (IActivateItems)_activator, _dataExportRepository.GetAllObjects<ExtractableCohort>(), false);
 
-        if(dialog.ShowDialog() == DialogResult.OK)
-            if (dialog.Selected != null)
-            {
-                ChosenCohort = (ExtractableCohort)dialog.Selected;
-                CheckCohortHasCorrectColumns();
-            }
+        if (dialog.ShowDialog() != DialogResult.OK) return;
+        if (dialog.Selected == null) return;
+        ChosenCohort = (ExtractableCohort)dialog.Selected;
+        CheckCohortHasCorrectColumns();
 
     }
 
     private void CheckCohortHasCorrectColumns()
     {
-        string release = OverrideReleaseIdentifier ?? new MicrosoftQuerySyntaxHelper().GetRuntimeName(ChosenCohort.GetReleaseIdentifier());
+        var release = OverrideReleaseIdentifier ?? MicrosoftQuerySyntaxHelper.Instance.GetRuntimeName(ChosenCohort.GetReleaseIdentifier());
 
         if (!_toProcess.Columns.Contains(release))
             checksUI1.OnCheckPerformed(
                 new CheckEventArgs(
-                    "Cannot deanonymise table because it contains no release identifier field (should be called " +
-                    release + ")", CheckResult.Fail));
+                    $"Cannot deanonymise table because it contains no release identifier field (should be called {release})", CheckResult.Fail));
         else
-            checksUI1.OnCheckPerformed(new CheckEventArgs("Found column " + release + " in your DataTable",
+            checksUI1.OnCheckPerformed(new CheckEventArgs($"Found column {release} in your DataTable",
                 CheckResult.Success));
             
         lblExpectedReleaseIdentifierColumn.Text = release;
@@ -99,7 +98,7 @@ public partial class DeAnonymiseAgainstCohortUI : Form, IDeAnonymiseAgainstCohor
     private void btnOk_Click(object sender, EventArgs e)
     {
         DialogResult = DialogResult.OK;
-        this.Close();
+        Close();
     }
 
     private void button1_Click(object sender, EventArgs e)
@@ -107,7 +106,7 @@ public partial class DeAnonymiseAgainstCohortUI : Form, IDeAnonymiseAgainstCohor
         ChosenCohort = null;
         OverrideReleaseIdentifier = null;
         DialogResult = DialogResult.Cancel;
-        this.Close();
+        Close();
     }
 
 }

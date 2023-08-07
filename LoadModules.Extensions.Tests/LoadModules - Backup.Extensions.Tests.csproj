@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ProjectGuid>{A6987FAF-E280-48C8-B50D-17FF34924E1D}</ProjectGuid>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
+    <IsCodedUITest>False</IsCodedUITest>
+    <TestProjectType>UnitTest</TestProjectType>
+    <AssemblyTitle>LoadModules.Extensions.Tests</AssemblyTitle>
+    <Product>LoadModules.Extensions.Tests</Product>
+    <Copyright>Copyright ©  2019</Copyright>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
+  <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.2" />
+    <PackageReference Include="NunitXml.TestLogger" Version="3.0.131" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AutomationPlugins\LoadModules.Extensions.AutomationPlugins\LoadModules.Extensions.AutomationPlugins.csproj" />
+    <ProjectReference Include="..\Interactive\LoadModules.Extensions.Interactive\LoadModules.Extensions.Interactive.csproj" />
+    <ProjectReference Include="..\Python\LoadModules.Extensions.Python\LoadModules.Extensions.Python.csproj" />
+    <ProjectReference Include="..\RDMP\Tests.Common\Tests.Common.csproj" />
+    <ProjectReference Include="..\ReleasePlugins\LoadModules.Extensions.ReleasePlugins\LoadModules.Extensions.ReleasePlugins.csproj" />
+    <ProjectReference Include="..\StatsScriptsExecution\LoadModules.Extensions.StatsScriptsExecution\LoadModules.Extensions.StatsScriptsExecution.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="TestDatabases.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

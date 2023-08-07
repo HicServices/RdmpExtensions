@@ -37,7 +37,7 @@ public class Python2And3InstalledTests
         //so we now know that version 3 is installed, and we have overriden the python path to the .exe explicitly and we are trying to launch with Version2 enum now
         var ex = Assert.Throws<Exception>(()=>
         {
-            provider.Check(new ThrowImmediatelyCheckNotifier());
+            provider.Check(ThrowImmediatelyCheckNotifier.Quiet);
             //provider.Fetch(MockRepository.GenerateStub<IDataLoadJob>(), new GracefulCancellationToken());
         });
         StringAssert.Contains(@"which is incompatible with the desired version 2.7.1",ex?.Message);

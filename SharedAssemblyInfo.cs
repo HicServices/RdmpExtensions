@@ -1,4 +1,7 @@
 ﻿using System.Reflection;
+#if WINDOWS
+[assembly: System.Runtime.Versioning.SupportedOSPlatformAttribute("windows")]
+#endif
 
 [assembly: AssemblyCompany("Health Informatics Centre, University of Dundee")]
 [assembly: AssemblyProduct("Extensions")]
@@ -6,6 +9,6 @@
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-[assembly: AssemblyVersion("6.1.0")]
-[assembly: AssemblyFileVersion("6.1.0")]
-[assembly: AssemblyInformationalVersion("6.1.0")]
+[assembly: AssemblyVersion("6.2.0")]
+[assembly: AssemblyFileVersion("6.2.0")]
+[assembly: AssemblyInformationalVersion("6.2.0-rc1")]

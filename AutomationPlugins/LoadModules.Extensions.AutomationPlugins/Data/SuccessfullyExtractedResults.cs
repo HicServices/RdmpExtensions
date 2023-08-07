@@ -17,24 +17,24 @@ public class SuccessfullyExtractedResults : DatabaseEntity
         
     public string SQL
     {
-        get { return _sQL; }
-        set { SetField(ref _sQL, value); }
+        get => _sQL;
+        set => SetField(ref _sQL, value);
     }
     public int ExtractableDataSet_ID
     {
-        get { return _extractableDataSet_ID; }
-        set { SetField(ref _extractableDataSet_ID, value); }
+        get => _extractableDataSet_ID;
+        set => SetField(ref _extractableDataSet_ID, value);
     }
     public int AutomateExtraction_ID
     {
-        get { return _automateExtraction_ID; }
-        set { SetField(ref _automateExtraction_ID, value); }
+        get => _automateExtraction_ID;
+        set => SetField(ref _automateExtraction_ID, value);
     }
     #endregion
 
     public SuccessfullyExtractedResults(PluginRepository repository, string sql, AutomateExtraction parent, IExtractableDataSet dataset)
     {
-        repository.InsertAndHydrate(this, new Dictionary<string, object>()
+        repository.InsertAndHydrate(this, new Dictionary<string, object>
         {
             {"SQL",sql},
             {"ExtractableDataSet_ID",dataset.ID},

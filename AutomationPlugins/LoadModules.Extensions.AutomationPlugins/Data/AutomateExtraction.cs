@@ -12,50 +12,50 @@ using Microsoft.Data.SqlClient;
 
 namespace LoadModules.Extensions.AutomationPlugins.Data;
 
-public class AutomateExtraction : DatabaseEntity, IMapsDirectlyToDatabaseTable
+public class AutomateExtraction : DatabaseEntity
 {
     private readonly AutomateExtractionRepository _repository;
 
     #region Database Properties
 
-    private int _extractionConfiguration_ID;
-    private int _automateExtractionSchedule_ID;
+    private int _extractionConfigurationId;
+    private int _automateExtractionScheduleId;
     private bool _disabled;
     private DateTime? _baselineDate;
     private bool _refreshCohort;
     private bool _release;
 
-    public int ExtractionConfiguration_ID
+    public int ExtractionConfigurationId
     {
-        get { return _extractionConfiguration_ID; }
-        set { SetField(ref _extractionConfiguration_ID, value); }
+        get => _extractionConfigurationId;
+        set => SetField(ref _extractionConfigurationId, value);
     }
-    public int AutomateExtractionSchedule_ID
+    public int AutomateExtractionScheduleId
     {
-        get { return _automateExtractionSchedule_ID; }
-        set { SetField(ref _automateExtractionSchedule_ID, value); }
+        get => _automateExtractionScheduleId;
+        set => SetField(ref _automateExtractionScheduleId, value);
     }
     public bool Disabled
     {
-        get { return _disabled; }
-        set { SetField(ref _disabled, value); }
+        get => _disabled;
+        set => SetField(ref _disabled, value);
     }
     public DateTime? BaselineDate
     {
-        get { return _baselineDate; }
-        set { SetField(ref _baselineDate, value); }
+        get => _baselineDate;
+        set => SetField(ref _baselineDate, value);
     }
 
     public bool RefreshCohort
     {
-        get { return _refreshCohort; }
-        set {SetField(ref _refreshCohort , value); }
+        get => _refreshCohort;
+        set => SetField(ref _refreshCohort , value);
     }
 
     public bool Release
     {
-        get { return _release; }
-        set { SetField(ref _release , value);}
+        get => _release;
+        set => SetField(ref _release , value);
     }
 
     #endregion
@@ -63,28 +63,22 @@ public class AutomateExtraction : DatabaseEntity, IMapsDirectlyToDatabaseTable
     #region Relationships
         
     [NoMappingToDatabase]
-    public IExtractionConfiguration ExtractionConfiguration { get
-    {
-        return _repository.DataExportRepository.GetObjectByID<ExtractionConfiguration>(ExtractionConfiguration_ID);
-    } }
+    public IExtractionConfiguration ExtractionConfiguration => _repository.DataExportRepository.GetObjectByID<ExtractionConfiguration>(ExtractionConfigurationId);
 
     [NoMappingToDatabase]
-    public AutomateExtractionSchedule AutomateExtractionSchedule { get
-    {
-        return _repository.GetObjectByID<AutomateExtractionSchedule>(AutomateExtractionSchedule_ID);
-    }}
+    public AutomateExtractionSchedule AutomateExtractionSchedule => _repository.GetObjectByID<AutomateExtractionSchedule>(AutomateExtractionScheduleId);
 
     #endregion
 
     public AutomateExtraction(PluginRepository repository, AutomateExtractionSchedule schedule, IExtractionConfiguration config)
     {
         _repository = (AutomateExtractionRepository) repository;
-        repository.InsertAndHydrate(this, new Dictionary<string, object>()
+        repository.InsertAndHydrate(this, new Dictionary<string, object>
         {
             {"AutomateExtractionSchedule_ID",schedule.ID},
             {"ExtractionConfiguration_ID",config.ID},
             {"RefreshCohort",false},
-            {"Release",false},
+            {"Release",false}
 
         });
 
@@ -95,8 +89,8 @@ public class AutomateExtraction : DatabaseEntity, IMapsDirectlyToDatabaseTable
         : base(repository, r)
     {
         _repository = (AutomateExtractionRepository) repository;
-        ExtractionConfiguration_ID = Convert.ToInt32(r["ExtractionConfiguration_ID"]);
-        AutomateExtractionSchedule_ID = Convert.ToInt32(r["AutomateExtractionSchedule_ID"]);
+        ExtractionConfigurationId = Convert.ToInt32(r["ExtractionConfiguration_ID"]);
+        AutomateExtractionScheduleId = Convert.ToInt32(r["AutomateExtractionSchedule_ID"]);
         Disabled = Convert.ToBoolean(r["Disabled"]);
         BaselineDate = ObjectToNullableDateTime(r["BaselineDate"]);
 
@@ -110,7 +104,7 @@ public class AutomateExtraction : DatabaseEntity, IMapsDirectlyToDatabaseTable
     public override string ToString()
     {
         _cachedExtractionConfiguration ??=
-            _repository.DataExportRepository.GetObjectByID<ExtractionConfiguration>(ExtractionConfiguration_ID);
+            _repository.DataExportRepository.GetObjectByID<ExtractionConfiguration>(ExtractionConfigurationId);
 
         return _cachedExtractionConfiguration.Name;
     }
@@ -118,24 +112,25 @@ public class AutomateExtraction : DatabaseEntity, IMapsDirectlyToDatabaseTable
     public DataTable GetIdentifiersTable()
     {
         var dt = new DataTable();
+        dt.BeginLoadData();
 
         var repo = (TableRepository)Repository;
         var server = repo.DiscoveredServer;
 
-        using (var con = server.GetConnection())
-        {
-            con.Open();
-            var cmd = server.GetCommand("Select ReleaseID from ReleaseIdentifiersSeen", con);
-            var da = server.GetDataAdapter(cmd);
-            da.Fill(dt);
-        }
+        using var con = server.GetConnection();
+        con.Open();
+        var cmd = server.GetCommand("Select ReleaseID from ReleaseIdentifiersSeen", con);
+        var da = server.GetDataAdapter(cmd);
+        da.Fill(dt);
+        dt.EndLoadData();
 
         return dt;
     }
 
     public SuccessfullyExtractedResults GetSuccessIfAnyFor(IExtractableDataSet ds)
     {
-        return _repository.GetAllObjects<SuccessfullyExtractedResults>(@"WHERE ExtractableDataSet_ID  = " + ds.ID + " AND AutomateExtraction_ID = " + ID).SingleOrDefault();
+        return _repository.GetAllObjects<SuccessfullyExtractedResults>(
+            $@"WHERE ExtractableDataSet_ID  = {ds.ID} AND AutomateExtraction_ID = {ID}").SingleOrDefault();
     }
 
     public void ClearBaselines()
@@ -143,13 +138,13 @@ public class AutomateExtraction : DatabaseEntity, IMapsDirectlyToDatabaseTable
         using (var con = _repository.DiscoveredServer.GetConnection())
         {
             con.Open();
-            new SqlCommand(@"Delete From 
+            new SqlCommand($@"Delete From 
   [ReleaseIdentifiersSeen]
   where
-  AutomateExtraction_ID = " + ID, (SqlConnection) con).ExecuteNonQuery();
+  AutomateExtraction_ID = {ID}", (SqlConnection) con).ExecuteNonQuery();
         }
 
-        foreach (SuccessfullyExtractedResults r in _repository.GetAllObjectsWithParent<SuccessfullyExtractedResults>(this))
+        foreach (var r in _repository.GetAllObjectsWithParent<SuccessfullyExtractedResults>(this))
             r.DeleteInDatabase();
             
         BaselineDate = null;

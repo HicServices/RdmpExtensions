@@ -15,13 +15,15 @@ public class Python3InstalledTests
     [SetUp]
     public void IsPython3Installed()
     {
-        PythonDataProvider p = new PythonDataProvider();
-        p.Version = PythonVersion.Version3;
+        var p = new PythonDataProvider
+        {
+            Version = PythonVersion.Version3
+        };
         try
         {
-            string version = p.GetPythonVersion();
+            var version = p.GetPythonVersion();
 
-            Console.WriteLine("Found python version:" + version);
+            Console.WriteLine($"Found python version:{version}");
         }
         catch (Exception e)
         {
@@ -35,15 +37,17 @@ public class Python3InstalledTests
     [Test]
     public void PythonScript_Version3_DodgySyntax()
     {
-        string MyPythonScript = @"print 'Hello World'";
+        var MyPythonScript = @"print 'Hello World'";
 
         File.Delete("Myscript.py");
         File.WriteAllText("Myscript.py", MyPythonScript);
 
-        PythonDataProvider provider = new PythonDataProvider();
-        provider.Version = PythonVersion.Version3;
-        provider.FullPathToPythonScriptToRun = "Myscript.py";
-        provider.MaximumNumberOfSecondsToLetScriptRunFor = 0;
+        var provider = new PythonDataProvider
+        {
+            Version = PythonVersion.Version3,
+            FullPathToPythonScriptToRun = "Myscript.py",
+            MaximumNumberOfSecondsToLetScriptRunFor = 0
+        };
 
         //call with accept all
         provider.Check(new AcceptAllCheckNotifier());
@@ -57,15 +61,17 @@ public class Python3InstalledTests
     [Test]
     public void PythonScript_ValidScript()
     {
-        string MyPythonScript = @"print (""Hello World"")";
+        var MyPythonScript = @"print (""Hello World"")";
 
         File.Delete("Myscript.py");
         File.WriteAllText("Myscript.py", MyPythonScript);
 
-        PythonDataProvider provider = new PythonDataProvider();
-        provider.Version = PythonVersion.Version3;
-        provider.FullPathToPythonScriptToRun = "Myscript.py";
-        provider.MaximumNumberOfSecondsToLetScriptRunFor = 0;
+        var provider = new PythonDataProvider
+        {
+            Version = PythonVersion.Version3,
+            FullPathToPythonScriptToRun = "Myscript.py",
+            MaximumNumberOfSecondsToLetScriptRunFor = 0
+        };
 
         //call with accept all
         provider.Check(new AcceptAllCheckNotifier());

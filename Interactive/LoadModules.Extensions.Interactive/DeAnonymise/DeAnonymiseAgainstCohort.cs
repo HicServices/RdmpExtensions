@@ -39,12 +39,14 @@ public class DeAnonymiseAgainstCohort: IPluginDataFlowComponent<DataTable>, IPip
 
         if (ConfigurationGetter.OverrideReleaseIdentifier != null)
         {
-            string replacementName = new MicrosoftQuerySyntaxHelper().GetRuntimeName(ConfigurationGetter.ChosenCohort.GetReleaseIdentifier());
+            var replacementName = MicrosoftQuerySyntaxHelper.Instance.GetRuntimeName(ConfigurationGetter.ChosenCohort.GetReleaseIdentifier());
 
             if (!toProcess.Columns.Contains(ConfigurationGetter.OverrideReleaseIdentifier))
-                throw new ArgumentException("Cannot DeAnonymise cohort because you specified OverrideReleaseIdentifier of '" + ConfigurationGetter.OverrideReleaseIdentifier + "' but the DataTable toProcess did not contain a column of that name");
+                throw new ArgumentException(
+                    $"Cannot DeAnonymise cohort because you specified OverrideReleaseIdentifier of '{ConfigurationGetter.OverrideReleaseIdentifier}' but the DataTable toProcess did not contain a column of that name");
 
-            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "Renaming DataTable column " + ConfigurationGetter.OverrideReleaseIdentifier + " to " + replacementName));
+            listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information,
+                $"Renaming DataTable column {ConfigurationGetter.OverrideReleaseIdentifier} to {replacementName}"));
             toProcess.Columns[ConfigurationGetter.OverrideReleaseIdentifier].ColumnName = replacementName;
         }
 

@@ -88,7 +88,7 @@ public class PythonDataProvider:IPluginDataProvider
                 : new CheckEventArgs(e.Message, CheckResult.Fail, e));
         }
 
-        if (FullPathToPythonScriptToRun?.Contains(" ")==true && FullPathToPythonScriptToRun?.Contains("\"")==false)
+        if (FullPathToPythonScriptToRun?.Contains(' ') ==true && FullPathToPythonScriptToRun?.Contains('"') ==false)
             notifier.OnCheckPerformed(
                 new CheckEventArgs(
                     "FullPathToPythonScriptToRun contains spaces but is not wrapped by quotes which will likely fail when we assemble the python execute command",
@@ -135,7 +135,6 @@ public class PythonDataProvider:IPluginDataProvider
             if (!OverridePythonExecutablePath.Exists)
                 throw new FileNotFoundException(
                     $"The specified OverridePythonExecutablePath:{OverridePythonExecutablePath} does not exist");
-            else
             if(OverridePythonExecutablePath.Name != "python.exe")
                 throw new FileNotFoundException(
                     $"The specified OverridePythonExecutablePath:{OverridePythonExecutablePath} file is not called python.exe... what is going on here?");
@@ -185,17 +184,19 @@ public class PythonDataProvider:IPluginDataProvider
         processStartInfo.UseShellExecute = false;
         processStartInfo.CreateNoWindow = true;
 
-        Process p = null;
+        Process p;
 
         var allErrorDataConsumed = false;
         var allOutputDataConsumed = false;
 
         try
         {
-            p =  new Process();
-            p.StartInfo = processStartInfo;
-            p.OutputDataReceived += (s, e) => allOutputDataConsumed = OutputDataReceived(s, e, listener,false);
-            p.ErrorDataReceived += (s, e) => allErrorDataConsumed = OutputDataReceived(s, e, listener,true);
+            p = new Process
+            {
+                StartInfo = processStartInfo
+            };
+            p.OutputDataReceived += (s, e) => allOutputDataConsumed = OutputDataReceived(e, listener,false);
+            p.ErrorDataReceived += (s, e) => allErrorDataConsumed = OutputDataReceived(e, listener,true);
                 
             p.Start();
             p.BeginErrorReadLine();
@@ -239,18 +240,19 @@ public class PythonDataProvider:IPluginDataProvider
                 throw new TimeoutException("Timeout expired while waiting for all output streams from the Python process to finish being read");
         }
 
-        if (outputDataReceivedExceptions.Any())
-            if (outputDataReceivedExceptions.Count == 1)
-                throw outputDataReceivedExceptions[0];
-            else
-                throw new AggregateException(outputDataReceivedExceptions);
+        lock(this)
+            if (_outputDataReceivedExceptions.Any())
+                if (_outputDataReceivedExceptions.Count == 1)
+                    throw _outputDataReceivedExceptions[0];
+                else
+                    throw new AggregateException(_outputDataReceivedExceptions);
 
         return p.ExitCode;
     }
 
-    List<Exception> outputDataReceivedExceptions = new List<Exception>();
+    readonly List<Exception> _outputDataReceivedExceptions = new();
 
-    private bool OutputDataReceived(object sender, DataReceivedEventArgs e, IDataLoadEventListener listener,bool isErrorStream)
+    private bool OutputDataReceived(DataReceivedEventArgs e, IDataLoadEventListener listener,bool isErrorStream)
     {
         if(e.Data == null)
             return true;
@@ -264,8 +266,8 @@ public class PythonDataProvider:IPluginDataProvider
             }
             catch (Exception ex)
             {
-                //the notify handler is crashing... lets stop tyring to read data from this async handler.  Also add the exception to the list because we don't want it throwing out of this lamda
-                outputDataReceivedExceptions.Add(ex);
+                //the notify handler is crashing... let's stop trying to read data from this async handler.  Also add the exception to the list because we don't want it throwing out of this lambda
+                _outputDataReceivedExceptions.Add(ex);
                 return true;
             }
         }
@@ -283,51 +285,39 @@ public class PythonDataProvider:IPluginDataProvider
 
     public string GetFullPythonInstallDirectory()
     {
-        return Path.Combine(Path.GetPathRoot(typeof(PythonDataProvider).Assembly.Location), GetPythonFolderName());
+        return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, GetPythonFolderName());
     }
 
     private string GetPythonFolderName()
     {
-        switch (Version)
+        return Version switch
         {
-            case PythonVersion.NotSet:
-                throw new Exception("Python version not set yet");
-            case PythonVersion.Version2:
-                return "python27";
-            case PythonVersion.Version3:
-                return "python35";
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+            PythonVersion.NotSet => throw new Exception("Python version not set yet"),
+            PythonVersion.Version2 => "python27",
+            PythonVersion.Version3 => "python35",
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
         
     private string GetExpectedPythonVersion()
     {
-        switch (Version)
+        return Version switch
         {
-            case PythonVersion.NotSet:
-                throw new Exception("Python version not set yet");
-            case PythonVersion.Version2:
-                return "2.7.1";
-            case PythonVersion.Version3:
-                return "3.4.3";
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+            PythonVersion.NotSet => throw new Exception("Python version not set yet"),
+            PythonVersion.Version2 => "2.7.1",
+            PythonVersion.Version3 => "3.4.3",
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
     private string GetCompatiblePythonVersion()
     {
-        switch (Version)
+        return Version switch
         {
-            case PythonVersion.NotSet:
-                throw new Exception("Python version not set yet");
-            case PythonVersion.Version2:
-                return "2";
-            case PythonVersion.Version3:
-                return "3";
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+            PythonVersion.NotSet => throw new Exception("Python version not set yet"),
+            PythonVersion.Version2 => "2",
+            PythonVersion.Version3 => "3",
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
     public string GetDescription()
     {

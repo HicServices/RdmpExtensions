@@ -54,7 +54,7 @@ public class Python2InstalledTests
 
         //call with accept all
         provider.Check(new AcceptAllCheckNotifier());
-        provider.Check(new ThrowImmediatelyCheckNotifier() { ThrowOnWarning = true });
+        provider.Check(ThrowImmediatelyCheckNotifier.QuietPicky);
 
         provider.Fetch(new ThrowImmediatelyDataLoadJob(), new GracefulCancellationToken());
     }

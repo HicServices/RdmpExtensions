@@ -23,8 +23,7 @@ public class ScriptExecutionTests
     [Test]
     public void SlowRollerTest()
     {
-        var script =
-            @"import time
+        const string script = @"import time
 
 print (""1"")
 time.sleep(1)
@@ -43,17 +42,19 @@ time.sleep(1)
         File.WriteAllText(file.FullName,script);
         try
         {
-            var py = new PythonDataProvider();
-            py.FullPathToPythonScriptToRun = file.FullName;
-            py.Version = PythonVersion.Version3;
+            var py = new PythonDataProvider
+            {
+                FullPathToPythonScriptToRun = file.FullName,
+                Version = PythonVersion.Version3
+            };
 
-            var tomemory = new ToMemoryDataLoadJob();
+            var toMemory = new ToMemoryDataLoadJob();
 
-            var exitCode = py.Fetch(tomemory, new GracefulCancellationToken());
+            var exitCode = py.Fetch(toMemory, new GracefulCancellationToken());
 
             Assert.AreEqual(ExitCodeType.Success, exitCode);
 
-            Assert.AreEqual(5, tomemory.EventsReceivedBySender[py].Count(m=>m.Message.Equals("1")));
+            Assert.AreEqual(5, toMemory.EventsReceivedBySender[py].Count(m=>m.Message.Equals("1")));
 
 
         }
@@ -66,8 +67,7 @@ time.sleep(1)
     [Test]
     public void SlowRollerAsync()
     {
-        var script =
-            @"import time
+        const string script = @"import time
 import sys
 
 print (""GetReady"")
@@ -83,9 +83,11 @@ sys.stdout.flush()
         File.WriteAllText(file.FullName, script);
         try
         {
-            var py = new PythonDataProvider();
-            py.FullPathToPythonScriptToRun = file.FullName;
-            py.Version = PythonVersion.Version3;
+            var py = new PythonDataProvider
+            {
+                FullPathToPythonScriptToRun = file.FullName,
+                Version = PythonVersion.Version3
+            };
 
             var tomemory = new ToMemoryDataLoadJob();
 
@@ -121,8 +123,7 @@ sys.stdout.flush()
     [Test]
     public void WriteToErrorAndStandardOut()
     {
-        var script =
-            @"from __future__ import print_function
+        const string script = @"from __future__ import print_function
 import sys
 
 def eprint(*args, **kwargs):
@@ -138,9 +139,11 @@ eprint(""Test Error"")
         File.WriteAllText(file.FullName, script);
         try
         {
-            var py = new PythonDataProvider();
-            py.FullPathToPythonScriptToRun = file.FullName;
-            py.Version = PythonVersion.Version3;
+            var py = new PythonDataProvider
+            {
+                FullPathToPythonScriptToRun = file.FullName,
+                Version = PythonVersion.Version3
+            };
 
             var tomem = new ToMemoryDataLoadJob(true);
             py.Fetch(tomem, new GracefulCancellationToken());
