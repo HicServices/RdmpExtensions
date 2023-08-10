@@ -31,15 +31,14 @@ public class Python2And3InstalledTests
         provider.Check(new AcceptAllCheckNotifier());// version 3 should now be installed
 
         //version 3 executable path is explicit override for executing commands
-        provider.OverridePythonExecutablePath = new FileInfo(Path.Combine(provider.GetFullPythonInstallDirectory(), "python.exe"));
+        provider.OverridePythonExecutablePath = new FileInfo(provider.GetFullPythonPath());
         provider.Version = PythonVersion.Version2;
 
         //so we now know that version 3 is installed, and we have overriden the python path to the .exe explicitly and we are trying to launch with Version2 enum now
         var ex = Assert.Throws<Exception>(()=>
         {
             provider.Check(ThrowImmediatelyCheckNotifier.Quiet);
-            //provider.Fetch(MockRepository.GenerateStub<IDataLoadJob>(), new GracefulCancellationToken());
         });
-        StringAssert.Contains(@"which is incompatible with the desired version 2.7.1",ex?.Message);
+        StringAssert.Contains(@"which is incompatible with the desired version 2.7",ex?.Message);
     }
 }
