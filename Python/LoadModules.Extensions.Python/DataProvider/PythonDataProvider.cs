@@ -311,7 +311,8 @@ public sealed class PythonDataProvider:IPluginDataProvider
         using var user = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Python\\PythonCore");
         using var machine32 = Registry.LocalMachine.OpenSubKey("SOFTWARE\\WOW6432Node\\Python\\PythonCore");
         using var user32 = Registry.CurrentUser.OpenSubKey("SOFTWARE\\WOW6432Node\\Python\\PythonCore");
-        var candidate = GetPythonVersions(machine,major).Union(GetPythonVersions(user,major)).MaxBy(static v=>v.minor);
+        var candidate = GetPythonVersions(machine, major).Union(GetPythonVersions(user, major)).DefaultIfEmpty()
+            .MaxBy(static v => v.minor);
         return candidate;
     }
 
