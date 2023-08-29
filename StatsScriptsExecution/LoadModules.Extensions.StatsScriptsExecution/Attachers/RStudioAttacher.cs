@@ -42,17 +42,21 @@ public class RStudioAttacher : Attacher, IPluginAttacher
         try
         {
             if (!RscriptRootDirectory.Exists)
-                throw new DirectoryNotFoundException("The specified Rscript root directory: " + RscriptRootDirectory.FullName + " does not exist");
+                throw new DirectoryNotFoundException(
+                    $"The specified Rscript root directory: {RscriptRootDirectory.FullName} does not exist");
 
             var fullPathToRscriptExe = Path.Combine(RscriptRootDirectory.FullName, "Rscript.exe");
             if (!File.Exists(fullPathToRscriptExe))
-                throw new FileNotFoundException("The specified Rscript root directory: " + RscriptRootDirectory.FullName + " does not contain Rscript.exe");
+                throw new FileNotFoundException(
+                    $"The specified Rscript root directory: {RscriptRootDirectory.FullName} does not contain Rscript.exe");
 
             if (!FullPathToRScript.Exists)
-                throw new FileNotFoundException("The specified R script to run: " + FullPathToRScript.FullName + " does not exist");
+                throw new FileNotFoundException(
+                    $"The specified R script to run: {FullPathToRScript.FullName} does not exist");
 
             if (!OutputDirectory.Exists)
-                throw new DirectoryNotFoundException("The specified output directory: " + OutputDirectory.FullName + " does not exist");
+                throw new DirectoryNotFoundException(
+                    $"The specified output directory: {OutputDirectory.FullName} does not exist");
         }
         catch (Exception e)
         {
@@ -79,7 +83,8 @@ public class RStudioAttacher : Attacher, IPluginAttacher
             return ExitCodeType.Error;
         }
 
-        job.OnNotify(this, new NotifyEventArgs(exitCode == 0 ? ProgressEventType.Information : ProgressEventType.Error, "R script terminated with exit code " + exitCode));
+        job.OnNotify(this, new NotifyEventArgs(exitCode == 0 ? ProgressEventType.Information : ProgressEventType.Error,
+            $"R script terminated with exit code {exitCode}"));
 
         return exitCode == 0 ? ExitCodeType.Success : ExitCodeType.Error;
     }
@@ -96,16 +101,20 @@ public class RStudioAttacher : Attacher, IPluginAttacher
         Process p;
         try
         {
-            p = new Process();
-            p.StartInfo = processStartInfo;
+            p = new Process
+            {
+                StartInfo = processStartInfo
+            };
 
-            job.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "commandline: " + processStartInfo.Arguments));
+            job.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information,
+                $"commandline: {processStartInfo.Arguments}"));
 
             p.Start();
         }
         catch (Exception e)
         {
-            throw new Exception("Failed to launch:" + Environment.NewLine + processStartInfo.FileName + Environment.NewLine + " with Arguments:" + processStartInfo.Arguments, e);
+            throw new Exception(
+                $"Failed to launch:{Environment.NewLine}{processStartInfo.FileName}{Environment.NewLine} with Arguments:{processStartInfo.Arguments}", e);
         }
 
         var startTime = DateTime.Now;
@@ -124,13 +133,14 @@ public class RStudioAttacher : Attacher, IPluginAttacher
                     killed = false;
                 }
 
-                throw new TimeoutException("Process command " + processStartInfo.FileName + " with arguments " + processStartInfo.Arguments + " did not complete after  " + scriptTimeout + " seconds " + (killed ? "(After timeout we killed the process successfully)" : "(We also failed to kill the process after the timeout expired)"));
+                throw new TimeoutException(
+                    $"Process command {processStartInfo.FileName} with arguments {processStartInfo.Arguments} did not complete after  {scriptTimeout} seconds {(killed ? "(After timeout we killed the process successfully)" : "(We also failed to kill the process after the timeout expired)")}");
             }
         }
 
         var errors = p.StandardError.ReadToEnd();
-        if (!String.IsNullOrEmpty(errors))
-            job.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, "Error from R: " + errors));
+        if (!string.IsNullOrEmpty(errors))
+            job.OnNotify(this, new NotifyEventArgs(ProgressEventType.Error, $"Error from R: {errors}"));
 
         return p.ExitCode;
     }
@@ -149,39 +159,37 @@ public class RStudioAttacher : Attacher, IPluginAttacher
         var actualOutputDir = CreateActualOutputDir(scriptFileName);
         var rscriptFullPath = Path.Combine(RscriptRootDirectory.FullName, "Rscript.exe");
 
-        var fullPrintPath = Path.Combine(actualOutputDir, scriptFileName + ".Rout");
+        var fullPrintPath = Path.Combine(actualOutputDir, $"{scriptFileName}.Rout");
         //var fullLogPath = Path.Combine(actualOutputDir, scriptFileName + ".log");
 
         //var dataInConnection = GetConnectionString(InputDatabase);
         //var dataOutConnection = GetConnectionString(_dbInfo);
 
-        var command = "--vanilla --default-packages=" + DefaultPackages +
-                      " \"" + FullPathToRScript.FullName.Replace('\\', '/') + "\"" + 
-                      " " + InputDatabase.Server + " " + InputDatabase.Database +
-                      " " + _dbInfo.Server + " " + _dbInfo.GetRuntimeName() +
-                      " \"" + actualOutputDir.TrimEnd('\\').Replace('\\','/') + "/\"" +
-                      " >\"" + fullPrintPath.Replace('\\', '/') + "\"";
+        var command =
+            $"--vanilla --default-packages={DefaultPackages} \"{FullPathToRScript.FullName.Replace('\\', '/')}\" {InputDatabase.Server} {InputDatabase.Database} {_dbInfo.Server} {_dbInfo.GetRuntimeName()} \"{actualOutputDir.TrimEnd('\\').Replace('\\', '/')}/\" >\"{fullPrintPath.Replace('\\', '/')}\"";
 
-        var info = new ProcessStartInfo(rscriptFullPath);
-        info.Arguments = command;
+        var info = new ProcessStartInfo(rscriptFullPath)
+        {
+            Arguments = command
+        };
 
         return info;
     }
 
     private string GetConnectionString(DiscoveredDatabase db)
     {
-        return String.Format("Server={0};Database={1};IntegratedSecurity=true;DRIVER=SQL Server", db.Server.Name, db.GetRuntimeName());
+        return $"Server={db.Server.Name};Database={db.GetRuntimeName()};IntegratedSecurity=true;DRIVER=SQL Server";
     }
 
     private string GetConnectionString(ExternalDatabaseServer db)
     {
-        return String.Format("Server={0};Database={1};IntegratedSecurity=true;DRIVER=SQL Server", db.Server, db.Database);
+        return $"Server={db.Server};Database={db.Database};IntegratedSecurity=true;DRIVER=SQL Server";
     }
 
     private string CreateActualOutputDir(string scriptFileName)
     {
         var timeStampString = DateTime.Now.ToString("yyyyMMddTHHmmss");
-        var dir = Path.Combine(OutputDirectory.FullName, timeStampString + "_" + scriptFileName);
+        var dir = Path.Combine(OutputDirectory.FullName, $"{timeStampString}_{scriptFileName}");
 
         try
         {

@@ -31,12 +31,14 @@ public class TestsRequiringAnAutomationPluginRepository:DatabaseTests
 
         var patcher = new AutomateExtractionPluginPatcher();
             
-        MasterDatabaseScriptExecutor executor = new MasterDatabaseScriptExecutor(db);
+        var executor = new MasterDatabaseScriptExecutor(db);
         executor.CreateAndPatchDatabase(patcher, new AcceptAllCheckNotifier());
 
-        var server = new ExternalDatabaseServer(repositoryLocator.CatalogueRepository, "Automation Server", patcher);
-        server.Server = db.Server.Name;
-        server.Database = db.GetRuntimeName();
+        var server = new ExternalDatabaseServer(repositoryLocator.CatalogueRepository, "Automation Server", patcher)
+        {
+            Server = db.Server.Name,
+            Database = db.GetRuntimeName()
+        };
         server.SaveToDatabase();
 
         return new AutomateExtractionRepository(repositoryLocator, server);
@@ -54,7 +56,7 @@ public class TestsRequiringAnAutomationPluginRepository:DatabaseTests
         var source = new PipelineComponent(catalogueRepository, validPipeline, typeof(BaselineHackerExecuteDatasetExtractionSource), 0);
         source.CreateArgumentsForClassIfNotExists<BaselineHackerExecuteDatasetExtractionSource>();
 
-        var broadcaster = new PipelineComponent(catalogueRepository, validPipeline, typeof(SuccessfullyExtractedResultsDocumenter), 1);
+        _=new PipelineComponent(catalogueRepository, validPipeline, typeof(SuccessfullyExtractedResultsDocumenter), 1);
             
         var destination = new PipelineComponent(catalogueRepository, validPipeline, typeof(ExecuteDatasetExtractionFlatFileDestination), 2);
         destination.CreateArgumentsForClassIfNotExists<ExecuteDatasetExtractionFlatFileDestination>();

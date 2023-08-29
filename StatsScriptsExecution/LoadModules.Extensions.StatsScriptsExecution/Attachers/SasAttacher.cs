@@ -38,17 +38,21 @@ public class SasAttacher : Attacher, IPluginAttacher
         try
         {
             if (!SASRootDirectory.Exists)
-                throw new DirectoryNotFoundException("The specified SAS root directory: " + SASRootDirectory.FullName + " does not exist");
+                throw new DirectoryNotFoundException(
+                    $"The specified SAS root directory: {SASRootDirectory.FullName} does not exist");
 
             var fullPathToSasExe = Path.Combine(SASRootDirectory.FullName, "sas.exe");
             if (!File.Exists(fullPathToSasExe))
-                throw new FileNotFoundException("The specified SAS root directory: " + SASRootDirectory.FullName + " does not contain sas.exe");
+                throw new FileNotFoundException(
+                    $"The specified SAS root directory: {SASRootDirectory.FullName} does not contain sas.exe");
 
             if (!FullPathToSASScript.Exists)
-                throw new FileNotFoundException("The specified SAS script to run: " + FullPathToSASScript.FullName + " does not exist");
+                throw new FileNotFoundException(
+                    $"The specified SAS script to run: {FullPathToSASScript.FullName} does not exist");
 
             if (!OutputDirectory.Exists)
-                throw new DirectoryNotFoundException("The specified output directory: " + OutputDirectory.FullName + " does not exist");
+                throw new DirectoryNotFoundException(
+                    $"The specified output directory: {OutputDirectory.FullName} does not exist");
         }
         catch (Exception e)
         {
@@ -75,7 +79,8 @@ public class SasAttacher : Attacher, IPluginAttacher
             return ExitCodeType.Error;
         }
 
-        job.OnNotify(this, new NotifyEventArgs(exitCode == 0 ? ProgressEventType.Information : ProgressEventType.Error, "SAS script terminated with exit code " + exitCode));
+        job.OnNotify(this, new NotifyEventArgs(exitCode == 0 ? ProgressEventType.Information : ProgressEventType.Error,
+            $"SAS script terminated with exit code {exitCode}"));
 
         return exitCode == 0 ? ExitCodeType.Success : ExitCodeType.Error;
     }
@@ -90,16 +95,20 @@ public class SasAttacher : Attacher, IPluginAttacher
         Process p;
         try
         {
-            p = new Process();
-            p.StartInfo = processStartInfo;
+            p = new Process
+            {
+                StartInfo = processStartInfo
+            };
 
-            job.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information, "commandline: " + processStartInfo.Arguments));
+            job.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information,
+                $"commandline: {processStartInfo.Arguments}"));
 
             p.Start();
         }
         catch (Exception e)
         {
-            throw new Exception("Failed to launch:" + Environment.NewLine + processStartInfo.FileName + Environment.NewLine + " with Arguments:" + processStartInfo.Arguments, e);
+            throw new Exception(
+                $"Failed to launch:{Environment.NewLine}{processStartInfo.FileName}{Environment.NewLine} with Arguments:{processStartInfo.Arguments}", e);
         }
 
         var startTime = DateTime.Now;
@@ -118,7 +127,8 @@ public class SasAttacher : Attacher, IPluginAttacher
                     killed = false;
                 }
 
-                throw new TimeoutException("Process command " + processStartInfo.FileName + " with arguments " + processStartInfo.Arguments + " did not complete after  " + scriptTimeout + " seconds " + (killed ? "(After timeout we killed the process successfully)" : "(We also failed to kill the process after the timeout expired)"));
+                throw new TimeoutException(
+                    $"Process command {processStartInfo.FileName} with arguments {processStartInfo.Arguments} did not complete after  {scriptTimeout} seconds {(killed ? "(After timeout we killed the process successfully)" : "(We also failed to kill the process after the timeout expired)")}");
             }
         }
 
@@ -139,40 +149,37 @@ public class SasAttacher : Attacher, IPluginAttacher
         var actualOutputDir = CreateActualOutputDir(scriptFileName);
         var sasFullPath = Path.Combine(SASRootDirectory.FullName, "sas.exe");
 
-        var fullPrintPath = Path.Combine(actualOutputDir, scriptFileName + ".out");
-        var fullLogPath = Path.Combine(actualOutputDir, scriptFileName + ".log");
+        var fullPrintPath = Path.Combine(actualOutputDir, $"{scriptFileName}.out");
+        var fullLogPath = Path.Combine(actualOutputDir, $"{scriptFileName}.log");
 
         var dataInConnection = GetSASConnectionString(InputDatabase);
         var dataOutConnection = GetSASConnectionString(_dbInfo);
 
-        var command = "-set output \"" + actualOutputDir + "\"" +
-                      " -set connect \"" + dataInConnection + "\"" + 
-                      " -set connectout \"" + dataOutConnection + "\"" +
-                      " -sysin \"" + FullPathToSASScript.FullName + "\"" +
-                      " -nosplash -noterminal -nostatuswin -noicon" +
-                      " -print \"" + fullPrintPath + "\"" +
-                      " -log \"" + fullLogPath + "\"";
+        var command =
+            $"-set output \"{actualOutputDir}\" -set connect \"{dataInConnection}\" -set connectout \"{dataOutConnection}\" -sysin \"{FullPathToSASScript.FullName}\" -nosplash -noterminal -nostatuswin -noicon -print \"{fullPrintPath}\" -log \"{fullLogPath}\"";
 
-        var info = new ProcessStartInfo(sasFullPath);
-        info.Arguments = command;
+        var info = new ProcessStartInfo(sasFullPath)
+        {
+            Arguments = command
+        };
 
         return info;
     }
 
     private string GetSASConnectionString(DiscoveredDatabase db)
     {
-        return String.Format("Server={0};Database={1};IntegratedSecurity=true;DRIVER=SQL Server", db.Server.Name, db.GetRuntimeName());
+        return $"Server={db.Server.Name};Database={db.GetRuntimeName()};IntegratedSecurity=true;DRIVER=SQL Server";
     }
 
     private string GetSASConnectionString(ExternalDatabaseServer db)
     {
-        return String.Format("Server={0};Database={1};IntegratedSecurity=true;DRIVER=SQL Server", db.Server, db.Database);
+        return $"Server={db.Server};Database={db.Database};IntegratedSecurity=true;DRIVER=SQL Server";
     }
 
     private string CreateActualOutputDir(string scriptFileName)
     {
         var timeStampString = DateTime.Now.ToString("yyyyMMddTHHmmss");
-        var dir = Path.Combine(OutputDirectory.FullName, timeStampString + "_" + scriptFileName);
+        var dir = Path.Combine(OutputDirectory.FullName, $"{timeStampString}_{scriptFileName}");
 
         try
         {

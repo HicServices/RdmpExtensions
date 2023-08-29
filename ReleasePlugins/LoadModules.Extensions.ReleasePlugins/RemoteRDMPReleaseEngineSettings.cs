@@ -12,7 +12,7 @@ public class RemoteRDMPReleaseEngineSettings : ICheckable
     [DemandsInitialization("Password for ZIP package")]
     public EncryptedString ZipPassword { get; set; }
 
-    [DemandsInitialization("Delete the released files from the origin location if release is succesful", DefaultValue = true)]
+    [DemandsInitialization("Delete the released files from the origin location if release is successful", DefaultValue = true)]
     public bool DeleteFilesOnSuccess { get; set; }
 
     [DemandsInitialization("Remote RDMP instance")]
@@ -29,19 +29,19 @@ public class RemoteRDMPReleaseEngineSettings : ICheckable
         {
             Credentials = new NetworkCredential
             {
-                UserName = this.RemoteRDMP.Username,
-                Password = this.RemoteRDMP.GetDecryptedPassword()
+                UserName = RemoteRDMP.Username,
+                Password = RemoteRDMP.GetDecryptedPassword()
             }
         };
         var client = new HttpClient(handler);
         try
         {
-            var baseUri = new UriBuilder(new Uri(this.RemoteRDMP.URL));
+            var baseUri = new UriBuilder(new Uri(RemoteRDMP.URL));
             baseUri.Path += "/api/plugin/";
             var message = new HttpRequestMessage(HttpMethod.Head, baseUri.ToString());
             var check = client.SendAsync(message).Result;
             check.EnsureSuccessStatusCode();
-            notifier.OnCheckPerformed(new CheckEventArgs("Checks passed " + check.Content.ReadAsStringAsync().Result, CheckResult.Success));
+            notifier.OnCheckPerformed(new CheckEventArgs($"Checks passed {check.Content.ReadAsStringAsync().Result}", CheckResult.Success));
         }
         catch (Exception e)
         {

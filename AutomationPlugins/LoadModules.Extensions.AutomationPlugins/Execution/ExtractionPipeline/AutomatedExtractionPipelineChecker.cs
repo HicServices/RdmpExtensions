@@ -27,7 +27,8 @@ public class AutomatedExtractionPipelineChecker:ICheckable
             if (_automateExtractionPipeline.PipelineComponents.Any(c => c.Class == typeof (SuccessfullyExtractedResultsDocumenter).FullName))
                 notifier.OnCheckPerformed(new CheckEventArgs("Found SuccessfullyExtractedResultsDocumenter plugin component",CheckResult.Success));
             else
-                notifier.OnCheckPerformed(new CheckEventArgs("Automated Extraction can only take place through Pipelines that include a "+typeof(SuccessfullyExtractedResultsDocumenter).Name+" plugin component", CheckResult.Fail));
+                notifier.OnCheckPerformed(new CheckEventArgs(
+                    $"Automated Extraction can only take place through Pipelines that include a {nameof(SuccessfullyExtractedResultsDocumenter)} plugin component", CheckResult.Fail));
             
             var source = _automateExtractionPipeline.Source;
 
@@ -38,14 +39,12 @@ public class AutomatedExtractionPipelineChecker:ICheckable
             }
 
             if (source.Class == typeof (BaselineHackerExecuteDatasetExtractionSource).FullName)
-                notifier.OnCheckPerformed(new CheckEventArgs("Found Compatible Source " + source.Class,
+                notifier.OnCheckPerformed(new CheckEventArgs($"Found Compatible Source {source.Class}",
                     CheckResult.Success));
             else
                 notifier.OnCheckPerformed(
                     new CheckEventArgs(
-                        "Source Component " + source.Class + " of Pipeline " + _automateExtractionPipeline +
-                        " is not a " + typeof (BaselineHackerExecuteDatasetExtractionSource).FullName +
-                        " (Deltas will never be created)", CheckResult.Warning));
+                        $"Source Component {source.Class} of Pipeline {_automateExtractionPipeline} is not a {typeof(BaselineHackerExecuteDatasetExtractionSource).FullName} (Deltas will never be created)", CheckResult.Warning));
         }
         catch (Exception e)
         {

@@ -3,18 +3,23 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using FAnsi.Discovery;
+using Microsoft.Win32;
 using Rdmp.Core.Curation;
 using Rdmp.Core.Curation.Data;
 using Rdmp.Core.DataFlowPipeline;
 using Rdmp.Core.DataLoad;
 using Rdmp.Core.DataLoad.Engine.DataProvider;
 using Rdmp.Core.DataLoad.Engine.Job;
+using Rdmp.Core.ReusableLibraryCode.Annotations;
 using Rdmp.Core.ReusableLibraryCode.Checks;
 using Rdmp.Core.ReusableLibraryCode.Progress;
 
 namespace LoadModules.Extensions.Python.DataProvider;
+
+#nullable enable
 
 public enum PythonVersion
 {
@@ -23,26 +28,24 @@ public enum PythonVersion
     Version3
 }
 
-public class PythonDataProvider:IPluginDataProvider
+public sealed class PythonDataProvider:IPluginDataProvider
 {
-        
-
     [DemandsInitialization("The Python script to run")]
-    public string FullPathToPythonScriptToRun { get; set; }
+    public string? FullPathToPythonScriptToRun { get; set; }
 
-    [DemandsInitialization("The maximum number of seconds to allow the python script to run for before declaring it a failure, 0 for indefinetly")]
+    [DemandsInitialization("The maximum number of seconds to allow the python script to run for before declaring it a failure, 0 for indefinitely")]
     public int MaximumNumberOfSecondsToLetScriptRunFor { get; set; }
 
-    [DemandsInitialization("Python version required to run your script")] 
+    [DemandsInitialization("Python version required to run your script")]
     public PythonVersion Version { get; set; }
 
     [DemandsInitialization("Override Python Executable Path")]
-    public FileInfo OverridePythonExecutablePath { get; set; }
+    public FileInfo? OverridePythonExecutablePath { get; set; }
 
-        
+
     public void LoadCompletedSoDispose(ExitCodeType exitCode, IDataLoadEventListener postLoadEventsListener)
     {
-            
+
     }
 
     public void Check(ICheckNotifier notifier)
@@ -60,14 +63,15 @@ public class PythonDataProvider:IPluginDataProvider
         {
             var version = GetPythonVersion();
 
-            if (version.StartsWith(GetExpectedPythonVersion()))
+            if (version?.StartsWith(GetExpectedPythonVersion(), StringComparison.Ordinal)==true)
                 notifier.OnCheckPerformed(
                     new CheckEventArgs(
-                        $"Found Expected Python version {version} on the host machine at directory {GetFullPythonInstallDirectory()}", CheckResult.Success));
-            else if (version.StartsWith(GetCompatiblePythonVersion()))
+                        $"Found Expected Python version {version} on the host machine at {GetPython(Version == PythonVersion.Version2 ? '2' : '3').path}", CheckResult.Success));
+            else if (version is not null && ((version[0] == '3' && Version == PythonVersion.Version3) ||
+                                             (version[0] == '2' && Version == PythonVersion.Version2)))
                 notifier.OnCheckPerformed(
                     new CheckEventArgs(
-                        $"Found Compatible Python version {version} on the host machine at directory {GetFullPythonInstallDirectory()}", CheckResult.Success));
+                        $"Found Compatible Python version {version} on the host machine at {GetPython(Version == PythonVersion.Version2 ? '2' : '3').path}", CheckResult.Success));
             else
             {
                 notifier.OnCheckPerformed(
@@ -88,7 +92,7 @@ public class PythonDataProvider:IPluginDataProvider
                 : new CheckEventArgs(e.Message, CheckResult.Fail, e));
         }
 
-        if (FullPathToPythonScriptToRun?.Contains(" ")==true && FullPathToPythonScriptToRun?.Contains("\"")==false)
+        if (FullPathToPythonScriptToRun?.Contains(' ') ==true && FullPathToPythonScriptToRun?.Contains('"') ==false)
             notifier.OnCheckPerformed(
                 new CheckEventArgs(
                     "FullPathToPythonScriptToRun contains spaces but is not wrapped by quotes which will likely fail when we assemble the python execute command",
@@ -101,69 +105,51 @@ public class PythonDataProvider:IPluginDataProvider
                     CheckResult.Warning));
     }
 
-    public string GetPythonVersion()
+    public string? GetPythonVersion()
     {
-        var info = GetPythonCommand(@"-c ""import sys; print(sys.version)""");
-            
+        const string getVersion = """
+                                  -c "import sys; print(sys.version)"
+                                  """;
         var toMemory = new ToMemoryDataLoadEventListener(true);
+        var result = ExecuteProcess(toMemory, getVersion, 600);
 
-        var result = ExecuteProcess(toMemory, info, 600);
-            
         if (result != 0)
             return null;
-            
+
         var msg = toMemory.EventsReceivedBySender[this].SingleOrDefault();
 
         if (msg != null)
             return msg.Message;
 
-        throw new Exception($"Call to {info.Arguments} did not return any value but exited with code {result}");
+        throw new Exception($"Call to {getVersion} did not return any value but exited with code {result}");
     }
 
-    private ProcessStartInfo GetPythonCommand(string command)
+    private string GetPythonCommand()
     {
-        string exeFullPath;
-
         if (OverridePythonExecutablePath == null)
-        {
-            //e.g. c:\python34
-            var installDir = GetFullPythonInstallDirectory();
-            exeFullPath = Path.Combine(installDir, "python");
-        }
-        else
-        {
-            if (!OverridePythonExecutablePath.Exists)
-                throw new FileNotFoundException(
-                    $"The specified OverridePythonExecutablePath:{OverridePythonExecutablePath} does not exist");
-            else
-            if(OverridePythonExecutablePath.Name != "python.exe")
-                throw new FileNotFoundException(
-                    $"The specified OverridePythonExecutablePath:{OverridePythonExecutablePath} file is not called python.exe... what is going on here?");
+            return GetPython(Version==PythonVersion.Version2?'2':'3').path;
 
-            exeFullPath = OverridePythonExecutablePath.FullName;
-        }
+        if (!OverridePythonExecutablePath.Exists)
+            throw new FileNotFoundException(
+                $"The specified OverridePythonExecutablePath:{OverridePythonExecutablePath} does not exist");
+        if(OverridePythonExecutablePath.Name != "python.exe")
+            throw new FileNotFoundException(
+                $"The specified OverridePythonExecutablePath:{OverridePythonExecutablePath} file is not called python.exe... what is going on here?");
 
-        var info = new ProcessStartInfo(exeFullPath)
-        {
-            Arguments = command
-        };
-
-        return info;
+        return OverridePythonExecutablePath.FullName;
     }
 
     public void Initialize(ILoadDirectory hicProjectDirectory, DiscoveredDatabase dbInfo)
     {
-            
+
     }
 
     public ExitCodeType Fetch(IDataLoadJob job, GracefulCancellationToken cancellationToken)
     {
-        var processStartInfo = GetPythonCommand(FullPathToPythonScriptToRun);
-            
         int exitCode;
         try
         {
-            exitCode = ExecuteProcess(job, processStartInfo,MaximumNumberOfSecondsToLetScriptRunFor);
+            exitCode = ExecuteProcess(job, FullPathToPythonScriptToRun, MaximumNumberOfSecondsToLetScriptRunFor);
         }
         catch (TimeoutException e)
         {
@@ -177,26 +163,32 @@ public class PythonDataProvider:IPluginDataProvider
         return exitCode == 0 ? ExitCodeType.Success : ExitCodeType.Error;
     }
 
-    private int ExecuteProcess(IDataLoadEventListener listener, ProcessStartInfo processStartInfo, int maximumNumberOfSecondsToLetScriptRunFor)
+    private int ExecuteProcess(IDataLoadEventListener listener, string script, int maximumNumberOfSecondsToLetScriptRunFor)
     {
-        processStartInfo.RedirectStandardOutput = true;
-        processStartInfo.RedirectStandardError = true;
+        var processStartInfo = new ProcessStartInfo
+        {
+            FileName = GetPythonCommand(),
+            Arguments = script,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
 
-        processStartInfo.UseShellExecute = false;
-        processStartInfo.CreateNoWindow = true;
-
-        Process p = null;
+        Process p;
 
         var allErrorDataConsumed = false;
         var allOutputDataConsumed = false;
 
         try
         {
-            p =  new Process();
-            p.StartInfo = processStartInfo;
-            p.OutputDataReceived += (s, e) => allOutputDataConsumed = OutputDataReceived(s, e, listener,false);
-            p.ErrorDataReceived += (s, e) => allErrorDataConsumed = OutputDataReceived(s, e, listener,true);
-                
+            p = new Process
+            {
+                StartInfo = processStartInfo
+            };
+            p.OutputDataReceived += (s, e) => allOutputDataConsumed = OutputDataReceived(e, listener,false);
+            p.ErrorDataReceived += (s, e) => allErrorDataConsumed = OutputDataReceived(e, listener,true);
+
             p.Start();
             p.BeginErrorReadLine();
             p.BeginOutputReadLine();
@@ -207,11 +199,11 @@ public class PythonDataProvider:IPluginDataProvider
             throw new Exception(
                 $"Failed to launch:{Environment.NewLine}{processStartInfo.FileName}{Environment.NewLine} with Arguments:{processStartInfo.Arguments}",e);
         }
-            
+
         // To avoid deadlocks, always read the output stream first and then wait.
         var startTime = DateTime.Now;
 
-            
+
         while (!p.WaitForExit(100))//while process has not exited
         {
             if (!TimeoutExpired(startTime)) continue; //if timeout expired
@@ -239,22 +231,22 @@ public class PythonDataProvider:IPluginDataProvider
                 throw new TimeoutException("Timeout expired while waiting for all output streams from the Python process to finish being read");
         }
 
-        if (outputDataReceivedExceptions.Any())
-            if (outputDataReceivedExceptions.Count == 1)
-                throw outputDataReceivedExceptions[0];
-            else
-                throw new AggregateException(outputDataReceivedExceptions);
+        lock(this)
+            if (_outputDataReceivedExceptions.Any())
+                throw _outputDataReceivedExceptions.Count == 1
+                    ? _outputDataReceivedExceptions[0]
+                    : new AggregateException(_outputDataReceivedExceptions);
 
         return p.ExitCode;
     }
 
-    List<Exception> outputDataReceivedExceptions = new List<Exception>();
+    private readonly List<Exception> _outputDataReceivedExceptions = new();
 
-    private bool OutputDataReceived(object sender, DataReceivedEventArgs e, IDataLoadEventListener listener,bool isErrorStream)
+    private bool OutputDataReceived(DataReceivedEventArgs e, IDataLoadEventListener listener,bool isErrorStream)
     {
         if(e.Data == null)
             return true;
-            
+
         lock (this)
         {
             try
@@ -264,12 +256,12 @@ public class PythonDataProvider:IPluginDataProvider
             }
             catch (Exception ex)
             {
-                //the notify handler is crashing... lets stop tyring to read data from this async handler.  Also add the exception to the list because we don't want it throwing out of this lamda
-                outputDataReceivedExceptions.Add(ex);
+                //the notify handler is crashing... let's stop trying to read data from this async handler.  Also add the exception to the list because we don't want it throwing out of this lambda
+                _outputDataReceivedExceptions.Add(ex);
                 return true;
             }
         }
-             
+
         return false;
     }
     private bool TimeoutExpired(DateTime startTime)
@@ -281,66 +273,57 @@ public class PythonDataProvider:IPluginDataProvider
     }
 
 
-    public string GetFullPythonInstallDirectory()
+    public string GetFullPythonPath()
     {
-        return Path.Combine(Path.GetPathRoot(typeof(PythonDataProvider).Assembly.Location), GetPythonFolderName());
+        return GetPython(Version == PythonVersion.Version2 ? '2' : '3').path;
     }
 
-    private string GetPythonFolderName()
+    [SupportedOSPlatform("windows")]
+    private static IEnumerable<(decimal minor, string fullVersion, string path)> GetPythonVersions(RegistryKey? k,char major)
     {
-        switch (Version)
+        if (k is null) yield break;
+
+        foreach (var v in k.GetSubKeyNames())
         {
-            case PythonVersion.NotSet:
-                throw new Exception("Python version not set yet");
-            case PythonVersion.Version2:
-                return "python27";
-            case PythonVersion.Version3:
-                return "python35";
-            default:
-                throw new ArgumentOutOfRangeException();
+            if (v.Length < 3 || v[0] != major || v[1] != '.' || !decimal.TryParse(v[2..], out var minor))
+                continue;
+
+            using var details = k.OpenSubKey(v);
+            if (details is null) continue;
+
+            var fullVersion = details?.GetValue("Version") ?? v;
+
+            using var pathKey = details?.OpenSubKey("InstallPath");
+            if (pathKey is null) continue;
+
+            var path = pathKey.GetValue("ExecutablePath")?.ToString() ?? Path.Combine(pathKey?.GetValue(null)?.ToString() ?? "DUMMY","python.exe");
+
+            if (!path.Contains("DUMMY",StringComparison.Ordinal))
+                yield return (minor,fullVersion.ToString()??"0.0.0", path.ToString()??"none");
         }
     }
-        
+
+    private static (decimal minor, string fullVersion, string path) GetPython(char major)
+    {
+        if (!OperatingSystem.IsWindows()) throw new InvalidOperationException("This Python plugin is Windows only for now");
+
+        using var machine = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Python\\PythonCore");
+        using var user = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Python\\PythonCore");
+        using var machine32 = Registry.LocalMachine.OpenSubKey("SOFTWARE\\WOW6432Node\\Python\\PythonCore");
+        using var user32 = Registry.CurrentUser.OpenSubKey("SOFTWARE\\WOW6432Node\\Python\\PythonCore");
+        var candidate = GetPythonVersions(machine, major).Union(GetPythonVersions(user, major)).DefaultIfEmpty()
+            .MaxBy(static v => v.minor);
+        return candidate;
+    }
+
     private string GetExpectedPythonVersion()
     {
-        switch (Version)
-        {
-            case PythonVersion.NotSet:
-                throw new Exception("Python version not set yet");
-            case PythonVersion.Version2:
-                return "2.7.1";
-            case PythonVersion.Version3:
-                return "3.4.3";
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
-    private string GetCompatiblePythonVersion()
-    {
-        switch (Version)
-        {
-            case PythonVersion.NotSet:
-                throw new Exception("Python version not set yet");
-            case PythonVersion.Version2:
-                return "2";
-            case PythonVersion.Version3:
-                return "3";
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
-    public string GetDescription()
-    {
-        throw new NotImplementedException();
-    }
+        if (Version != PythonVersion.Version2 && Version!=PythonVersion.Version3)
+            throw new Exception("Python version not set yet or invalid");
 
-    public IDataProvider Clone()
-    {
-        throw new NotImplementedException();
-    }
+        if (!OperatingSystem.IsWindows()) throw new InvalidOperationException("This Python plugin is Windows only for now");
 
-    public bool Validate(ILoadDirectory destination)
-    {
-        return true;
+        var major = Version == PythonVersion.Version2 ? '2' : '3';
+        return GetPython(major).fullVersion;
     }
 }

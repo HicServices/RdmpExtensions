@@ -21,12 +21,12 @@ public class PythonNotInstalledTests
             Version = version
         };
 
-        var ex = Assert.Throws<Exception>(()=>provider.Check(new ThrowImmediatelyCheckNotifier()));
+        var ex = Assert.Throws<Exception>(()=>provider.Check(ThrowImmediatelyCheckNotifier.Quiet));
 
         Assert.IsTrue(ex?.Message.Contains("Failed to launch"));
     }
 
-    private void InconclusiveIfPythonIsInstalled(PythonVersion version)
+    private static void InconclusiveIfPythonIsInstalled(PythonVersion version)
     {
         var provider = new PythonDataProvider
         {
