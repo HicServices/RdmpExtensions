@@ -2,7 +2,6 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <AssemblyTitle>Rdmp.Extensions.Plugin</AssemblyTitle>
-    <AssemblyName>RdmpExtensionMain</AssemblyName>
     <Product>Rdmp.Extensions.Plugin</Product>
     <Copyright>Copyright ©  2019</Copyright>
   </PropertyGroup>
