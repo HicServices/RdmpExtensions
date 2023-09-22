@@ -1,24 +1,22 @@
 # RdmpExtensions
 
 ## Building
+Before Building, ensure the version numbe ris correct within the rdmpextension.nuspec and sharedAssembly.info file
+You will also need 7zip or an equivalent installed.
 
 You can build this plugin ready for upload to an RDMP instance using:
 
 ```bash
-cd Plugin/windows
-dotnet publish --runtime win-x64 -c Release --self-contained false
-cd ../main
-dotnet publish -c Release --self-contained false
-cd ../..
-nuget pack ./HIC.Extensions.nuspec -Properties Configuration=Release -IncludeReferencedProjects -Symbols -Version 3.0.1
+dotnet publish -p:DebugType=embedded -p:GenerateDocumentation=false Plugin/windows/windows.csproj -c Release -o p/windows
+dotnet publish -p:DebugType=embedded -p:GenerateDocumentation=false Plugin/main/main.csproj -c Release -o p/main
+7z a -tzip Rdmp.Extensions.Plugin.6.2.0.nupkg rdmpextension.nuspec p
+dotnet run --project RDMP/Tools/rdmp/rdmp.csproj -c Release -- pack -p --file Rdmp.Extensions.Plugin.6.2.0.nupkg --dir yaml
 ```
-_Use the version number in SharedAssembly.info in pace of 3.0.1_
-
-Once built you will have a file called `Rdmp.Hic.Plugin.3.0.1.nupkg` 
+Once built you will have a file called ` Rdmp.Extensions.Plugin.6.2.0.nupkg` 
 
 Upload it to RDMP using
 
 ```bash
-./rdmp pack -f Z:\Repos\HICPlugin\HIC.Extensions.3.0.1.nupkg
+./rdmp pack -f Z:\Repos\RdmpExtensions\Rdmp.Extensions.Plugin.6.2.0.nupkg
 ```
 _Upload into RDMP. Or use the gui client 'Plugins' node under the Tables(Advanced) toolbar button_
