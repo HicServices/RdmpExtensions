@@ -1,7 +1,7 @@
 # RdmpExtensions
 
 ## Building
-Before Building, ensure the version numbe ris correct within the rdmpextension.nuspec and sharedAssembly.info file
+Before Building, ensure the version number is correct within the rdmpextension.nuspec and sharedAssembly.info file
 You will also need 7zip or an equivalent installed.
 
 You can build this plugin ready for upload to an RDMP instance using:
