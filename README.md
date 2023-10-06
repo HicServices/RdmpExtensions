@@ -1,4 +1,22 @@
 # RdmpExtensions
+A collection of non-core RDMP functionality.
+This includes:
+
+* Automation Plugins
+
+    Allows for Automation of extractions
+* Interactive Plugins
+
+    Contains the DeAnonymise functionality to deanonymise against a cohort
+* Python
+
+    Allows for python scripts to be ran as data providers
+* Release Plugin
+
+    Allows for releases from remote RDMP instances
+* StatsScriptsExecution Plugin
+    
+    Allows for R scripts to be ran from RDMP
 
 ## Building
 Before Building, ensure the version number is correct within the rdmpextension.nuspec and sharedAssembly.info file
