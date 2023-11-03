@@ -160,10 +160,6 @@ public class RStudioAttacher : Attacher, IPluginAttacher
         var rscriptFullPath = Path.Combine(RscriptRootDirectory.FullName, "Rscript.exe");
 
         var fullPrintPath = Path.Combine(actualOutputDir, $"{scriptFileName}.Rout");
-        //var fullLogPath = Path.Combine(actualOutputDir, scriptFileName + ".log");
-
-        //var dataInConnection = GetConnectionString(InputDatabase);
-        //var dataOutConnection = GetConnectionString(_dbInfo);
 
         var command =
             $"--vanilla --default-packages={DefaultPackages} \"{FullPathToRScript.FullName.Replace('\\', '/')}\" {InputDatabase.Server} {InputDatabase.Database} {_dbInfo.Server} {_dbInfo.GetRuntimeName()} \"{actualOutputDir.TrimEnd('\\').Replace('\\', '/')}/\" >\"{fullPrintPath.Replace('\\', '/')}\"";
@@ -174,16 +170,6 @@ public class RStudioAttacher : Attacher, IPluginAttacher
         };
 
         return info;
-    }
-
-    private string GetConnectionString(DiscoveredDatabase db)
-    {
-        return $"Server={db.Server.Name};Database={db.GetRuntimeName()};IntegratedSecurity=true;DRIVER=SQL Server";
-    }
-
-    private string GetConnectionString(ExternalDatabaseServer db)
-    {
-        return $"Server={db.Server};Database={db.Database};IntegratedSecurity=true;DRIVER=SQL Server";
     }
 
     private string CreateActualOutputDir(string scriptFileName)
