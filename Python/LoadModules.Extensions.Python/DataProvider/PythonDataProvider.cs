@@ -13,7 +13,6 @@ using Rdmp.Core.DataFlowPipeline;
 using Rdmp.Core.DataLoad;
 using Rdmp.Core.DataLoad.Engine.DataProvider;
 using Rdmp.Core.DataLoad.Engine.Job;
-using Rdmp.Core.ReusableLibraryCode.Annotations;
 using Rdmp.Core.ReusableLibraryCode.Checks;
 using Rdmp.Core.ReusableLibraryCode.Progress;
 
@@ -73,9 +72,6 @@ public sealed class PythonDataProvider:IPluginDataProvider
         //make sure Python is installed
         try
         {
-            // If the override exe exists, trust it.
-            if (OverridePythonExecutablePath?.Exists == true) return;
-
             var version = GetPythonVersion();
 
             if (version?.StartsWith(GetExpectedPythonVersion(), StringComparison.Ordinal)==true)
@@ -149,6 +145,14 @@ public sealed class PythonDataProvider:IPluginDataProvider
 
     public ExitCodeType Fetch(IDataLoadJob job, GracefulCancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(FullPathToPythonScriptToRun))
+        {
+            job.OnNotify(this,
+                new NotifyEventArgs(ProgressEventType.Error,
+                    "No Python script provided"));
+            return ExitCodeType.Error;
+        }
+
         int exitCode;
         try
         {

@@ -88,7 +88,7 @@ public class Python2InstalledTests
     [Test]
     public void PythonScript_OverrideExecutablePath_DodgyFileType()
     {
-        var MyPythonScript = @"s = raw_input ('==>')";
+        const string MyPythonScript = "s = raw_input ('==>')";
 
         var py = Path.Combine(TestContext.CurrentContext.WorkDirectory, "Myscript.py");
 
@@ -105,7 +105,7 @@ public class Python2InstalledTests
         //call with accept all
         var ex = Assert.Throws<Exception>(()=>provider.Check(new AcceptAllCheckNotifier()));
 
-        StringAssert.Contains(@"Myscript.py file is not called python.exe... what is going on here?",ex.Message);
+        StringAssert.Contains(@"Myscript.py file is not called python.exe... what is going on here?",ex?.Message);
     }
 
     [Test]
