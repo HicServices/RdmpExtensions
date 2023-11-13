@@ -167,7 +167,7 @@ public sealed class PythonDataProvider:IPluginDataProvider
     {
         var processStartInfo = new ProcessStartInfo
         {
-            FileName = GetPythonCommand(),
+            FileName = GetPythonCommand() ?? throw new Exception("No Python executable found"),
             Arguments = script,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
@@ -298,8 +298,8 @@ public sealed class PythonDataProvider:IPluginDataProvider
 
             var path = pathKey.GetValue("ExecutablePath")?.ToString() ?? Path.Combine(pathKey?.GetValue(null)?.ToString() ?? "DUMMY","python.exe");
 
-            if (!path.Contains("DUMMY",StringComparison.Ordinal))
-                yield return (minor,fullVersion.ToString()??"0.0.0", path.ToString()??"none");
+            if (File.Exists(path))
+                yield return (minor,fullVersion.ToString()??"0.0.0", path);
         }
     }
 
