@@ -1,9 +1,3 @@
-// Copyright (c) The University of Dundee 2018-2019
-// This file is part of the Research Data Management Platform (RDMP).
-// RDMP is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-// RDMP is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-// You should have received a copy of the GNU General Public License along with RDMP. If not, see <https://www.gnu.org/licenses/>.
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,23 +9,19 @@ using NUnit.Framework;
 namespace LoadModules.Extensions.Tests;
 
 /// <summary>
-/// Tests to confirm that the dependencies in csproj files (NuGet packages) match those in the .nuspec files and that packages.md
+/// Tests to confirm that the dependencies in csproj files (NuGet packages) match those in the .nuspec files and that packages.md 
 /// lists the correct versions (in documentation)
 /// </summary>
 public class PackageListIsCorrectTests
 {
-    private static readonly EnumerationOptions EnumerationOptions = new()
-        { RecurseSubdirectories = true, MatchCasing = MatchCasing.CaseInsensitive, IgnoreInaccessible = true };
+    private static readonly EnumerationOptions EnumerationOptions = new() { RecurseSubdirectories = true,MatchCasing = MatchCasing.CaseInsensitive,IgnoreInaccessible = true};
 
     //<PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
-    private static readonly Regex RPackageRef =
-        new(@"<PackageReference\s+Include=""(.*)""\s+Version=""([^""]*)""",
-            RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
+    private static readonly Regex RPackageRef = new(@"<PackageReference\s+Include=""(.*)""\s+Version=""([^""]*)""", RegexOptions.IgnoreCase|RegexOptions.Compiled|RegexOptions.CultureInvariant);
 
     // | Org.SomePackage |
     //
-    private static readonly Regex RMarkdownEntry = new(@"^\|\s*\[?([^ |\]]+)(\]\([^)]+\))?\s*\|",
-        RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
+    private static readonly Regex RMarkdownEntry = new(@"^\|\s*\[?([^ |\]]+)(\]\([^)]+\))?\s*\|", RegexOptions.IgnoreCase|RegexOptions.Compiled|RegexOptions.CultureInvariant);
 
 
     /// <summary>
@@ -39,17 +29,17 @@ public class PackageListIsCorrectTests
     /// </summary>
     /// <param name="rootPath"></param>
     [TestCase]
-    public void TestPackagesDocumentCorrect(string rootPath = null)
+    public void TestPackagesDocumentCorrect(string rootPath=null)
     {
-        var root = FindRoot(rootPath);
+        var root= FindRoot(rootPath);
         var undocumented = new StringBuilder();
 
         // Extract the named packages from PACKAGES.md
-        var packagesMarkdown = File.ReadAllLines(GetPackagesMarkdown(root))
+        var packagesMarkdown = GetPackagesMarkdown(root).SelectMany(File.ReadAllLines)
             .Select(line => RMarkdownEntry.Match(line))
-            .Where(m => m.Success)
-            .Skip(2) // Jump over the header
+            .Where(m=>m.Success)
             .Select(m => m.Groups[1].Value)
+            .Except(new[]{"Package", "-------" })
             .ToHashSet(StringComparer.InvariantCultureIgnoreCase);
 
         // Extract the named packages from csproj files
@@ -57,14 +47,13 @@ public class PackageListIsCorrectTests
             .Select(m => m.Groups[1].Value).ToHashSet(StringComparer.InvariantCultureIgnoreCase);
 
         // Then subtract those listed in PACKAGES.md (should be empty)
-        var undocumentedPackages = usedPackages.Except(packagesMarkdown).Select(BuildRecommendedMarkdownLine).ToList();
+        var undocumentedPackages = usedPackages.Except(packagesMarkdown).Select(BuildRecommendedMarkdownLine);
         undocumented.AppendJoin(Environment.NewLine, undocumentedPackages);
 
         var unusedPackages = packagesMarkdown.Except(usedPackages).ToArray();
         Assert.IsEmpty(unusedPackages,
             $"The following packages are listed in PACKAGES.md but are not used in any csproj file: {string.Join(", ", unusedPackages)}");
-        Assert.Zero(undocumentedPackages.Count,
-            $"One or more packages not documented in PACKAGES.md. Recommended addition:{Environment.NewLine}{undocumented}");
+        Assert.IsEmpty(undocumented.ToString());
     }
 
     /// <summary>
@@ -72,8 +61,7 @@ public class PackageListIsCorrectTests
     /// </summary>
     /// <param name="package"></param>
     /// <returns></returns>
-    private static object BuildRecommendedMarkdownLine(string package) =>
-        $"| {package} | [GitHub]() | LICENCE GOES HERE | |";
+    private static object BuildRecommendedMarkdownLine(string package) => $"Package {package} is not documented in PACKAGES.md. Recommended line is:\r\n| {package} | [GitHub]() | LICENCE GOES HERE | |";
 
     /// <summary>
     /// Find the root of this repo, which is usually the directory containing the .sln file
@@ -88,7 +76,6 @@ public class PackageListIsCorrectTests
             if (!Path.IsPathRooted(path)) path = Path.Combine(TestContext.CurrentContext.TestDirectory, path);
             return new DirectoryInfo(path);
         }
-
         var root = new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
         while (!root.EnumerateFiles("*.sln", SearchOption.TopDirectoryOnly).Any() && root.Parent != null)
             root = root.Parent;
@@ -103,8 +90,7 @@ public class PackageListIsCorrectTests
     /// <returns></returns>
     private static IEnumerable<string> GetCsprojFiles(DirectoryInfo root)
     {
-        return root.EnumerateFiles("*.csproj", EnumerationOptions).Select(f => f.FullName)
-            .Where(f => !f.Contains("tests", StringComparison.InvariantCultureIgnoreCase));
+        return root.EnumerateFiles("*.csproj", EnumerationOptions).Select(f => f.FullName).Where(f => !f.Contains("tests", StringComparison.InvariantCultureIgnoreCase));
     }
 
     /// <summary>
@@ -112,10 +98,11 @@ public class PackageListIsCorrectTests
     /// </summary>
     /// <param name="root"></param>
     /// <returns></returns>
-    private static string GetPackagesMarkdown(DirectoryInfo root)
+    private static string[] GetPackagesMarkdown(DirectoryInfo root)
     {
-        var path = root.EnumerateFiles("packages.md", EnumerationOptions).Select(f => f.FullName).SingleOrDefault();
-        Assert.IsNotNull(path, "Could not find packages.md");
+        var path = root.EnumerateFiles("packages.md", EnumerationOptions).Select(f => f.FullName).ToArray();
+        Assert.False(path.Length==0, "Could not find packages.md");
         return path;
     }
+
 }
