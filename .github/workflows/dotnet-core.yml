@@ -38,12 +38,18 @@ jobs:
         shell: bash
         run: |
             find ./RDMP/Tools/rdmp/Databases.yaml -type f -exec sed -i 's/RDMP_/TEST_/g' {} \;
-      - name: Initialise LocalDB
-        shell: bash
-        run: |
-          SqlLocalDB.exe create MSSQLLocalDB -s
-          sqlcmd -l 180 -S '(localdb)\MSSQLLocalDB' -Q "SELECT @@VERSION;"
-          sed -i'' -e 's/localhost/\(localdb\)\\MSSQLLocalDB/' RDMP/Tests.Common/TestDatabases.txt
+      # - name: Initialise LocalDB
+      #   shell: bash
+      #   run: |
+      #     SqlLocalDB.exe create MSSQLLocalDB -s
+      #     sqlcmd -l 180 -S '(localdb)\MSSQLLocalDB' -Q "SELECT @@VERSION;"
+      #     sed -i'' -e 's/localhost/\(localdb\)\\MSSQLLocalDB/' RDMP/Tests.Common/TestDatabases.txt
+      - name: Install a SQL Server suite of tools
+        uses: potatoqualitee/mssqlsuite@v1.7
+        with:
+          install: sqlengine, sqlclient, sqlpackage, localdb
+      - name: Run sqlclient
+        run: sqlcmd -S localhost -U sa -P dbatools.I0 -d tempdb -Q "SELECT @@version;"
       - uses: shogo82148/actions-setup-mysql@v1
         with:
           mysql-version: '8.0'
@@ -51,7 +57,7 @@ jobs:
           auto-start: true
       - name: Set up database
         run: |
-          dotnet run --project RDMP/Tools/rdmp/rdmp.csproj -c Release -- install --createdatabasetimeout 1800 "(localdb)\MSSQLLocalDB" TEST_ -e     
+          dotnet run --project RDMP/Tools/rdmp/rdmp.csproj -c Release -- install --createdatabasetimeout 1800 localhost TEST_ -e     
       - name: Test
         run: |
           dotnet test
