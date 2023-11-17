@@ -30,6 +30,10 @@ jobs:
         uses: crazy-max/ghaction-chocolatey@v3
         with:
           args: install -r sqllocaldb --no-progress
+      - name: Install python2
+        uses: crazy-max/ghaction-chocolatey@v3
+        with:
+          args: install -r python2
       - name: Populate Databases.yaml 
         shell: bash
         run: |
