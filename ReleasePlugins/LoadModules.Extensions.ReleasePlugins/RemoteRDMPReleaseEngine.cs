@@ -41,9 +41,9 @@ public class RemoteRDMPReleaseEngine : ReleaseEngine
 
         var zipOutput = Path.Combine(ReleaseAudit.ReleaseFolder.FullName, releaseFileName);
         ZipReleaseFolder(ReleaseAudit.ReleaseFolder, RemoteRDMPSettings.ZipPassword.GetDecryptedValue(), zipOutput);
-            
+
         UploadToRemote(zipOutput, releaseFileName, projectSafeHavenFolder);
-        
+
         ReleaseSuccessful = true;
     }
 
@@ -65,7 +65,7 @@ public class RemoteRDMPReleaseEngine : ReleaseEngine
             ZipPassword = RemoteRDMPSettings.ZipPassword.GetDecryptedValue()
         };
         content.Add(new StringContent(JsonConvert.SerializeObject(settings)), "settings");
-                
+
         try
         {
             var result = client.PostAsync(RemoteRDMPSettings.RemoteRDMP.GetUrlForRelease(), content).Result;
@@ -98,13 +98,13 @@ public class RemoteRDMPReleaseEngine : ReleaseEngine
             throw;
         }
     }
-        
+
     private void ZipReleaseFolder(DirectoryInfo customExtractionDirectory, string zipPassword, string zipOutput)
     {
         var zip = new ZipFile() { UseZip64WhenSaving = Zip64Option.AsNecessary };
         if (!string.IsNullOrWhiteSpace(zipPassword))
             zip.Password = zipPassword;
-                
+
         zip.AddDirectory(customExtractionDirectory.FullName);
         zip.Save(zipOutput);
     }
@@ -118,7 +118,7 @@ public class RemoteRDMPReleaseEngine : ReleaseEngine
     {
         if (string.IsNullOrWhiteSpace(masterTicket))
             return $"Proj-{Project.ProjectNumber}";
-            
+
         var catalogueRepository = Project.DataExportRepository.CatalogueRepository;
         var factory = new TicketingSystemFactory(catalogueRepository);
         var system = factory.CreateIfExists(catalogueRepository.GetTicketingSystem());

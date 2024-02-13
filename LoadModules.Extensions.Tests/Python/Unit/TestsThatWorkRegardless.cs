@@ -14,8 +14,8 @@ public class TestsThatWorkRegardless
     {
         var provider = new PythonDataProvider();
         var ex = Assert.Throws<Exception>(()=>provider.Check(ThrowImmediatelyCheckNotifier.Quiet));
-        Assert.AreEqual("Version of Python required for script has not been selected",ex?.Message);
-            
+        Assert.That(ex?.Message, Is.EqualTo("Version of Python required for script has not been selected"));
+
     }
 
 
@@ -38,8 +38,8 @@ public class TestsThatWorkRegardless
         };
         //call with accept all
         var ex = Assert.Throws<Exception>(()=>provider.Check(new AcceptAllCheckNotifier()));
-            
-        StringAssert.Contains(@"The specified OverridePythonExecutablePath:C:\fishmongers\python does not exist",ex?.Message);
+
+        Assert.That(ex?.Message, Does.Contain(@"The specified OverridePythonExecutablePath:C:\fishmongers\python does not exist"));
 
     }
 

@@ -25,14 +25,14 @@ internal class ExecuteCommandCreateNewAutomateExtraction : BasicAutomationComman
 
         // the project doesnt have a schedule
         Schedule = existingSchedules.FirstOrDefault(s => s.Project_ID == extractionConfiguration.Project_ID);
-            
+
         if (Schedule == null)
         {
             SetImpossible($"Project {extractionConfiguration.Project} does not have an {nameof(AutomateExtractionSchedule)}");
             return;
         }
 
-            
+
         ExtractionConfiguration = extractionConfiguration;
         var existingAutomateExtractions = AutomationRepository.GetAllObjects<AutomateExtraction>();
 

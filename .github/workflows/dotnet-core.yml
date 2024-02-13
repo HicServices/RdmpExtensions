@@ -10,7 +10,7 @@ env:
   
 jobs:
   package:
-    runs-on: self-hosted
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
@@ -18,17 +18,46 @@ jobs:
           repository: HicServices/RDMP
           ref: develop
           path: RDMP
-      - uses: actions/setup-dotnet@v1
+      - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 7.0.x
       - name: Get version
         id: version
         shell: cmd
         run: |
           getversions >> %GITHUB_OUTPUT%
+      - name: Install MS SQL 2019 Express LocalDB
+        uses: crazy-max/ghaction-chocolatey@v3
+        with:
+          args: install -r sqllocaldb --no-progress
+      - name: Install python2
+        uses: crazy-max/ghaction-chocolatey@v3
+        with:
+          args: install -r python2
+      - name: Populate Databases.yaml 
+        shell: bash
+        run: |
+            find ./RDMP/Tools/rdmp/Databases.yaml -type f -exec sed -i 's/RDMP_/TEST_/g' {} \;
+      # - name: Initialise LocalDB
+      #   shell: bash
+      #   run: |
+      #     SqlLocalDB.exe create MSSQLLocalDB -s
+      #     sqlcmd -l 180 -S '(localdb)\MSSQLLocalDB' -Q "SELECT @@VERSION;"
+      #     sed -i'' -e 's/localhost/\(localdb\)\\MSSQLLocalDB/' RDMP/Tests.Common/TestDatabases.txt
+      - name: Install a SQL Server suite of tools
+        uses: potatoqualitee/mssqlsuite@v1.7
+        with:
+          install: sqlengine, sqlclient, sqlpackage, localdb
+      - name: Run sqlclient
+        run: sqlcmd -S localhost -U sa -P dbatools.I0 -d tempdb -Q "SELECT @@version;"
+      - uses: shogo82148/actions-setup-mysql@v1
+        with:
+          mysql-version: '8.0'
+          root-password: 'YourStrong!Passw0rd'
+          auto-start: true
       - name: Set up database
         run: |
-          dotnet run --project RDMP/Tools/rdmp/rdmp.csproj -c Release -- install localhost TEST_ -d
+          dotnet run --project RDMP/Tools/rdmp/rdmp.csproj -c Release -- install --createdatabasetimeout 1800 localhost TEST_ -e     
       - name: Test
         run: |
           dotnet test

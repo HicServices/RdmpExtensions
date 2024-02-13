@@ -13,7 +13,7 @@ namespace LoadModules.Extensions.Interactive.DeAnonymise;
 public class DeAnonymiseAgainstCohort: IPluginDataFlowComponent<DataTable>, IPipelineRequirement<IBasicActivateItems>
 {
     /// <summary>
-    /// When null (default) we launch a new DeAnonymiseAgainstCohortUI in order that the user selects which cohort he wants to deanonymise against. If you set this then you can 
+    /// When null (default) we launch a new DeAnonymiseAgainstCohortUI in order that the user selects which cohort he wants to deanonymise against. If you set this then you can
     /// (for example in unit tests) specify an explicit implementation and dodge the gui.
     /// </summary>
     public IDeAnonymiseAgainstCohortConfigurationFulfiller ConfigurationGetter;
@@ -68,7 +68,7 @@ public class DeAnonymiseAgainstCohort: IPluginDataFlowComponent<DataTable>, IPip
     }
     public void Check(ICheckNotifier notifier)
     {
-           
+
     }
 
     public void PreInitialize(IBasicActivateItems value, IDataLoadEventListener listener)

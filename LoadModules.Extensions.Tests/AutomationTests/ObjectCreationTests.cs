@@ -19,8 +19,11 @@ public class ObjectCreationTests : TestsRequiringAnAutomationPluginRepository
         var proj = new Project(Repo.DataExportRepository, "My cool project");
         var schedule = new AutomateExtractionSchedule(Repo, proj);
 
-        Assert.IsTrue(schedule.Exists());
-        Assert.AreEqual(schedule.Project_ID , proj.ID);
+        Assert.Multiple(() =>
+        {
+            Assert.That(schedule.Exists(), Is.True);
+            Assert.That(proj.ID, Is.EqualTo(schedule.Project_ID));
+        });
 
         //Configurations
         var config = new ExtractionConfiguration(Repo.DataExportRepository, proj)
@@ -28,23 +31,29 @@ public class ObjectCreationTests : TestsRequiringAnAutomationPluginRepository
             Name = "Configuration1"
         };
         config.SaveToDatabase();
-            
+
         //Permission to use a given configuration
         var automate = new AutomateExtraction(Repo,schedule,config);
-        Assert.AreEqual(automate.ExtractionConfigurationId,config.ID);
-        Assert.AreEqual(automate.Disabled ,false);
-        Assert.IsNull(automate.BaselineDate);
+        Assert.Multiple(() =>
+        {
+            Assert.That(config.ID, Is.EqualTo(automate.ExtractionConfigurationId));
+            Assert.That(automate.Disabled, Is.EqualTo(false));
+            Assert.That(automate.BaselineDate, Is.Null);
+        });
 
         //Baseline (for when an extraction executes and a baseline is created for the datasets)
-            
+
         //should cascade delete everything
         schedule.DeleteInDatabase();
-            
+
         config.DeleteInDatabase();
         proj.DeleteInDatabase();
 
-        Assert.IsFalse(schedule.Exists());
-        Assert.IsFalse(proj.Exists());
+        Assert.Multiple(() =>
+        {
+            Assert.That(schedule.Exists(), Is.False);
+            Assert.That(proj.Exists(), Is.False);
+        });
 
     }
 
@@ -53,12 +62,15 @@ public class ObjectCreationTests : TestsRequiringAnAutomationPluginRepository
     {
         var project = new Project(Repo.DataExportRepository,"proj");
         var configuration= new ExtractionConfiguration(Repo.DataExportRepository,project);
-            
+
         var p = new Pipeline(Repo.CatalogueRepository);
 
         var que = new QueuedExtraction(Repo, configuration, p, DateTime.Now.AddHours(1));
-        Assert.IsTrue(que.Exists());
-        Assert.Greater(que.DueDate, DateTime.Now);
+        Assert.Multiple(() =>
+        {
+            Assert.That(que.Exists(), Is.True);
+            Assert.That(que.DueDate, Is.GreaterThan(DateTime.Now));
+        });
 
         que.DeleteInDatabase();
 
@@ -86,7 +98,7 @@ public class ObjectCreationTests : TestsRequiringAnAutomationPluginRepository
         //shouldn't be able to create a second audit of the same ds
         Assert.Throws<SqlException>(() => new SuccessfullyExtractedResults(Repo, "Select * from FantasyLand", automateConfig, ds));
 
-        Assert.IsTrue(results.Exists());
+        Assert.That(results.Exists(), Is.True);
 
         //ensures accumulator only has the lifetime of a single data load execution
         var acc = IdentifierAccumulator.GetInstance(DataLoadInfo.Empty);
@@ -97,7 +109,7 @@ public class ObjectCreationTests : TestsRequiringAnAutomationPluginRepository
         acc.CommitCurrentState(Repo,automateConfig);
 
         var dt = automateConfig.GetIdentifiersTable();
-        Assert.AreEqual(dt.Rows.Count,2);
+        Assert.That(dt.Rows, Has.Count.EqualTo(2));
 
         //next dataset executes in parallel race conditions galore!
         acc = IdentifierAccumulator.GetInstance(DataLoadInfo.Empty);
@@ -105,10 +117,10 @@ public class ObjectCreationTests : TestsRequiringAnAutomationPluginRepository
         acc.CommitCurrentState(Repo, automateConfig);
 
         dt = automateConfig.GetIdentifiersTable();
-        Assert.AreEqual(dt.Rows.Count, 3);
+        Assert.That(dt.Rows, Has.Count.EqualTo(3));
 
         automateConfig.ClearBaselines();
         dt = automateConfig.GetIdentifiersTable();
-        Assert.AreEqual(dt.Rows.Count, 0);
+        Assert.That(dt.Rows, Is.Empty);
     }
 }

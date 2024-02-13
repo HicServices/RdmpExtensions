@@ -39,6 +39,6 @@ public class Python2And3InstalledTests
         {
             provider.Check(ThrowImmediatelyCheckNotifier.Quiet);
         });
-        StringAssert.Contains(@"which is incompatible with the desired version 2.7",ex?.Message);
+        Assert.That(ex?.Message, Does.Contain(@"which is incompatible with the desired version 2.7"));
     }
 }

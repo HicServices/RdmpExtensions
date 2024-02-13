@@ -8,7 +8,7 @@ public class NeverAllowAnythingTicketing:ITicketingSystem
 {
     public void Check(ICheckNotifier notifier)
     {
-            
+
     }
 
     public bool IsValidTicketName(string ticketName)
@@ -18,7 +18,7 @@ public class NeverAllowAnythingTicketing:ITicketingSystem
 
     public void NavigateToTicket(string ticketName)
     {
-            
+
     }
 
     public TicketingReleaseabilityEvaluation GetDataReleaseabilityOfTicket(string masterTicket, string requestTicket,

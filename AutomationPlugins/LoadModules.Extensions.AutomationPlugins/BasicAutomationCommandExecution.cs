@@ -25,7 +25,7 @@ public class BasicAutomationCommandExecution : BasicCommandExecution
         {
             SetImpossible("There is no Automation Repository configured");
         }
-                
+
     }
 
 }

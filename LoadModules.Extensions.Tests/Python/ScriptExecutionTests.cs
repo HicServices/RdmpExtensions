@@ -52,11 +52,12 @@ time.sleep(1)
 
             var exitCode = py.Fetch(toMemory, new GracefulCancellationToken());
 
-            Assert.AreEqual(ExitCodeType.Success, exitCode);
+            Assert.Multiple(() =>
+            {
+                Assert.That(exitCode, Is.EqualTo(ExitCodeType.Success));
 
-            Assert.AreEqual(5, toMemory.EventsReceivedBySender[py].Count(m=>m.Message.Equals("1")));
-
-
+                Assert.That(toMemory.EventsReceivedBySender[py].Count(m => m.Message.Equals("1")), Is.EqualTo(5));
+            });
         }
         finally
         {
@@ -98,20 +99,25 @@ sys.stdout.flush()
             //wait 1 second, the first message should have come through but not the second
             Task.Delay(2000).Wait();
 
-            Assert.IsTrue(tomemory.EventsReceivedBySender[py].Any(m => m.Message.Equals("GetReady")));
-            Assert.IsFalse(tomemory.EventsReceivedBySender[py].Any(m => m.Message.Equals("FIGHT!")));
-            Assert.IsFalse(task.IsCompleted);
+            Assert.Multiple(() =>
+            {
+                Assert.That(tomemory.EventsReceivedBySender[py].Any(static m => m.Message.Equals("GetReady")), Is.True);
+                Assert.That(tomemory.EventsReceivedBySender[py].Any(static m => m.Message.Equals("FIGHT!")), Is.False);
+                Assert.That(task.IsCompleted, Is.False);
+            });
 
             //wait another 6 seconds
             Task.Delay(6000).Wait();
-                
-            //now both messages should have come through
-            Assert.IsTrue(tomemory.EventsReceivedBySender[py].Any(m => m.Message.Equals("GetReady")));
-            Assert.IsTrue(tomemory.EventsReceivedBySender[py].Any(m => m.Message.Equals("FIGHT!")));
 
-            //should already be finished
-            Assert.IsTrue(task.IsCompleted);
+            Assert.Multiple(() =>
+            {
+                //now both messages should have come through
+                Assert.That(tomemory.EventsReceivedBySender[py].Any(static m => m.Message.Equals("GetReady")), Is.True);
+                Assert.That(tomemory.EventsReceivedBySender[py].Any(static m => m.Message.Equals("FIGHT!")), Is.True);
 
+                //should already be finished
+                Assert.That(task.IsCompleted, Is.True);
+            });
         }
         finally
         {
@@ -148,15 +154,17 @@ eprint(""Test Error"")
             var tomem = new ToMemoryDataLoadJob(true);
             py.Fetch(tomem, new GracefulCancellationToken());
 
-            Assert.AreEqual(
-                tomem.EventsReceivedBySender[py].First(n => n.ProgressEventType == ProgressEventType.Information)
-                    .Message, "Test Normal Msg");
+            Assert.Multiple(() =>
+            {
+                Assert.That(
+                            tomem.EventsReceivedBySender[py].First(static n => n.ProgressEventType == ProgressEventType.Information)
+                                .Message, Is.EqualTo("Test Normal Msg"));
 
-                
-            Assert.AreEqual(
-                tomem.EventsReceivedBySender[py].Single(n => n.ProgressEventType == ProgressEventType.Warning)
-                    .Message, "Test Error");
 
+                Assert.That(
+                    tomem.EventsReceivedBySender[py].Single(static n => n.ProgressEventType == ProgressEventType.Warning)
+                        .Message, Is.EqualTo("Test Error"));
+            });
         }
         finally
         {
