@@ -9,17 +9,17 @@ namespace LoadModules.Extensions.AutomationPlugins.Data.Repository;
 public class AutomateExtractionRepositoryFinder : PluginRepositoryFinder
 {
     public static int Timeout = 5;
-        
+
     public AutomateExtractionRepositoryFinder(IRDMPPlatformRepositoryServiceLocator repositoryLocator) : base(repositoryLocator)
     {
-            
+
     }
 
     public override PluginRepository GetRepositoryIfAny()
     {
         if (RepositoryLocator.CatalogueRepository == null || RepositoryLocator.DataExportRepository == null)
             return null;
-            
+
         var patcher = new AutomateExtractionPluginPatcher();
 
         var compatibleServers = RepositoryLocator.CatalogueRepository.GetAllObjects<ExternalDatabaseServer>()

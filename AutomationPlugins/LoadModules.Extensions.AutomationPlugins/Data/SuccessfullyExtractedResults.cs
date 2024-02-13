@@ -14,7 +14,7 @@ public class SuccessfullyExtractedResults : DatabaseEntity
     private string _sQL;
     private int _extractableDataSet_ID;
     private int _automateExtraction_ID;
-        
+
     public string SQL
     {
         get => _sQL;

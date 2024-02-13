@@ -29,7 +29,7 @@ public class AutomatedExtractionPipelineChecker:ICheckable
             else
                 notifier.OnCheckPerformed(new CheckEventArgs(
                     $"Automated Extraction can only take place through Pipelines that include a {nameof(SuccessfullyExtractedResultsDocumenter)} plugin component", CheckResult.Fail));
-            
+
             var source = _automateExtractionPipeline.Source;
 
             if (source == null)

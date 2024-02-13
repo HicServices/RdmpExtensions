@@ -32,8 +32,8 @@ public class DeltaHacker
 
         if(validFromField == null)
             return BaselineHackEvaluation.DatasetNotCompatibleWithBaselining;
-            
-        //there must be an existing baseline 
+
+        //there must be an existing baseline
 
         //get the ids that the request is for
         var configId = _extractDatasetCommand.Configuration.ID;
@@ -52,7 +52,7 @@ public class DeltaHacker
 
         //see if there is an audit of the previous execution success for this dataset
         var previousSuccess = automateExtraction[0].GetSuccessIfAnyFor(_extractDatasetCommand.DatasetBundle.DataSet);
-                
+
         //no there is no record of a succesful extraction so a full baseline is needed
         if(previousSuccess == null)
             return BaselineHackEvaluation.NoCompatibleBaselineAvailable;
@@ -82,12 +82,12 @@ public class DeltaHacker
 
         //
         var tblForJoin = _repository.DiscoveredServer.GetCurrentDatabase().ExpectTable("ReleaseIdentifiersSeen");
-            
+
         if(!tblForJoin.Exists())
             throw new Exception($"Table '{tblForJoin} did not exist!");
 
         var tableForJoinName = tblForJoin.GetFullyQualifiedName();
-            
+
         hackSql = $@"
 AND
 (
@@ -120,7 +120,7 @@ AND
         {
             var col = tableInfo.ColumnInfos.SingleOrDefault(c => c.GetRuntimeName() == validFromFieldName);
 
-            //table doesn't have a 
+            //table doesn't have a
             if(col == null)
             {
                 listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information,
@@ -146,7 +146,7 @@ AND
                         ));
                         return null;
                     }
-                        
+
                     //we are not a primary and we have found a primary already so ignore this col
                 }
                 else //previous one was not a primary
@@ -175,7 +175,7 @@ AND
                 $"No ColumnInfos were found called '{validFromFieldName}'"));
             return null;
         }
-            
+
         listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information,
             $"Found valid from field '{validFromField}'"));
         return validFromField;

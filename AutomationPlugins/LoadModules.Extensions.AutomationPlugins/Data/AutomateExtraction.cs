@@ -61,7 +61,7 @@ public class AutomateExtraction : DatabaseEntity
     #endregion
 
     #region Relationships
-        
+
     [NoMappingToDatabase]
     public IExtractionConfiguration ExtractionConfiguration => _repository.DataExportRepository.GetObjectByID<ExtractionConfiguration>(ExtractionConfigurationId);
 
@@ -99,7 +99,7 @@ public class AutomateExtraction : DatabaseEntity
     }
 
     private ExtractionConfiguration _cachedExtractionConfiguration;
-        
+
 
     public override string ToString()
     {
@@ -146,7 +146,7 @@ public class AutomateExtraction : DatabaseEntity
 
         foreach (var r in _repository.GetAllObjectsWithParent<SuccessfullyExtractedResults>(this))
             r.DeleteInDatabase();
-            
+
         BaselineDate = null;
         SaveToDatabase();
     }

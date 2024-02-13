@@ -98,7 +98,7 @@ public class RemoteRDMPDataReleaseDestination : IPluginDataFlowComponent<Release
         {
             listener.OnNotify(this, new NotifyEventArgs(ProgressEventType.Information,
                 $"Data release succeeded into: {RDMPReleaseSettings.RemoteRDMP.Name}"));
-                
+
             // we can freeze the configuration now:
             foreach (var config in _configurationReleased)
             {

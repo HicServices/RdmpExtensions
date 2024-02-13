@@ -83,7 +83,7 @@ A2.ReleaseID = {_commitTblName}.ReleaseID )";
                 var cmd = new SqlCommand(sql, con);
                 cmd.ExecuteNonQuery();
             }
-            
+
 
             tempTable.Drop();
         }

@@ -15,7 +15,7 @@ public class AutomateExtractionRepository : PluginRepository
         CatalogueRepository = repositoryLocator.CatalogueRepository;
         DataExportRepository = repositoryLocator.DataExportRepository;
     }
-        
+
     protected override bool IsCompatibleType(Type type)
     {
         return typeof(DatabaseEntity).IsAssignableFrom(type);

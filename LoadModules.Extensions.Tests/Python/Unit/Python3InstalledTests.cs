@@ -55,7 +55,7 @@ public class Python3InstalledTests
         var toMemory = new ToMemoryDataLoadJob(false);
         provider.Fetch(toMemory, new GracefulCancellationToken());
 
-        Assert.AreEqual(1,toMemory.EventsReceivedBySender[provider].Count(m => m.Message.Contains("SyntaxError: Missing parentheses in call to 'print'")));
+        Assert.That(toMemory.EventsReceivedBySender[provider].Count(m => m.Message.Contains("SyntaxError: Missing parentheses in call to 'print'")), Is.EqualTo(1));
     }
 
     [Test]
