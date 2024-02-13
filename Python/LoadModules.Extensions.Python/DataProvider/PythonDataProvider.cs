@@ -13,7 +13,6 @@ using Rdmp.Core.DataFlowPipeline;
 using Rdmp.Core.DataLoad;
 using Rdmp.Core.DataLoad.Engine.DataProvider;
 using Rdmp.Core.DataLoad.Engine.Job;
-using Rdmp.Core.ReusableLibraryCode.Annotations;
 using Rdmp.Core.ReusableLibraryCode.Checks;
 using Rdmp.Core.ReusableLibraryCode.Progress;
 
@@ -58,6 +57,18 @@ public sealed class PythonDataProvider:IPluginDataProvider
             return;
         }
 
+        if (FullPathToPythonScriptToRun?.Contains(' ') == true && FullPathToPythonScriptToRun?.Contains('"') == false)
+            notifier.OnCheckPerformed(
+                new CheckEventArgs(
+                    "FullPathToPythonScriptToRun contains spaces but is not wrapped by quotes which will likely fail when we assemble the python execute command",
+                    CheckResult.Fail));
+
+        if (!File.Exists(FullPathToPythonScriptToRun?.Trim('\"', '\'')))
+            notifier.OnCheckPerformed(
+                new CheckEventArgs(
+                    $"File {FullPathToPythonScriptToRun} does not exist (FullPathToPythonScriptToRun)",
+                    CheckResult.Warning));
+
         //make sure Python is installed
         try
         {
@@ -91,18 +102,6 @@ public sealed class PythonDataProvider:IPluginDataProvider
                 ? new CheckEventArgs("Python is not installed on the host", CheckResult.Fail, e)
                 : new CheckEventArgs(e.Message, CheckResult.Fail, e));
         }
-
-        if (FullPathToPythonScriptToRun?.Contains(' ') ==true && FullPathToPythonScriptToRun?.Contains('"') ==false)
-            notifier.OnCheckPerformed(
-                new CheckEventArgs(
-                    "FullPathToPythonScriptToRun contains spaces but is not wrapped by quotes which will likely fail when we assemble the python execute command",
-                    CheckResult.Fail));
-
-        if (!File.Exists(FullPathToPythonScriptToRun?.Trim('\"', '\'')))
-            notifier.OnCheckPerformed(
-                new CheckEventArgs(
-                    $"File {FullPathToPythonScriptToRun} does not exist (FullPathToPythonScriptToRun)",
-                    CheckResult.Warning));
     }
 
     public string? GetPythonVersion()
@@ -146,6 +145,14 @@ public sealed class PythonDataProvider:IPluginDataProvider
 
     public ExitCodeType Fetch(IDataLoadJob job, GracefulCancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(FullPathToPythonScriptToRun))
+        {
+            job.OnNotify(this,
+                new NotifyEventArgs(ProgressEventType.Error,
+                    "No Python script provided"));
+            return ExitCodeType.Error;
+        }
+
         int exitCode;
         try
         {
@@ -291,15 +298,15 @@ public sealed class PythonDataProvider:IPluginDataProvider
             using var details = k.OpenSubKey(v);
             if (details is null) continue;
 
-            var fullVersion = details?.GetValue("Version") ?? v;
+            var fullVersion = details.GetValue("Version") ?? v;
 
-            using var pathKey = details?.OpenSubKey("InstallPath");
+            using var pathKey = details.OpenSubKey("InstallPath");
             if (pathKey is null) continue;
 
-            var path = pathKey.GetValue("ExecutablePath")?.ToString() ?? Path.Combine(pathKey?.GetValue(null)?.ToString() ?? "DUMMY","python.exe");
+            var path = pathKey.GetValue("ExecutablePath")?.ToString() ?? Path.Combine(pathKey.GetValue(null)?.ToString() ?? "DUMMY","python.exe");
 
-            if (!path.Contains("DUMMY",StringComparison.Ordinal))
-                yield return (minor,fullVersion.ToString()??"0.0.0", path.ToString()??"none");
+            if (File.Exists(path))
+                yield return (minor,fullVersion.ToString()??"0.0.0", path);
         }
     }
 

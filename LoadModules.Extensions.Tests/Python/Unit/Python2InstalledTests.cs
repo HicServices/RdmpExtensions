@@ -88,7 +88,7 @@ public class Python2InstalledTests
     [Test]
     public void PythonScript_OverrideExecutablePath_DodgyFileType()
     {
-        var MyPythonScript = @"s = raw_input ('==>')";
+        const string MyPythonScript = "s = raw_input ('==>')";
 
         var py = Path.Combine(TestContext.CurrentContext.WorkDirectory, "Myscript.py");
 
