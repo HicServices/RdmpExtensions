@@ -20,7 +20,7 @@ public partial class DeAnonymiseAgainstCohortUI : Form, IDeAnonymiseAgainstCohor
     private readonly IDataExportRepository _dataExportRepository;
     public IExtractableCohort ChosenCohort { get; set; }
     public string OverrideReleaseIdentifier { get; set; }
-        
+
     public DeAnonymiseAgainstCohortUI(DataTable toProcess, IBasicActivateItems activator)
     {
         _toProcess = toProcess;
@@ -39,7 +39,7 @@ public partial class DeAnonymiseAgainstCohortUI : Form, IDeAnonymiseAgainstCohor
 
         if (_dataExportRepository == null)
             throw new Exception("DataExportRepository was not set so cannot fetch list of cohorts to advertise to user at runtime");
-         
+
         foreach (DataColumn column in toProcess.Columns)
         {
             var b = new Button
@@ -50,14 +50,14 @@ public partial class DeAnonymiseAgainstCohortUI : Form, IDeAnonymiseAgainstCohor
             b.Click += b_Click;
         }
     }
-        
+
     void b_Click(object sender, EventArgs e)
     {
         OverrideReleaseIdentifier = ((Button) sender).Text;
         CheckCohortHasCorrectColumns();
     }
 
-       
+
     private void btnChooseCohort_Click(object sender, EventArgs e)
     {
         var dialog = new SelectDialog<IMapsDirectlyToDatabaseTable>(
@@ -81,7 +81,7 @@ public partial class DeAnonymiseAgainstCohortUI : Form, IDeAnonymiseAgainstCohor
         else
             checksUI1.OnCheckPerformed(new CheckEventArgs($"Found column {release} in your DataTable",
                 CheckResult.Success));
-            
+
         lblExpectedReleaseIdentifierColumn.Text = release;
     }
 

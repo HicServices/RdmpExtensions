@@ -22,7 +22,7 @@ public class DeAnonymiseAgainstCohortTests:TestsRequiringACohort,IDeAnonymiseAga
 
         ChosenCohort = _extractableCohort;
         _deAnonymiseAgainstCohort.ConfigurationGetter = this;//we force it to use this one (otherwise it would launch a Windows Form)
-            
+
     }
 
     [Test]
@@ -45,13 +45,12 @@ public class DeAnonymiseAgainstCohortTests:TestsRequiringACohort,IDeAnonymiseAga
         using var clone = dt.Copy();  // Grab a copy of the pre-pipeline data to compare
         var result = _deAnonymiseAgainstCohort.ProcessPipelineData(dt, ThrowImmediatelyDataLoadEventListener.Quiet, new GracefulCancellationToken());
 
-        Assert.IsTrue(result.Columns.Contains("PrivateID"));
+        Assert.That(result.Columns.Contains("PrivateID"), Is.True);
 
         for(var i=0;i<result.Rows.Count;i++)
         {
-            Assert.AreEqual(
-                _cohortKeysGenerated[(string)result.Rows[i]["PrivateID"]],
-                clone.Rows[i]["ReleaseID"]);
+            Assert.That(
+                clone.Rows[i]["ReleaseID"], Is.EqualTo(_cohortKeysGenerated[(string)result.Rows[i]["PrivateID"]]));
         }
 
         OverrideReleaseIdentifier = null;
@@ -74,13 +73,12 @@ public class DeAnonymiseAgainstCohortTests:TestsRequiringACohort,IDeAnonymiseAga
             using var clone = dt.Copy();  // Grab a copy of the pre-pipeline data to compare
             using var result = _deAnonymiseAgainstCohort.ProcessPipelineData(dt, ThrowImmediatelyDataLoadEventListener.Quiet, new GracefulCancellationToken());
 
-            Assert.IsTrue(result.Columns.Contains("PrivateID"));
+            Assert.That(result.Columns.Contains("PrivateID"), Is.True);
 
             for (var i = 0; i < result.Rows.Count; i++)
             {
-                Assert.AreEqual(
-                    _cohortKeysGenerated[(string)result.Rows[i]["PrivateID"]],
-                    clone.Rows[i]["HappyFunTimes"]);
+                Assert.That(
+                    clone.Rows[i]["HappyFunTimes"], Is.EqualTo(_cohortKeysGenerated[(string)result.Rows[i]["PrivateID"]]));
             }
         }
         finally
@@ -100,7 +98,7 @@ public class DeAnonymiseAgainstCohortTests:TestsRequiringACohort,IDeAnonymiseAga
 
         var ex = Assert.Throws<ArgumentException>(() => _deAnonymiseAgainstCohort.ProcessPipelineData(dt, ThrowImmediatelyDataLoadEventListener.Quiet, new GracefulCancellationToken()));
 
-        Assert.IsTrue(ex?.Message.StartsWith("Column 'ReleaseID' does not belong to table"),$"Exception text was '{ex?.Message}'");
+        Assert.That(ex?.Message.StartsWith("Column 'ReleaseID' does not belong to table"), Is.True, $"Exception text was '{ex?.Message}'");
     }
 
     [Test]
@@ -115,7 +113,7 @@ public class DeAnonymiseAgainstCohortTests:TestsRequiringACohort,IDeAnonymiseAga
         OverrideReleaseIdentifier = "HappyFace";
 
         var ex = Assert.Throws<ArgumentException>(() => _deAnonymiseAgainstCohort.ProcessPipelineData(dt, ThrowImmediatelyDataLoadEventListener.Quiet, new GracefulCancellationToken()));
-        Assert.AreEqual(ex.Message,"Cannot DeAnonymise cohort because you specified OverrideReleaseIdentifier of 'HappyFace' but the DataTable toProcess did not contain a column of that name");
+        Assert.That(ex?.Message, Is.EqualTo("Cannot DeAnonymise cohort because you specified OverrideReleaseIdentifier of 'HappyFace' but the DataTable toProcess did not contain a column of that name"));
     }
 
 }

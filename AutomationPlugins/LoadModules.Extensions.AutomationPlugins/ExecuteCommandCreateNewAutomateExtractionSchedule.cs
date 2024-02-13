@@ -21,7 +21,7 @@ public class ExecuteCommandCreateNewAutomateExtractionSchedule : BasicAutomation
         }
 
         var existing = AutomationRepository.GetAllObjects<AutomateExtractionSchedule>();
-            
+
         if(existing.Any(s=>s.Project_ID == project.ID))
         {
             SetImpossible($"Project already has an {nameof(AutomateExtractionSchedule)}");

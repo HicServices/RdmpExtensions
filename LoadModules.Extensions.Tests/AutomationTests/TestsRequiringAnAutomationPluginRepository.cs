@@ -19,7 +19,7 @@ public class TestsRequiringAnAutomationPluginRepository:DatabaseTests
     [SetUp]
     public void CreateAutomationDatabase()
     {
-            
+
         Repo = CreateAutomationDatabaseStatic(DiscoveredServerICanCreateRandomDatabasesAndTablesOn,RepositoryLocator);
     }
 
@@ -30,7 +30,7 @@ public class TestsRequiringAnAutomationPluginRepository:DatabaseTests
             db.Drop();
 
         var patcher = new AutomateExtractionPluginPatcher();
-            
+
         var executor = new MasterDatabaseScriptExecutor(db);
         executor.CreateAndPatchDatabase(patcher, new AcceptAllCheckNotifier());
 
@@ -57,7 +57,7 @@ public class TestsRequiringAnAutomationPluginRepository:DatabaseTests
         source.CreateArgumentsForClassIfNotExists<BaselineHackerExecuteDatasetExtractionSource>();
 
         _=new PipelineComponent(catalogueRepository, validPipeline, typeof(SuccessfullyExtractedResultsDocumenter), 1);
-            
+
         var destination = new PipelineComponent(catalogueRepository, validPipeline, typeof(ExecuteDatasetExtractionFlatFileDestination), 2);
         destination.CreateArgumentsForClassIfNotExists<ExecuteDatasetExtractionFlatFileDestination>();
 

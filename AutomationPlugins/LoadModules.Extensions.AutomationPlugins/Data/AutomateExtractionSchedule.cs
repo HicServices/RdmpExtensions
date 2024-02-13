@@ -160,7 +160,7 @@ public class AutomateExtractionSchedule : DatabaseEntity, INamed
             notifier.OnCheckPerformed(new CheckEventArgs("No Ticket specified, governance will not be checked",CheckResult.Warning));
             return;
         }
-            
+
         var ticketingSystem = _repository.CatalogueRepository.GetTicketingSystem();
 
 

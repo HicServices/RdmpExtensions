@@ -19,7 +19,7 @@ public class QueuedExtraction : DatabaseEntity
     private DateTime _dueDate;
     private string _requester;
     private DateTime _requestDate;
-        
+
 
     public int ExtractionConfiguration_ID
     {

@@ -60,7 +60,7 @@ public class AutomationUserInterface : PluginUserInterface
             case IProject p:
             {
                 var schedule = GetScheduleIfAny(p);
-                
+
                 if(schedule != null)
                     return new[] { schedule };
                 break;

@@ -33,7 +33,7 @@ public class Python2InstalledTests
             Assert.Inconclusive();
         }
     }
-        
+
     [Test]
     [TestCase(false)]
     [TestCase(true)]
@@ -81,7 +81,7 @@ public class Python2InstalledTests
         //new MockRepository().DynamicMock<IDataLoadJob>()
         var ex = Assert.Throws<Exception>(()=>provider.Fetch(new ThrowImmediatelyDataLoadJob(), new GracefulCancellationToken()));
 
-        Assert.IsTrue(ex?.Message.Contains("Python command timed out"),$"Unexpected exception for timeout: {ex?.Message}");
+        Assert.That(ex?.Message.Contains("Python command timed out"), Is.True, $"Unexpected exception for timeout: {ex?.Message}");
 
     }
 
@@ -103,9 +103,9 @@ public class Python2InstalledTests
             OverridePythonExecutablePath = new FileInfo(py)
         };
         //call with accept all
-        var ex = Assert.Throws<Exception>(()=>provider.Check(new AcceptAllCheckNotifier()));
+        var ex = Assert.Throws<Exception>(() => provider.Check(new AcceptAllCheckNotifier()));
 
-        StringAssert.Contains(@"Myscript.py file is not called python.exe... what is going on here?",ex.Message);
+        Assert.That(ex?.Message, Does.Contain(@"Myscript.py file is not called python.exe... what is going on here?"));
     }
 
     [Test]
@@ -124,7 +124,7 @@ public class Python2InstalledTests
 
         var result = provider.Fetch(toMemory, new GracefulCancellationToken());
 
-        Assert.IsTrue(toMemory.EventsReceivedBySender[provider].Any(m => m.Message.Contains("can't open file 'ImANonExistentFile.py'")));
+        Assert.That(toMemory.EventsReceivedBySender[provider].Any(m => m.Message.Contains("can't open file 'ImANonExistentFile.py'")), Is.True);
 
     }
 }

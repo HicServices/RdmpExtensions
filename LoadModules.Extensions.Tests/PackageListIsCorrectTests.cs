@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace LoadModules.Extensions.Tests;
 
 /// <summary>
-/// Tests to confirm that the dependencies in csproj files (NuGet packages) match those in the .nuspec files and that packages.md 
+/// Tests to confirm that the dependencies in csproj files (NuGet packages) match those in the .nuspec files and that packages.md
 /// lists the correct versions (in documentation)
 /// </summary>
 public class PackageListIsCorrectTests
@@ -51,9 +51,12 @@ public class PackageListIsCorrectTests
         undocumented.AppendJoin(Environment.NewLine, undocumentedPackages);
 
         var unusedPackages = packagesMarkdown.Except(usedPackages).ToArray();
-        Assert.IsEmpty(unusedPackages,
-            $"The following packages are listed in PACKAGES.md but are not used in any csproj file: {string.Join(", ", unusedPackages)}");
-        Assert.IsEmpty(undocumented.ToString());
+        Assert.Multiple(() =>
+        {
+            Assert.That(unusedPackages, Is.Empty,
+                    $"The following packages are listed in PACKAGES.md but are not used in any csproj file: {string.Join(", ", unusedPackages)}");
+            Assert.That(undocumented.ToString(), Is.Empty);
+        });
     }
 
     /// <summary>
@@ -76,10 +79,11 @@ public class PackageListIsCorrectTests
             if (!Path.IsPathRooted(path)) path = Path.Combine(TestContext.CurrentContext.TestDirectory, path);
             return new DirectoryInfo(path);
         }
+
         var root = new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
         while (!root.EnumerateFiles("*.sln", SearchOption.TopDirectoryOnly).Any() && root.Parent != null)
             root = root.Parent;
-        Assert.IsNotNull(root.Parent, "Could not find root of repository");
+        Assert.That(root.Parent, Is.Not.Null, "Could not find root of repository");
         return root;
     }
 
@@ -90,7 +94,7 @@ public class PackageListIsCorrectTests
     /// <returns></returns>
     private static IEnumerable<string> GetCsprojFiles(DirectoryInfo root)
     {
-        return root.EnumerateFiles("*.csproj", EnumerationOptions).Select(f => f.FullName).Where(f => !f.Contains("tests", StringComparison.InvariantCultureIgnoreCase));
+        return root.EnumerateFiles("*.csproj", EnumerationOptions).Select(static f => f.FullName).Where(static f => !f.Contains("tests", StringComparison.InvariantCultureIgnoreCase));
     }
 
     /// <summary>
@@ -100,8 +104,8 @@ public class PackageListIsCorrectTests
     /// <returns></returns>
     private static string[] GetPackagesMarkdown(DirectoryInfo root)
     {
-        var path = root.EnumerateFiles("packages.md", EnumerationOptions).Select(f => f.FullName).ToArray();
-        Assert.False(path.Length==0, "Could not find packages.md");
+        var path = root.EnumerateFiles("packages.md", EnumerationOptions).Select(static f => f.FullName).ToArray();
+        Assert.That(path, Is.Not.Empty, "Packages.md not found");
         return path;
     }
 

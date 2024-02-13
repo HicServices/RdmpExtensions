@@ -44,7 +44,7 @@ public class SuccessfullyExtractedResultsDocumenter : IPluginDataFlowComponent<D
         {
             _sql = ds.QueryBuilder.SQL;
             _dataset = ds.DatasetBundle.DataSet;
-                
+
             var finder = new AutomateExtractionRepositoryFinder(new RepositoryProvider(ds.DataExportRepository));
             _repo = finder.GetRepositoryIfAny() as AutomateExtractionRepository;
 
@@ -60,15 +60,15 @@ public class SuccessfullyExtractedResultsDocumenter : IPluginDataFlowComponent<D
 
             //index ensure you can't have multiple so this shouldn't blow up
             _automateExtraction = matches.Single();
-               
-            //delete any old baseline records 
+
+            //delete any old baseline records
             var success = _automateExtraction.GetSuccessIfAnyFor(ds.DatasetBundle.DataSet);
             success?.DeleteInDatabase();
 
             _accumulator = IdentifierAccumulator.GetInstance(_dataLoadInfo);
 
         }
-            
+
         foreach (var value in ds.ReleaseIdentifierSubstitutions
                      .SelectMany(substitution => toProcess.Rows.Cast<DataRow>(),
                          (substitution, dr) => dr[substitution.GetRuntimeName()])
@@ -79,7 +79,7 @@ public class SuccessfullyExtractedResultsDocumenter : IPluginDataFlowComponent<D
 
         return toProcess;
     }
-        
+
     private DataTable ProcessPipelineData(ExtractGlobalsCommand globalData, DataTable toProcess, IDataLoadEventListener listener, GracefulCancellationToken cancellationToken)
     {
         listener.OnNotify(this,new NotifyEventArgs(ProgressEventType.Warning,
@@ -102,12 +102,12 @@ public class SuccessfullyExtractedResultsDocumenter : IPluginDataFlowComponent<D
 
     public void Abort(IDataLoadEventListener listener)
     {
-            
+
     }
 
     public void Check(ICheckNotifier notifier)
     {
-            
+
     }
 
     public void PreInitialize(IExtractCommand value, IDataLoadEventListener listener)

@@ -6,7 +6,7 @@ using Rdmp.Core.ReusableLibraryCode.Checks;
 namespace LoadModules.Extensions.Python.Tests.Unit;
 
 [Category("Integration")]
-public class PythonNotInstalledTests 
+public class PythonNotInstalledTests
 {
 
     [Test]
@@ -23,7 +23,7 @@ public class PythonNotInstalledTests
 
         var ex = Assert.Throws<Exception>(()=>provider.Check(ThrowImmediatelyCheckNotifier.Quiet));
 
-        Assert.IsTrue(ex?.Message.Contains("Failed to launch"));
+        Assert.That(ex?.Message.Contains("Failed to launch"), Is.True);
     }
 
     private static void InconclusiveIfPythonIsInstalled(PythonVersion version)
