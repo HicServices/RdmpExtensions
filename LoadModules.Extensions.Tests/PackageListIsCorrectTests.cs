@@ -104,7 +104,7 @@ public class PackageListIsCorrectTests
     /// <returns></returns>
     private static string[] GetPackagesMarkdown(DirectoryInfo root)
     {
-        var path = root.EnumerateFiles("packages.md", EnumerationOptions).Select(static f => f.FullName).ToArray();
+        var path = root.EnumerateFiles("packages.md", EnumerationOptions).Select(static f => f.FullName).Where(f => !f.Contains("RDMP\\Documentation\\CodeTutorials\\Packages.md")).ToArray();
         Assert.That(path, Is.Not.Empty, "Packages.md not found");
         return path;
     }
