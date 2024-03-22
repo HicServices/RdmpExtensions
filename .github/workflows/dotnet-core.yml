@@ -82,13 +82,13 @@ jobs:
           dotnet publish -p:DebugType=embedded -p:GenerateDocumentation=false Plugin/main/main.csproj -c Release -o p/main
           rm p/windows/windows.dll
           rm p/main/main.dll
-          cmd /c 7z a -tzip HIC.Rdmp.Extensions.Plugin.${{ steps.version.outputs.version }}.nupkg plugin.nuspec p
-          dotnet run --project RDMP/Tools/rdmp/rdmp.csproj -c Release -- pack -p --file HIC.Rdmp.Extensions.Plugin.${{ steps.version.outputs.version }}.nupkg --dir yaml
+          cmd /c 7z a -tzip HIC.Rdmp.Extensions.Plugin.${{ steps.version.outputs.version }}.rdmp plugin.nuspec p
+          dotnet run --project RDMP/Tools/rdmp/rdmp.csproj -c Release -- pack -p --file HIC.Rdmp.Extensions.Plugin.${{ steps.version.outputs.version }}.rdmp --dir yaml
           dotnet run --project RDMP/Tools/rdmp/rdmp.csproj -c Release -- cmd listsupportedcommands --dir yaml
-      - name: Store created nupkg files
+      - name: Store created rdmp files
         uses: actions/upload-artifact@v4
         with:
-          path: ./*.nupkg
+          path: ./*.rdmp
           retention-days: 1
       - name: Upload release binaries
         if: contains(github.ref,'refs/tags/')
@@ -96,4 +96,4 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref }}
-          file: 'HIC.Rdmp.Extensions.Plugin.${{ steps.version.outputs.version }}.nupkg'
+          file: 'HIC.Rdmp.Extensions.Plugin.${{ steps.version.outputs.version }}.rdmp'
