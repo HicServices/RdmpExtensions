@@ -173,7 +173,7 @@ public class AutomateExtractionSchedule : DatabaseEntity, INamed
             return;
         }
 
-        var evaluation = config.GetDataReleaseabilityOfTicket(Ticket, null, null, out var reason, out var exc);
+        var evaluation = config.GetDataReleaseabilityOfTicket(Ticket, null, null, [], out var reason, out var exc);
 
         if(evaluation == TicketingReleaseabilityEvaluation.Releaseable)
             return;
