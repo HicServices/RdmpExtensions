@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Rdmp.Core.Curation;
 using Rdmp.Core.Ticketing;
 using Rdmp.Core.ReusableLibraryCode.Checks;
 
@@ -22,7 +24,7 @@ public class AllowAnythingTicketing:ITicketingSystem
     }
 
     public TicketingReleaseabilityEvaluation GetDataReleaseabilityOfTicket(string masterTicket, string requestTicket,
-        string releaseTicket, out string reason, out Exception exception)
+        string releaseTicket, List<TicketingSystemReleaseStatus> _, out string reason, out Exception exception)
     {
         reason = null;
         exception = null;
@@ -30,4 +32,5 @@ public class AllowAnythingTicketing:ITicketingSystem
     }
 
     public string GetProjectFolderName(string masterTicket) => $"Project {masterTicket}";
+    public List<string> GetAvailableStatuses() => [];
 }
