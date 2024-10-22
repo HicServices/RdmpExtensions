@@ -102,3 +102,4 @@ jobs:
           tag: ${{ github.ref }}
           file_glob: true
           file: 'HIC.Rdmp.Extensions.Plugin.${{ steps.version.outputs.version }}.*'
+          overwrite: true
