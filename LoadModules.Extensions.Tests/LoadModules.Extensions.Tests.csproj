@@ -1,10 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{A6987FAF-E280-48C8-B50D-17FF34924E1D}</ProjectGuid>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
+    <TargetFramework>$(TargetFramework)-windows</TargetFramework>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
     <AssemblyTitle>LoadModules.Extensions.Tests</AssemblyTitle>
@@ -12,13 +8,6 @@
     <Copyright>Copyright ©  2019</Copyright>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
-  <ItemGroup>
-    <Content Remove="C:\Users\AzureUser_JS\.nuget\packages\hic.rdmp.plugin.test\8.1.0-rc1\contentFiles\any\net6.0\testhost.dll" />
-    <Content Remove="C:\Users\AzureUser_JS\.nuget\packages\hic.rdmp.plugin.test\8.1.0-rc1\contentFiles\any\net6.0\testhost.exe" />
-    <Content Remove="C:\Users\AzureUser_JS\.nuget\packages\microsoft.testplatform.testhost\17.5.0\build\netcoreapp3.1\x64\testhost.dll" />
-    <Content Remove="C:\Users\AzureUser_JS\.nuget\packages\microsoft.testplatform.testhost\17.5.0\build\netcoreapp3.1\x64\testhost.exe" />
-  </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SharedAssemblyInfo.cs" Link="SharedAssemblyInfo.cs" />
   </ItemGroup>
