@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Data;
 using System.Windows.Forms;
 using FAnsi.Implementations.MicrosoftSQL;
@@ -18,7 +19,11 @@ public partial class DeAnonymiseAgainstCohortUI : Form, IDeAnonymiseAgainstCohor
     private readonly DataTable _toProcess;
     private readonly IBasicActivateItems _activator;
     private readonly IDataExportRepository _dataExportRepository;
+    
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public IExtractableCohort ChosenCohort { get; set; }
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string OverrideReleaseIdentifier { get; set; }
 
     public DeAnonymiseAgainstCohortUI(DataTable toProcess, IBasicActivateItems activator)

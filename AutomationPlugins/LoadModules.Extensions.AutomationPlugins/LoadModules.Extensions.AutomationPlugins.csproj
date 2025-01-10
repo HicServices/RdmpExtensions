@@ -1,20 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
-    <RestorePackages>false</RestorePackages>
     <AssemblyTitle>LoadModules.Extensions.AutomationPlugins</AssemblyTitle>
     <Product>LoadModules.Extensions.AutomationPlugins</Product>
-    <Copyright>Copyright ©  2017</Copyright>
+    <Copyright>Copyright ©  2017-2024 Health Informatics Centre, University of Dundee</Copyright>
     <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <FileVersion>1.1.0.0</FileVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <PostBuildEvent />
-    <PostBuildEvent />
-    <PostBuildEvent />
-  </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent />
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Data\Repository\AutomationDatabasePluginPatcher.cs" />

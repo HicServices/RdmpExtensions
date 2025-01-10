@@ -1,11 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>    
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
-    <RestorePackages>false</RestorePackages>
     <AssemblyTitle>LoadModules.Extensions</AssemblyTitle>
     <Product>LoadModules.Extensions</Product>
-    <Copyright>Copyright ©  2016</Copyright>
+    <Copyright>Copyright ©  2016-2024 Health Informatics Centre, University of Dundee</Copyright>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
