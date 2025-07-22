@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using Ionic.Zip;
 using LoadModules.Extensions.ReleasePlugins.Data;
 using Newtonsoft.Json;
 using Rdmp.Core.DataExport.Data;
@@ -12,6 +11,7 @@ using Rdmp.Core.DataExport.DataRelease.Pipeline;
 using Rdmp.Core.DataExport.DataRelease.Potential;
 using Rdmp.Core.Ticketing;
 using Rdmp.Core.ReusableLibraryCode.Progress;
+using Ionic.Zip;
 
 namespace LoadModules.Extensions.ReleasePlugins;
 
