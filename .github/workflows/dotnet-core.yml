@@ -43,7 +43,7 @@ jobs:
       #     sqlcmd -l 180 -S '(localdb)\MSSQLLocalDB' -Q "SELECT @@VERSION;"
       #     sed -i'' -e 's/localhost/\(localdb\)\\MSSQLLocalDB/' RDMP/Tests.Common/TestDatabases.txt
       - name: Install a SQL Server suite of tools
-        uses: potatoqualitee/mssqlsuite@v1.8
+        uses: potatoqualitee/mssqlsuite@v1.11
         with:
           install: sqlengine, sqlclient, sqlpackage, localdb
       - name: Run sqlclient
