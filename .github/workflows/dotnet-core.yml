@@ -86,7 +86,7 @@ jobs:
           dotnet run --project RDMP/Tools/rdmp/rdmp.csproj -c Release -- pack -p --file HIC.Rdmp.Extensions.Plugin.${{ steps.version.outputs.version }}.nupkg --dir yaml
           dotnet run --project RDMP/Tools/rdmp/rdmp.csproj -c Release -- cmd listsupportedcommands --dir yaml
       - name: Store created rdmp files
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           path: |
             ./*.rdmp
