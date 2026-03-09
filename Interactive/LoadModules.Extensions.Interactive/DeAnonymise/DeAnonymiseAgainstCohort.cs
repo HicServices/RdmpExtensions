@@ -71,7 +71,7 @@ public class DeAnonymiseAgainstCohort: IPluginDataFlowComponent<DataTable>, IPip
 
     }
 
-    public void PreInitialize(IBasicActivateItems value, IDataLoadEventListener listener)
+    public void PreInitialize(IBasicActivateItems activator,IBasicActivateItems value, IDataLoadEventListener listener)
     {
         _activator = value;
     }

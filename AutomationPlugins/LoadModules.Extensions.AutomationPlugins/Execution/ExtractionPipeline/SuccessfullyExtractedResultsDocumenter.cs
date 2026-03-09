@@ -1,8 +1,6 @@
-﻿using System;
-using System.Data;
-using System.Linq;
-using LoadModules.Extensions.AutomationPlugins.Data;
+﻿using LoadModules.Extensions.AutomationPlugins.Data;
 using LoadModules.Extensions.AutomationPlugins.Data.Repository;
+using Rdmp.Core.CommandExecution;
 using Rdmp.Core.DataExport.Data;
 using Rdmp.Core.DataExport.DataExtraction.Commands;
 using Rdmp.Core.DataFlowPipeline;
@@ -12,6 +10,9 @@ using Rdmp.Core.QueryBuilding;
 using Rdmp.Core.Repositories;
 using Rdmp.Core.ReusableLibraryCode.Checks;
 using Rdmp.Core.ReusableLibraryCode.Progress;
+using System;
+using System.Data;
+using System.Linq;
 
 namespace LoadModules.Extensions.AutomationPlugins.Execution.ExtractionPipeline;
 
@@ -110,12 +111,12 @@ public class SuccessfullyExtractedResultsDocumenter : IPluginDataFlowComponent<D
 
     }
 
-    public void PreInitialize(IExtractCommand value, IDataLoadEventListener listener)
+    public void PreInitialize(IBasicActivateItems activator, IExtractCommand value, IDataLoadEventListener listener)
     {
         _extractDatasetCommand = value;
     }
 
-    public void PreInitialize(DataLoadInfo value, IDataLoadEventListener listener)
+    public void PreInitialize(IBasicActivateItems activator, DataLoadInfo value, IDataLoadEventListener listener)
     {
         _dataLoadInfo = value;
     }
