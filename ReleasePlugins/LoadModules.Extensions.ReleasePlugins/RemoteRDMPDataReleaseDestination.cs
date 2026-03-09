@@ -12,6 +12,7 @@ using Rdmp.Core.DataFlowPipeline.Requirements;
 using Rdmp.Core.Ticketing;
 using Rdmp.Core.ReusableLibraryCode.Checks;
 using Rdmp.Core.ReusableLibraryCode.Progress;
+using Rdmp.Core.CommandExecution;
 
 namespace LoadModules.Extensions.ReleasePlugins;
 
@@ -142,12 +143,12 @@ public class RemoteRDMPDataReleaseDestination : IPluginDataFlowComponent<Release
         return system?.GetProjectFolderName(masterTicket).Replace("/", "") ?? string.Empty;
     }
 
-    public void PreInitialize(Project value, IDataLoadEventListener listener)
+    public void PreInitialize(IBasicActivateItems activator, Project value, IDataLoadEventListener listener)
     {
         _project = value;
     }
 
-    public void PreInitialize(ReleaseData value, IDataLoadEventListener listener)
+    public void PreInitialize(IBasicActivateItems activator, ReleaseData value, IDataLoadEventListener listener)
     {
         _releaseData = value;
     }
