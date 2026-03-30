@@ -18,7 +18,7 @@ jobs:
           repository: HicServices/RDMP
           ref: v9.2.0-rc1
           path: RDMP
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
       - name: Get version
         id: version
         shell: cmd
